@@ -10,6 +10,8 @@ Panduan lengkap penggunaan template Otika sebagai dasar aplikasi admin/dashboard
 >
 > Font Nunito untuk shell admin/member disimpan di `public/fonts/nunito` dan dipanggil lewat `public/css/app-custom.css` dari origin aplikasi. CSS Otika tetap dimuat dari `ASSET_URL`; deklarasi font lokal mencegah permintaan font Nunito lintas origin.
 
+> Font ikon Summernote yang dirujuk oleh `bundles/summernote/summernote-bs4.css` juga harus berasal dari origin aplikasi. Berkas WOFF/TTF ada di `public/fonts/summernote`, dan `public/css/content-admin.css` mendefinisikan ulang `@font-face` setelah CSS Summernote. Untuk plugin Otika lain yang memakai font relatif, periksa permintaan font di browser sebelum dipakai; host aset eksternal belum menyediakan CORS font untuk origin lokal.
+
 ## 1. Arsitektur template
 
 Jenis halaman:
@@ -277,6 +279,8 @@ Gunakan markup Bootstrap standar:
 ```
 
 Modal menggunakan `.modal`, `.modal-dialog`, `.modal-content`, `.modal-header`, `.modal-body`, dan `.modal-footer`. Collapse memakai `data-toggle="collapse"`, `href/data-target`, dan `aria-expanded`.
+
+Untuk layout Admin, render semua modal melalui `@push('modals')` pada view. `layouts/admin.blade.php` merender `@stack('modals')` sebagai anak langsung `<body>`, di luar `#app`, `.main-wrapper`, dan `.main-content`. Bootstrap menaruh backdrop sebagai anak `<body>`; modal yang berada di dalam shell Otika dapat tertahan oleh stacking context shell sehingga backdrop menggelapkan modal dan memblokir klik. Jangan mengatasi kasus ini dengan menaikkan `z-index` modal atau backdrop secara global. Saat membuat modal baru, periksa bahwa dialog tetap terang, bisa difokuskan dan diklik, serta backdrop hanya menggelapkan halaman di belakangnya.
 
 ### Avatar, media, progress, list, empty state
 
@@ -684,7 +688,9 @@ Sidebar: Dashboard, Course Saya, Pesanan, Profil. Dashboard menampilkan course a
 
 ### 19.9 Admin: builder kurikulum
 
+- Halaman listing kategori dan course memakai seluruh lebar `.section-body` yang tersedia. Hindari `max-width` tetap pada wrapper tabel; batasi lebar hanya pada halaman dengan konten bacaan atau builder yang membutuhkan fokus.
 - Halaman daftar course memakai DataTables + modal create/edit. Field kaya (deskripsi) memakai Summernote di dalam modal besar (`modal-lg`) dan thumbnail memakai `image-preview`.
+- Panel status course menampilkan **Terbitkan course** pada draf; tombol **Arsipkan course** hanya tampil saat status terbit. Aksi arsip juga divalidasi di server.
 - Halaman **Kurikulum** (`admin.courses.curriculum`) berupa halaman kustom: daftar bab sebagai card; tiap card berisi daftar video (judul, durasi, status pemrosesan video) dan tombol Tambah Video. Tambah/ubah bab dan video memakai modal. Urutan dapat diubah (drag `sortable` Otika atau tombol naik/turun) dan disimpan via AJAX.
 - Persiapan video menggunakan halaman kustom `admin.lessons.video.prepare` (GET `/admin/lessons/{lesson}/video/prepare`) dengan konteks course/bab/video; form CRUD metadata tetap modal. Halaman memeriksa browser, tanpa pilihan OS wajib. Tampilkan batas format/ukuran/durasi dari config sebelum memilih file.
 - Tahap: Memeriksa browser → Memproses di perangkat → Mengunggah → Memvalidasi → Siap. Pisahkan progres tiap tahap, jangan membuat persen palsu jika engine tidak menyediakannya. Tampilkan pesan menjaga tab terbuka, tombol Batal/Coba lagi dan alasan browser/input tidak didukung.

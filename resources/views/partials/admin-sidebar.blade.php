@@ -15,6 +15,9 @@
                     <i data-feather="home" aria-hidden="true"></i><span>Dashboard</span>
                 </a>
             </li>
+            <li class="menu-header">KONTEN</li>
+            <li class="dropdown {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><a href="{{ route('admin.categories.index') }}" class="nav-link"><i data-feather="grid" aria-hidden="true"></i><span>Kategori</span></a></li>
+            <li class="dropdown {{ request()->routeIs('admin.courses.*') || request()->routeIs('admin.sections.*') ? 'active' : '' }}"><a href="{{ route('admin.courses.index') }}" class="nav-link"><i data-feather="book-open" aria-hidden="true"></i><span>Course</span></a></li>
         </ul>
     </aside>
 </div>

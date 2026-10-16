@@ -152,7 +152,7 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | BR-07 | Pesanan belum dibayar kedaluwarsa dalam 24 jam (dapat diatur). Satu user maksimal satu pesanan tertunda per course. |
 | BR-08 | Admin selalu dapat melihat materi untuk keperluan pratinjau. |
 | BR-09 | Admin dapat memberi akses manual; tanggal berakhir default 6 bulan dan dapat diubah dengan alasan tercatat. |
-| BR-10 | Course berstatus draft atau arsip tidak tampil di publik dan tidak dapat dibeli. Anggota lama pada course yang diarsipkan tetap dapat belajar sampai akses berakhir. |
+| BR-10 | Course berstatus draft atau arsip tidak tampil di publik dan tidak dapat dibeli. Pengarsipan hanya dapat dilakukan pada course yang sudah terbit. Anggota lama pada course yang diarsipkan tetap dapat belajar sampai akses berakhir. |
 | BR-11 | Harga disimpan dalam Rupiah bulat. Harga diskon, bila ada, harus lebih kecil dari harga normal. |
 | BR-12 | Perubahan akses (beri, perpanjang, cabut) dan perubahan status pesanan dicatat di log sistem. |
 

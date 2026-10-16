@@ -1,0 +1,33 @@
+@font-face {
+    font-family: "summernote";
+    font-style: normal;
+    font-weight: normal;
+    font-display: block;
+    src: url("../fonts/summernote/summernote4c4d.woff") format("woff"),
+        url("../fonts/summernote/summernote4c4d.ttf") format("truetype");
+}
+
+.content-admin { width: 100%; min-width: 0; }
+.content-admin--curriculum { max-width: 1440px; }
+.content-admin .card { border: 1px solid #e7e9f2; box-shadow: 0 6px 22px rgba(32, 38, 58, .05); }
+.content-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 20px 24px; }
+.content-card-header h2, .content-card-header h3, .content-admin .card-header h2 { margin: 0; color: #20263a; font-size: 1.12rem; line-height: 1.35; }
+.content-card-header p { margin: 6px 0 0; color: #667085; line-height: 1.5; }
+.content-kicker { color: #4f5ed7 !important; font-size: .75rem; font-weight: 800; letter-spacing: .09em; }
+.content-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-width: 190px; }
+.content-course-title { display: flex; align-items: center; gap: 12px; min-width: 210px; }
+.content-course-title img { width: 64px; height: 42px; object-fit: cover; border-radius: 5px; }
+.content-course-title small, .content-lesson small { display: block; color: #667085; }
+.content-thumbnail-preview { display: block; width: 160px; aspect-ratio: 16 / 9; object-fit: cover; margin-top: 12px; border-radius: 6px; }
+.content-section .card-body { padding: 16px 24px 22px; }
+.content-section-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.content-lesson { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-top: 1px solid #e7e9f2; }
+.content-order-controls { display: flex; gap: 6px; }
+.content-order-form { margin-top: 16px; }
+.content-empty-line { margin: 0; padding: 16px 0; color: #667085; }
+.content-admin .table td { vertical-align: middle; }
+.content-admin .btn-sm, body > .modal .btn-sm { min-height: 40px; }
+.content-order-controls .btn, .content-lesson .btn { min-width: 40px; }
+.content-admin .btn:focus-visible, .content-admin a:focus-visible { outline: 3px solid rgba(37, 56, 199, .35); outline-offset: 2px; }
+body > .modal .modal-body { max-height: 65vh; overflow-y: auto; }
+@media (max-width: 575.98px) { .content-card-header, .content-lesson { align-items: flex-start; flex-direction: column; } .content-actions { min-width: 0; } .content-admin .card-body { padding: 18px; } }

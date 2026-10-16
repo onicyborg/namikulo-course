@@ -291,6 +291,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 - SRS-C6: Hapus course/bab/video = soft delete. Course yang memiliki enrollment atau order tidak boleh dihapus permanen. Hapus video juga menghapus berkas video di disk privat setelah soft delete dikonfirmasi.
 - SRS-C7: Reorder menerima daftar id berurutan, memvalidasi bahwa semua id milik parent yang sama, dan menyimpan dalam satu transaksi.
 - SRS-C8: Total durasi dan jumlah video course dihitung dari relasi (`withCount`, `withSum`), tidak disimpan ganda.
+- SRS-C9: Aksi arsip hanya tersedia untuk course berstatus `published`; server menolak permintaan arsip untuk course `draft` atau `archived`.
 
 ### 5.3 User dan anggota course (Admin)
 

@@ -23,6 +23,7 @@
             @include('partials.application-footer')
         </div>
     </div>
+    @stack('modals')
     <script src="{{ asset('js/app.min.js') }}"></script>
     @stack('plugin-scripts')
     <script src="{{ asset('js/scripts.js') }}"></script>

@@ -14,7 +14,7 @@
                     <div class="card-body">
                         <p class="dashboard-eyebrow">Area admin</p>
                         <h2>Halo, {{ auth()->user()->name }}</h2>
-                        <p>Informasi akun admin Anda ada di panel sebelah. Menu pengelolaan course akan muncul saat tersedia.</p>
+                        <p>Mulai kelola kategori dan course melalui menu Konten. Siapkan kurikulum sebelum video diproses pada tahap berikutnya.</p>
                     </div>
                 </div>
             </div>

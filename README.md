@@ -2,7 +2,7 @@
 
 Platform course video berbayar dengan area admin dan member, pembayaran Midtrans Core API melalui UI custom, serta akses belajar enam bulan. Nama tampilan aplikasi mengikuti `APP_NAME`.
 
-**Status:** Phase 0 sudah diimplementasikan dan menunggu UAT user. Belum ada phase yang dinyatakan lulus. Fitur Phase 1–7 dalam dokumen merupakan target pengembangan, bukan klaim fitur sudah tersedia.
+**Status:** Phase 0 menunggu UAT user; Phase 1 lulus UAT user. Phase 2 aktif atas instruksi user, sedangkan Phase 3–7 masih target pengembangan.
 
 ## Pedoman proyek
 
@@ -33,8 +33,8 @@ Asset Otika memakai `asset()` dan `ASSET_URL`; asset aplikasi memakai `url()`/`S
 1. Salin `.env.example` menjadi `.env`, lalu isi koneksi PostgreSQL, SMTP, dan `SEED_ADMIN_*`.
 2. Jalankan `composer install` bila folder `vendor` belum tersedia.
 3. Jalankan `php artisan key:generate` hanya bila `APP_KEY` pada instalasi baru masih kosong.
-4. Jalankan migration dan seeder sesuai urutan pada [Phase 0](docs/phases/PHASE-0.md#perintah-untuk-user).
-5. Jalankan UAT Phase 0, lalu laporkan hasilnya sebelum pengembangan beralih ke Phase 1.
+4. Jalankan migration dan seeder sesuai urutan pada [Phase 0](docs/phases/PHASE-0.md#perintah-untuk-user), lalu perintah [Phase 1](docs/phases/PHASE-1.md#perintah-untuk-user). PHP extension DOM diperlukan untuk membersihkan HTML deskripsi course.
+5. Jalankan UAT Phase 0 dan [Phase 1](docs/phases/PHASE-1.md#panduan-uji-manual-uat), lalu laporkan hasilnya. Phase 1 dimulai atas instruksi eksplisit user sebelum Phase 0 dinyatakan lulus.
 
 Proyek tidak memakai npm, Vite, atau build frontend. Asset Otika dimuat dari `ASSET_URL`; CSS dan JavaScript aplikasi berada di `public/`.
 
