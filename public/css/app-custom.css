@@ -1,0 +1,309 @@
+@font-face {
+    font-family: "Namikulo Nunito";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("../fonts/nunito/nunito-v9-latin-regular.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Namikulo Nunito";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url("../fonts/nunito/nunito-v9-latin-600.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Namikulo Nunito";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("../fonts/nunito/nunito-v9-latin-700.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Namikulo Nunito";
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url("../fonts/nunito/nunito-v9-latin-800.woff2") format("woff2");
+}
+
+:root {
+    --app-primary: #6777ef;
+    --app-primary-dark: #4f5ed7;
+    --app-ink: #20263a;
+    --app-muted: #667085;
+    --app-line: #e7e9f2;
+    --app-focus: #2538c7;
+}
+
+body {
+    font-family: "Namikulo Nunito", "Segoe UI", Arial, sans-serif;
+}
+
+.skip-link {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 2000;
+    padding: 10px 14px;
+    background: #fff;
+    color: var(--app-focus);
+    border: 2px solid var(--app-focus);
+    border-radius: 6px;
+    transform: translateY(-150%);
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(37, 56, 199, .35) !important;
+    outline-offset: 2px;
+}
+
+.brand-link {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    height: 70px;
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.main-sidebar .sidebar-brand:not(.sidebar-brand-sm) {
+    padding: 0 16px;
+}
+
+.main-sidebar .sidebar-brand .brand-link .logo-name {
+    max-width: 100%;
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: .07em;
+    overflow-wrap: anywhere;
+}
+
+.nav-user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    background: var(--app-primary);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 700;
+}
+
+.main-navbar .nav-link-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--app-ink) !important;
+}
+
+.main-navbar .nav-link-user .nav-user-avatar {
+    margin-right: 0;
+}
+
+.nav-user-name {
+    display: inline-block;
+    max-width: 170px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 700;
+}
+
+.dropdown-menu form,
+.dropdown-menu form button {
+    width: 100%;
+}
+
+.dropdown-menu form button {
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.dashboard-canvas {
+    max-width: 1200px;
+}
+
+.dashboard-grid > [class*="col-"] {
+    margin-bottom: 24px;
+}
+
+.dashboard-grid .card {
+    height: 100%;
+    margin-bottom: 0;
+}
+
+.dashboard-welcome,
+.dashboard-account,
+.dashboard-course-state {
+    border: 1px solid var(--app-line);
+    box-shadow: 0 6px 22px rgba(32, 38, 58, .06);
+}
+
+.dashboard-welcome {
+    min-height: 270px;
+    border-top: 3px solid var(--app-primary);
+}
+
+.dashboard-welcome .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 40px;
+}
+
+.dashboard-welcome h2 {
+    margin-bottom: 12px;
+    color: var(--app-ink);
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-welcome p:last-child {
+    max-width: 56ch;
+    margin-bottom: 0;
+    color: var(--app-muted);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.dashboard-eyebrow {
+    margin-bottom: 12px;
+    color: var(--app-primary-dark);
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.dashboard-account .card-header {
+    min-height: 62px;
+    padding: 18px 26px;
+    border-bottom: 1px solid var(--app-line);
+}
+
+.dashboard-account .card-header h2 {
+    margin: 0;
+    color: var(--app-ink);
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.dashboard-account .card-body {
+    padding: 12px 26px 18px;
+}
+
+.account-summary {
+    margin: 0;
+}
+
+.account-summary > div {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--app-line);
+}
+
+.account-summary > div:last-child {
+    border-bottom: 0;
+}
+
+.account-summary dt,
+.account-summary dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.account-summary dt {
+    color: var(--app-muted);
+    font-weight: 600;
+}
+
+.account-summary dd {
+    color: var(--app-ink);
+}
+
+.dashboard-course-state {
+    margin-bottom: 24px;
+}
+
+.dashboard-course-state .card-body {
+    padding: 0;
+}
+
+.app-empty-state {
+    padding: 32px 24px;
+}
+
+.app-empty-state .empty-state-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 16px;
+    color: var(--app-primary);
+}
+
+.app-empty-state .empty-state-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.app-empty-state h2 {
+    font-size: 1.05rem;
+}
+
+.app-empty-state .lead {
+    color: var(--app-muted);
+    font-size: .95rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 575.98px) {
+    .main-content {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .dashboard-welcome {
+        min-height: 0;
+    }
+
+    .dashboard-welcome .card-body {
+        padding: 28px 24px;
+    }
+
+    .dashboard-account .card-header {
+        padding: 16px 22px;
+    }
+
+    .dashboard-account .card-body {
+        padding: 8px 22px 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

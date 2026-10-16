@@ -1,6 +1,6 @@
 # Phase 0: Fondasi, layout dan autentikasi
 
-Status: **Direncanakan, belum diimplementasikan atau lulus UAT**.
+Status: **Sudah diimplementasikan, menunggu UAT user**.
 
 Acuan: PRD F-101–F-104, BR-12; SRS 1–4, 5.1, 6–7; design 19.1–19.2. Lihat [roadmap](README.md), [PRD](../PRD.md), [SRS](../SRS.md), [design](../../design.md), dan [AGENTS](../../AGENTS.md). Jika ada konflik, prioritas AGENTS > SRS > PRD > design.
 
@@ -30,7 +30,7 @@ APP_NAME, APP_URL, APP_TIMEZONE=Asia/Jakarta, APP_LOCALE=id, ASSET_URL; DB_*; SE
 
 ## Perintah untuk user
 
-Perintah berikut **baru dijalankan sesudah implementasi tersedia**, dengan urutan final diperiksa kembali pada serah-terima. Agent tidak menjalankan migrate/seed atau pengujian.
+Perintah berikut dijalankan user untuk menyiapkan dan menguji hasil implementasi. Agent tidak menjalankan migrate, seed, aplikasi, atau pengujian.
 
 1. Isi .env dan koneksi database/SMTP; jangan menimpa .env existing.
 2. `composer install` jika dependency belum tersedia, setelah skrip diaudit.
@@ -52,9 +52,12 @@ Dilakukan user. Tambahkan pemeriksaan umum [roadmap](README.md#prosedur-tiap-pha
 | 3. Coba akun nonaktif, login gagal berulang, dan lintas role | Akun nonaktif ditolak, throttle bekerja, role salah 403. |
 | 4. Kirim forgot password dan pakai tautan reset sah/tidak sah | SMTP diterima user; password berubah hanya dengan token sah, tidak bocor dalam log. |
 | 5. Periksa log dan lima layout/error pada ukuran wajib | Log bersih dari rahasia; aset benar dan navigasi hanya ke route yang tersedia. |
+| 6. Buka login, daftar, reset password, serta dashboard; periksa Console dan Network browser | Tidak ada permintaan `fa-solid-900`/`fa-regular-400` yang gagal karena CORS; tombol tampil/sembunyi password tetap berfungsi. |
+| 7. Muat ulang `/admin` dan `/my/dashboard` tanpa cache; periksa Console dan Network browser | Nunito dimuat dari `/fonts/nunito/*.woff2` pada origin aplikasi; tidak ada permintaan font Nunito ke host Otika yang gagal karena CORS. |
+| 8. Buka dashboard admin dan member pada lebar 375, 768, 1024 px dan desktop | Brand sidebar tidak terpotong/bertumpuk, nama akun di navbar terbaca, judul tidak berulang, dan kartu tersusun tanpa scroll horizontal. |
 
 ## Kriteria kelulusan, asumsi dan keterbatasan
 
 Lulus setelah UAT auth/otorisasi/layout/log dinyatakan lulus user. Halaman dashboard minimal adalah batas scope, bukan dashboard produk lengkap. Tidak ada aktivasi cron-job.org pada phase ini.
 
-Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Perbaiki temuan pada phase ini sebelum meminta lanjut. Laporan akhir memuat ringkasan/file, perintah user, .env, UAT, asumsi/keterbatasan, dan kalimat: **“Sudah diimplementasikan, menunggu pengujian user. Tidak ada test yang dijalankan oleh agent.”** Gunakan kalimat implementasi itu hanya setelah kode benar-benar dibuat; dokumen ini masih rencana.
+Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Temuan UAT diperbaiki di phase ini sebelum melanjutkan ke Phase 1. **Sudah diimplementasikan, menunggu pengujian user. Tidak ada test yang dijalankan oleh agent.**

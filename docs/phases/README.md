@@ -1,6 +1,6 @@
 # Roadmap pengembangan
 
-Status: seluruh phase **Direncanakan**. Phase aktif: **belum ditetapkan user**. Dibuat 16 Oktober 2026 berdasarkan PRD/SRS versi 1.2 dan arahan cron-job.org.
+Status: Phase 0 **menunggu UAT user**; Phase 1–7 direncanakan. Phase aktif: **Phase 0**. Dibuat 16 Oktober 2026 berdasarkan PRD/SRS versi 1.2 dan arahan cron-job.org.
 
 Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen tidak mengaktifkan phase atau menyatakan implementasi selesai. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
@@ -8,7 +8,7 @@ Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen 
 
 | Phase | Hasil utama | Keterlacakan PRD | Status |
 |---|---|---|---|
-| [0](PHASE-0.md) | Fondasi, lima layout, autentikasi, role, audit log | F-101–104, BR-12 (fondasi) | Direncanakan |
+| [0](PHASE-0.md) | Fondasi, lima layout, autentikasi, role, audit log | F-101–104, BR-12 (fondasi) | Menunggu UAT user |
 | [1](PHASE-1.md) | Kategori, course, bab, metadata video | F-201–206, F-208–209; prasyarat F-207 | Direncanakan |
 | [2](PHASE-2.md) | User, enrollment manual, expiry, pemicu cron-job.org | F-301–305, BR-09/12 | Direncanakan |
 | [3](PHASE-3.md) | Landing, katalog, detail | F-401–404 | Direncanakan |
@@ -57,4 +57,4 @@ Seluruh kebutuhan M dan UAT integrasi lulus oleh user; keputusan S/C dicatat; st
 
 ## Perintah untuk user sekarang
 
-Tidak ada. Perintah tiap phase digunakan sesudah implementasi phase tersebut dan harus disesuaikan dengan migration/seeder/config aktual pada serah-terima. Tidak ada test dijalankan saat dokumen ini dibuat.
+Ikuti urutan setup dan [UAT Phase 0](PHASE-0.md#panduan-uji-manual-uat). Agent tidak menjalankan migration, seed, aplikasi, atau test.

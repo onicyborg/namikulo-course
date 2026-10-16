@@ -2,7 +2,7 @@
 
 Platform course video berbayar dengan area admin dan member, pembayaran Midtrans Core API melalui UI custom, serta akses belajar enam bulan. Nama tampilan aplikasi mengikuti `APP_NAME`.
 
-**Status:** perencanaan. Roadmap Phase 0–7 telah disusun; belum ada phase yang dinyatakan lulus. Fitur dalam dokumen merupakan target pengembangan, bukan klaim fitur sudah tersedia.
+**Status:** Phase 0 sudah diimplementasikan dan menunggu UAT user. Belum ada phase yang dinyatakan lulus. Fitur Phase 1–7 dalam dokumen merupakan target pengembangan, bukan klaim fitur sudah tersedia.
 
 ## Pedoman proyek
 
@@ -30,15 +30,13 @@ Asset Otika memakai `asset()` dan `ASSET_URL`; asset aplikasi memakai `url()`/`S
 
 ## Memulai pengembangan
 
-1. Baca pedoman dan [Phase 0](docs/phases/PHASE-0.md).
-2. User menentukan phase aktif dan menyiapkan database PostgreSQL, SMTP, serta konfigurasi lokal.
-3. Implementasikan phase aktif; jalankan hanya perkakas pengembangan yang diizinkan AGENTS.md.
-4. Agent menyerahkan perubahan, daftar perintah user dan variabel lingkungan, UAT, asumsi, serta keterbatasan.
-5. User menjalankan migration/seeder, menguji, lalu memberi keputusan lulus atau daftar perbaikan.
+1. Salin `.env.example` menjadi `.env`, lalu isi koneksi PostgreSQL, SMTP, dan `SEED_ADMIN_*`.
+2. Jalankan `composer install` bila folder `vendor` belum tersedia.
+3. Jalankan `php artisan key:generate` hanya bila `APP_KEY` pada instalasi baru masih kosong.
+4. Jalankan migration dan seeder sesuai urutan pada [Phase 0](docs/phases/PHASE-0.md#perintah-untuk-user).
+5. Jalankan UAT Phase 0, lalu laporkan hasilnya sebelum pengembangan beralih ke Phase 1.
 
-Repository awal masih membawa skrip setup/dev Laravel yang memanggil migrate dan Vite. Penyesuaiannya termasuk Phase 0; jangan memakai `composer setup`/`composer dev` sebagai petunjuk instalasi proyek sebelum diselaraskan. Tidak ada kebutuhan `npm install` atau build frontend dalam rancangan ini.
-
-Perintah pada dokumen phase adalah rencana serah-terima setelah implementasi tersedia. Jangan menjalankan semuanya sekarang. Seeder, endpoint, job, konfigurasi, dan halaman yang disebut belum tentu sudah dibuat.
+Proyek tidak memakai npm, Vite, atau build frontend. Asset Otika dimuat dari `ASSET_URL`; CSS dan JavaScript aplikasi berada di `public/`.
 
 ## Operasi dan rilis
 
@@ -48,4 +46,4 @@ Kontrak endpoint, daftar task, interval, token, serta batas batch tercantum di [
 
 Target awal persiapan video adalah browser desktop kompatibel; batas usulan sumber 200 MiB/15 menit/maksimum 720p perlu UAT. Belum menjamin semua OS/browser atau perangkat mampu memprosesnya.
 
-Belum ada perintah instalasi, migration, seed, atau test yang dijalankan dalam penyusunan dokumentasi ini.
+Agent tidak menjalankan migration, seed, aplikasi, atau test. Semua pengujian dilakukan user mengikuti panduan UAT phase aktif.

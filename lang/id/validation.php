@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'accepted' => ':attribute harus diterima.',
+    'array' => ':attribute harus berupa daftar.',
+    'boolean' => ':attribute harus bernilai benar atau salah.',
+    'confirmed' => 'Konfirmasi :attribute tidak cocok.',
+    'current_password' => 'Kata sandi saat ini tidak sesuai.',
+    'date' => ':attribute harus berupa tanggal yang valid.',
+    'email' => ':attribute harus berupa alamat email yang valid.',
+    'exists' => ':attribute yang dipilih tidak valid.',
+    'image' => ':attribute harus berupa gambar.',
+    'in' => ':attribute yang dipilih tidak valid.',
+    'integer' => ':attribute harus berupa angka bulat.',
+    'max' => [
+        'array' => ':attribute tidak boleh memiliki lebih dari :max item.',
+        'file' => 'Ukuran :attribute tidak boleh lebih dari :max kilobita.',
+        'numeric' => ':attribute tidak boleh lebih dari :max.',
+        'string' => ':attribute tidak boleh lebih dari :max karakter.',
+    ],
+    'mimes' => ':attribute harus berupa berkas dengan tipe: :values.',
+    'mimetypes' => ':attribute harus berupa berkas dengan tipe: :values.',
+    'min' => [
+        'array' => ':attribute harus memiliki sedikitnya :min item.',
+        'file' => 'Ukuran :attribute harus sedikitnya :min kilobita.',
+        'numeric' => ':attribute harus sedikitnya :min.',
+        'string' => ':attribute harus memiliki sedikitnya :min karakter.',
+    ],
+    'numeric' => ':attribute harus berupa angka.',
+    'password' => [
+        'letters' => ':attribute harus mengandung setidaknya satu huruf.',
+        'mixed' => ':attribute harus mengandung setidaknya satu huruf besar dan satu huruf kecil.',
+        'numbers' => ':attribute harus mengandung setidaknya satu angka.',
+        'symbols' => ':attribute harus mengandung setidaknya satu simbol.',
+        'uncompromised' => ':attribute pernah muncul dalam kebocoran data. Gunakan kata sandi lain.',
+    ],
+    'required' => ':attribute wajib diisi.',
+    'same' => ':attribute harus sama dengan :other.',
+    'string' => ':attribute harus berupa teks.',
+    'unique' => ':attribute sudah digunakan.',
+    'url' => ':attribute harus berupa URL yang valid.',
+
+    'attributes' => [
+        'name' => 'nama lengkap',
+        'email' => 'alamat email',
+        'password' => 'kata sandi',
+        'password_confirmation' => 'konfirmasi kata sandi',
+        'phone' => 'nomor telepon',
+        'role' => 'peran',
+    ],
+];

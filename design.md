@@ -5,6 +5,10 @@ Panduan lengkap penggunaan template Otika sebagai dasar aplikasi admin/dashboard
 > Asset sudah di-deploy. Semua contoh memakai `ASSET_URL`; jangan menyalin folder asset lokal apabila asset publik sudah tersedia.
 >
 > **Catatan proyek Platform Course:** bagian 1–18 adalah panduan template Otika. Bagian **19** menambahkan layout, token desain, dan spesifikasi halaman khusus proyek ini (landing, katalog, checkout custom, player). Bila ada konflik, bagian 19 dan `AGENTS.md` yang berlaku. Seluruh frontend memakai Blade murni (tanpa Vue/React/Alpine/Livewire).
+>
+> Font Awesome pada CSS Otika memuat berkas font dari host aset. Host tersebut belum mengirim header CORS untuk origin pengembangan lokal. Pada halaman proyek, gunakan ikon Feather atau kontrol teks sampai CORS di host aset dikonfigurasi; jangan menambahkan kelas `fas`/`far` yang memicu permintaan font lintas origin.
+>
+> Font Nunito untuk shell admin/member disimpan di `public/fonts/nunito` dan dipanggil lewat `public/css/app-custom.css` dari origin aplikasi. CSS Otika tetap dimuat dari `ASSET_URL`; deklarasi font lokal mencegah permintaan font Nunito lintas origin.
 
 ## 1. Arsitektur template
 
