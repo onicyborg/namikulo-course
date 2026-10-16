@@ -649,7 +649,7 @@ Seluruh UI dibuat sendiri dengan layout Public. Midtrans hanya dipanggil dari se
 - **Hitung mundur** batas waktu bayar (JS vanilla). Setelah habis, tampilkan state "Kedaluwarsa" dan tombol "Buat pesanan baru".
 - **Polling status** ke `/orders/{order}/status` setiap 5 detik (hentikan saat tab tidak aktif). Polling hanya memperbarui tampilan; pemberian akses tetap oleh webhook di server.
 - Saat berhasil: layar sukses dengan tanggal akses berakhir dan tombol "Mulai belajar".
-- State lain: gagal, dibatalkan, kedaluwarsa, menunggu. Tombol "Ganti metode" (membatalkan pesanan lama) dan "Batalkan pesanan".
+- State lain: gagal, dibatalkan, kedaluwarsa, menunggu. Tombol "Ganti metode" (membatalkan percobaan pembayaran lama dan membuat percobaan baru pada pesanan yang sama sesuai SRS 5.6) dan "Batalkan pesanan".
 
 Ketentuan UI: nominal selalu dalam format Rupiah (`Rp 1.250.000`), tidak ada tulisan "Midtrans" yang mengganggu selain info kepercayaan kecil di footer langkah pembayaran, dan seluruh teks berbahasa Indonesia.
 
@@ -659,7 +659,7 @@ Tata letak desktop: area video lebar (kiri) + panel kurikulum (kanan, dapat dili
 
 Komponen:
 - Header ramping: tombol kembali ke course, judul video, progres.
-- Pemutar: elemen `<video>` tanpa kontrol bawaan; kontrol custom (play/pause, seek, volume, kecepatan, kualitas, layar penuh).
+- Pemutar: elemen `<video>` tanpa kontrol bawaan; kontrol custom (play/pause, seek, volume, kecepatan, layar penuh; pilihan kualitas hanya bila ada lebih dari satu rendition).
 - Panel kurikulum: bab → video, penanda sedang diputar, penanda selesai, gembok bila tidak boleh.
 - Tombol "Sebelumnya" dan "Berikutnya".
 - Bagian deskripsi di bawah video.
@@ -682,7 +682,10 @@ Sidebar: Dashboard, Course Saya, Pesanan, Profil. Dashboard menampilkan course a
 
 - Halaman daftar course memakai DataTables + modal create/edit. Field kaya (deskripsi) memakai Summernote di dalam modal besar (`modal-lg`) dan thumbnail memakai `image-preview`.
 - Halaman **Kurikulum** (`admin.courses.curriculum`) berupa halaman kustom: daftar bab sebagai card; tiap card berisi daftar video (judul, durasi, status pemrosesan video) dan tombol Tambah Video. Tambah/ubah bab dan video memakai modal. Urutan dapat diubah (drag `sortable` Otika atau tombol naik/turun) dan disimpan via AJAX.
-- Status pemrosesan video memakai badge: Menunggu, Diproses, Siap, Gagal (dengan tombol Coba lagi).
+- Persiapan video menggunakan halaman kustom `admin.lessons.video.prepare` (GET `/admin/lessons/{lesson}/video/prepare`) dengan konteks course/bab/video; form CRUD metadata tetap modal. Halaman memeriksa browser, tanpa pilihan OS wajib. Tampilkan batas format/ukuran/durasi dari config sebelum memilih file.
+- Tahap: Memeriksa browser → Memproses di perangkat → Mengunggah → Memvalidasi → Siap. Pisahkan progres tiap tahap, jangan membuat persen palsu jika engine tidak menyediakannya. Tampilkan pesan menjaga tab terbuka, tombol Batal/Coba lagi dan alasan browser/input tidak didukung.
+- ffmpeg.wasm single-thread dimuat hanya di halaman ini, sumber tetap lokal, HLS terenkripsi satu kualitas diunggah bertahap. Refresh/tutup tab dapat mengharuskan proses ulang; jangan menjanjikan proses background atau resume otomatis setelah browser ditutup. Aset lama tetap aktif saat penggantinya disiapkan.
+- State wajib: dependency gagal dimuat, browser tidak kompatibel, memori tidak cukup, format/ukuran tidak sesuai, koneksi terputus, sesi kedaluwarsa, validasi gagal, selesai/dibatalkan. Tidak ada tombol pemilih kualitas semu pada player satu kualitas.
 - Halaman **Anggota Course** (`admin.courses.members`): tabel anggota dengan sumber (pembelian/manual), tanggal mulai, tanggal berakhir, status; aksi Tambah anggota (modal, cari user via select2), Perpanjang, Cabut akses.
 
 ### 19.10 State wajib di seluruh halaman baru

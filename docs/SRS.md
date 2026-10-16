@@ -1,6 +1,6 @@
 # SRS — Platform Course Berbayar
 
-Versi 1.0 · Status: Draf untuk persetujuan user · Tanggal: 16 Oktober 2026
+Versi 1.2 · Status: Draf; pemrosesan browser dan operasi tanpa worker · Tanggal: 16 Oktober 2026
 
 Dokumen ini adalah spesifikasi teknis yang menjadi acuan agent. Kebutuhan produk ada di [PRD.md](PRD.md); aturan kerja agent ada di [../AGENTS.md](../AGENTS.md). Bila ada konflik, urutan prioritas: AGENTS.md > SRS.md > PRD.md > design.md.
 
@@ -12,17 +12,17 @@ Kata "harus" = wajib; "sebaiknya" = dianjurkan; "boleh" = opsional.
 
 - Aplikasi monolit Laravel 12 dengan Blade. Tanpa SPA, tanpa build frontend.
 - Database: PostgreSQL (development), MySQL 8 (production). Migration portabel.
-- Queue `database`, scheduler Laravel dijalankan cron setiap menit.
+- MVP cPanel tanpa queue worker: service sinkron, QUEUE_CONNECTION=sync; cache/session database. cron-job.org memicu batch langsung lewat HTTPS (5.10), tanpa Laravel Scheduler/crontab aplikasi.
 - Penyimpanan:
   - Disk `public` (`storage/app/public`): thumbnail course, avatar.
-  - Disk `video_private` (`storage/app/private/videos`): video asli, hasil HLS, kunci. **Tidak pernah** dapat diakses langsung lewat web server.
-- Integrasi eksternal: Midtrans Core API (HTTP), SMTP, `ffmpeg`/`ffprobe` (proses lokal).
+  - Disk `video_private` (`storage/app/private/videos`): hasil HLS dan unggahan sementara; sumber asli tetap di komputer admin. Kunci persisten hanya DB terenkripsi. **Tidak pernah** dapat diakses langsung lewat web server.
+- Integrasi eksternal: Midtrans Core API (HTTP), SMTP, ffmpeg.wasm di browser admin (asset lokal), tanpa FFmpeg/ffprobe di server.
 - Pemisahan lapisan: Controller (tipis) → Service (logika bisnis) → Model. Kode Blade tidak berisi logika bisnis.
 
 ```text
-Browser ──► Laravel (Blade) ──► DB (PostgreSQL / MySQL)
+Browser admin (ffmpeg.wasm) ──► Laravel (Blade) ──► DB (PostgreSQL / MySQL)
               │   ├─► Disk video_private (HLS terenkripsi)
-              │   ├─► Queue worker ─► ffmpeg
+              │   ├─► Batch HTTP cron-job.org (tanpa worker)
               │   └─► Midtrans Core API  ◄── Webhook Midtrans
               └─► SMTP
 ```
@@ -32,24 +32,24 @@ Browser ──► Laravel (Blade) ──► DB (PostgreSQL / MySQL)
 ```text
 app/
   Enums/            UserRole, CourseStatus, EnrollmentStatus, EnrollmentSource,
-                    OrderStatus, PaymentStatus, VideoStatus
+                    OrderStatus, PaymentStatus, VideoStatus, UploadStatus
   Http/Controllers/
-    Auth/  Admin/  Member/  Site/  Checkout/  Learn/  Stream/  Webhook/
+    Auth/  Admin/  Member/  Site/  Checkout/  Learn/  Stream/  Webhook/  Operations/
   Http/Middleware/  EnsureRole, SecurityHeaders, EnsureActiveUser
   Models/           User, Category, Course, Section, Lesson, VideoAsset, Order,
                     Payment, PaymentNotification, Enrollment, LessonProgress,
-                    PlaybackSession, SystemLog
+                    PlaybackSession, SystemLog, VideoUpload, OperationState
   Policies/
   Services/
     ActivityLogger.php
     EnrollmentService.php
     Checkout/OrderService.php  Checkout/MidtransClient.php  Checkout/PaymentService.php
-    Video/VideoProcessor.php  Video/PlaybackService.php  Video/VideoDelivery.php (interface)
+    Video/VideoImportService.php  Video/PlaybackService.php  Video/VideoDelivery.php (interface)
     Video/HlsVideoDelivery.php
-  Jobs/             ProcessVideoToHls
-  Console/Commands/ ExpireEnrollments, ExpirePendingOrders, ReconcilePayments,
-                    PrunePlaybackSessions, CleanupVideoUploads
-config/              course.php  midtrans.php  video.php
+  Services/Operations/ ExpireEnrollments, ExpirePendingOrders, ReconcilePayments,
+                       PrunePlaybackSessions, CleanupVideoUploads
+                       SendAccessExpiryReminders (opsional F-509)
+config/              course.php  midtrans.php  video.php  operations.php
 resources/views/
   layouts/ (admin, member, auth, public, player)
   partials/ components/ errors/
@@ -122,14 +122,18 @@ Index: `(status, is_featured, featured_order)` bernama eksplisit.
 |---|---|---|
 | lesson_id | foreignUuid | unique, cascade |
 | status | string(20) | `pending`/`processing`/`ready`/`failed` |
-| original_path | string null | relatif disk `video_private` |
+| original_path | string null | null pada MVP browser; sumber tidak diunggah |
 | hls_path | string null | direktori HLS relatif |
 | encryption_key | text null | kunci 16 byte terenkripsi `Crypt::encryptString` (base64) |
-| renditions | json null | mis. `["720p","480p"]` |
-| duration_seconds | unsignedInteger null | dari ffprobe |
+| renditions | json null | MVP `["source"]`, satu kualitas maksimum 720p |
+| duration_seconds | unsignedInteger null | metadata browser, diverifikasi konsistensinya dengan manifest saat impor |
 | size_bytes | unsignedBigInteger null | |
 | error_message | text null | ringkas, tanpa path server |
 | processed_at | timestamp null | |
+
+**video_uploads** (staging impor, dibuat Phase 4)
+
+Kolom UUID v7 `id`, `user_id`/`lesson_id` foreignUuid, `status` string(30) (preparing/uploading/validating/ready/failed/cancelled), `encryption_key` text null (cast encrypted), `manifest` json null, `expected_bytes` unsignedBigInteger null, `received_bytes` unsignedBigInteger default 0, `validation_cursor` unsignedInteger default 0, `last_activity_at`/`expires_at` timestamp nullable, `error_message` text null, timestamps. Index `(lesson_id,status)` bernama eksplisit. Manifest menyimpan daftar segmen, ukuran/hash/durasi yang divalidasi batasnya; jangan menyimpan payload biner. FK restrict pada lesson/user selama sesi berlangsung. Record terminal dibersihkan sesuai retensi; jangan menghapus aset aktif melalui cascade sesi. Model fillable eksplisit dan enum UploadStatus. Publikasi atomik pada finalisasi memperbarui video_assets; aset lama tetap valid sampai penggantinya siap.
 
 **orders**
 
@@ -254,11 +258,17 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | Kategori | resource `categories` `->except(['show','create','edit'])` |
 | Course | resource `courses` `->except(['show','create','edit'])`; `POST courses/{course}/featured` toggle unggulan; `POST courses/{course}/publish` dan `/unpublish` |
 | Kurikulum | `GET courses/{course}/curriculum` → `admin.courses.curriculum`; `POST/PUT/DELETE courses/{course}/sections[/{section}]`; `POST courses/{course}/sections/reorder`; `POST/PUT/DELETE sections/{section}/lessons[/{lesson}]`; `POST sections/{section}/lessons/reorder` |
-| Video | `POST lessons/{lesson}/video/chunk` (unggah per potongan), `POST lessons/{lesson}/video/retry`, `GET lessons/{lesson}/video/status` (JSON), `DELETE lessons/{lesson}/video` |
+| Video | `GET lessons/{lesson}/video/prepare` → `admin.lessons.video.prepare`; `POST lessons/{lesson}/video/uploads` (inisiasi); `PUT video/uploads/{upload}/manifest`; `POST video/uploads/{upload}/chunks`; `POST video/uploads/{upload}/finalize`; `GET video/uploads/{upload}` (status); `DELETE video/uploads/{upload}` (batal); `DELETE lessons/{lesson}/video` (hapus aset). Prefix admin, nama `admin.video-uploads.*`, policy admin + ownership/lesson scope, CSRF dan throttle. Retry via sesi yang sama bila valid atau sesi baru setelah gagal; tidak menjalankan encoding server. |
 | User | resource `users` `->except(['show','create','edit'])`; `POST users/{user}/reset-password`; `POST users/{user}/toggle-active` |
 | Anggota course | `GET courses/{course}/members` → `admin.courses.members`; `POST courses/{course}/members`; `PUT members/{enrollment}` (ubah tanggal/perpanjang); `POST members/{enrollment}/revoke` |
 | Pesanan | `GET orders` → `admin.orders.index`; `GET orders/{order}` → `admin.orders.show`; `POST orders/{order}/sync` |
 | Log | `GET logs` → `admin.logs.index` (S) |
+
+### 4.6 Pemicu operasi
+
+| Method | URL | Nama | Middleware |
+|---|---|---|---|
+| POST | `/operations/jobs/{task}` | `operations.jobs.store` | `cron.token`, throttle; tanpa auth sesi, pengecualian CSRF terbatas sesuai 5.10 |
 
 ## 5. Spesifikasi fungsional
 
@@ -302,7 +312,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 
 - SRS-E1: `EnrollmentService::activeFor(User $user, Course $course): ?Enrollment` mengembalikan enrollment dengan `status = active` **dan** `expires_at > now()`. Seluruh pemeriksaan akses (halaman belajar, playback, key, segmen, heartbeat) memakai method ini; kolom `status` saja tidak dipercaya.
 - SRS-E2: Pembuatan enrollment dari pembelian: `starts_at = payment.paid_at`, `expires_at = starts_at->copy()->addMonthsNoOverflow($course->access_months)`.
-- SRS-E3: Command `enrollments:expire` (terjadwal tiap jam) mengubah `active` → `expired` bila `expires_at <= now()` dan mencabut sesi pemutarannya.
+- SRS-E3: Service `ExpireEnrollments` (dipicu cron-job.org tiap jam; bagian 5.10) mengubah `active` → `expired` bila `expires_at <= now()` dan mencabut sesi pemutarannya.
 - SRS-E4: Pembelian dilarang bila `activeFor` ada (BR-04). Setelah kedaluwarsa, enrollment baru dibuat (baris baru), baris lama tetap sebagai riwayat.
 - SRS-E5: Admin (`role = admin`) dianggap memiliki akses pratinjau ke semua course tanpa enrollment, dan sesi pratinjau tidak mengubah progres.
 
@@ -343,42 +353,32 @@ Aturan umum: seluruh logika di `OrderService` dan `PaymentService`; `MidtransCli
    - Status tidak boleh turun dari `paid` ke status non-lunas oleh notifikasi yang datang terlambat/urutan terbalik.
 6. `createFromOrder` idempoten: bila sudah ada enrollment untuk `order_id` tersebut, tidak membuat baru. Unique index pada `enrollments.order_id` adalah pengaman terakhir.
 7. Selalu balas HTTP 200 setelah notifikasi sah diproses (termasuk bila sudah pernah diproses) agar Midtrans tidak mengirim ulang tanpa henti.
-8. Catat hasil di `payment_notifications.process_result` dan `system_logs`. Kirim email sukses secara queued (S).
+8. Catat hasil di `payment_notifications.process_result` dan `system_logs`. Email sukses (S) dikirim sinkron setelah commit dengan timeout SMTP; kegagalan email tidak membatalkan pembayaran/enrollment atau mengubah respons webhook menjadi gagal. Simpan `orders.payment_email_sent_at` dan `payment_email_last_attempt_at` (timestamp nullable, migration Phase 5) sebagai penanda hasil/percobaan, dan sediakan retry manual admin berotorisasi. Lock per order mencegah pengiriman bersamaan; timeout SMTP setelah pengiriman dapat menghasilkan hasil tidak pasti, jadi jangan menjanjikan exactly-once email atau retry otomatis tanpa batas.
 
 **Penjadwalan**
 
-- `orders:expire-pending` tiap 10 menit: untuk order `pending` yang lewat `expires_at`, cek dulu status ke Midtrans (hindari menandai kedaluwarsa pesanan yang sebenarnya sudah dibayar), lalu tandai `expired`.
-- `payments:reconcile` tiap 15 menit (S): cek status payment `pending` berumur > 10 menit sebagai jaring pengaman webhook terlambat.
+- Service `ExpirePendingOrders`, dipicu cron-job.org tiap 10 menit: untuk order `pending` yang lewat `expires_at`, cek dulu status ke Midtrans (hindari menandai kedaluwarsa pesanan yang sebenarnya sudah dibayar), lalu tandai `expired`.
+- Service `ReconcilePayments`, dipicu cron-job.org tiap 15 menit (S): cek status payment `pending` berumur > 10 menit sebagai jaring pengaman webhook terlambat.
 - Admin dapat menekan "Sinkron" pada order (`admin.orders.sync`), memanggil logika yang sama.
 
 **Metode pembayaran MVP:** Virtual Account (BCA, BNI, BRI, Permata, CIMB), QRIS, GoPay, ShopeePay. Daftar yang tampil diambil dari `config('midtrans.enabled_channels')` sehingga mengikuti kanal yang aktif di akun merchant. Kartu kredit tidak termasuk MVP.
 
 ### 5.7 Pemutar dan pengiriman video terlindungi
 
-**Unggah**
+**Persiapan di browser dan impor tanpa worker (menggantikan encoding server)**
 
-- SRS-V1: Unggah dari modal memakai Dropzone dengan `chunking`, ukuran potongan 5 MB, ke `admin/lessons/{lesson}/video/chunk`. Server menyimpan potongan di `videos/tmp/{upload_id}`, menyusunnya setelah potongan terakhir, memvalidasi ekstensi (`mp4`, `mov`, `mkv`, `webm`) dan isi lewat `ffprobe` (harus memiliki stream video). Tolak jika ukuran melebihi `config('video.max_size_mb')`.
-- SRS-V2: Membuat/menimpa `video_assets` dengan `status = pending`, lalu dispatch job `ProcessVideoToHls` ke queue.
-- SRS-V3: Server harus dikonfigurasi (`upload_max_filesize`, `post_max_size`, `client_max_body_size`) minimal sebesar ukuran potongan + overhead. Hal ini dicatat di panduan deployment.
+- SRS-V1: Halaman admin memeriksa HTTPS, WebAssembly, Web Worker dan Web Crypto sebelum memilih file. Tidak memakai OS sebagai penentu; Windows/macOS/Linux lewat browser desktop yang lulus UAT. Mulai Chrome/Edge desktop; Firefox/Safari dievaluasi terpisah. HP/tablet bukan target persiapan MVP, tetapi tetap target player sesuai NFR-C1.
+- SRS-V2: ffmpeg.wasm single-thread, wrapper/core/worker dipin versi, di-host di `public/vendor/ffmpeg/` via `url()`, dimuat hanya pada halaman admin terkait. Gunakan distribusi siap pakai tanpa Vite/npm build/frontend framework. Periksa dukungan module worker dan MIME WASM di hosting. Multi-thread/SharedArrayBuffer tidak menjadi persyaratan MVP; jangan memasang COOP/COEP global tanpa kebutuhan.
+- SRS-V3: Batas usulan awal: sumber MP4 H.264 8-bit yuv420p, audio AAC bila ada, dimensi landscape <=1280x720 (portrait <=720x1280), durasi <=900 detik dan ukuran <=200 MiB. Nilai ini batas konfigurasi awal untuk UAT, bukan kapasitas terjamin. Periksa codec/dimensi/durasi melalui metadata engine browser; MIME/ekstensi saja tidak cukup. Input tidak sesuai ditolak dengan petunjuk ekspor ulang. Tidak mengonversi video bebas atau membuat dua resolusi pada MVP.
+- SRS-V4: Browser menjalankan stream copy satu rendition `source`, HLS VOD MPEG-TS dengan target segmen 6 detik. Batas segmen mengikuti keyframe sumber, tidak selalu persis 6 detik; tolak profil yang menghasilkan segmen melebihi batas upload yang diizinkan. Target GOP sumber disarankan <=6 detik. Verifikasi kemampuan HLS muxer dan AES-128 dari build yang dipin melalui UAT user; jangan mengasumsikan semua build mendukungnya.
+- SRS-V5: Buat kunci 16 byte dengan `crypto.getRandomValues` per percobaan impor. Kunci hanya sementara di memori/virtual FS browser untuk HLS key info. Kirim via HTTPS body autentikasi admin+CSRF ke sesi impor, simpan dengan Crypt di DB; redaksi payload key pada seluruh logger. Jangan menggunakan server secret di browser, localStorage, URL atau file publik untuk kunci. Playback key tetap hanya lewat endpoint sesi sah. Hapus virtual key/files setelah proses, batal atau gagal sebisa mungkin.
+- SRS-V6: Upload sumber asli tidak dilakukan. Browser mengirim hasil manifest dan segmen melalui fetch/FormData bertahap, satu video aktif per admin dengan lock server. Chunk maksimal 5 MiB, jalur/nama ditentukan server, potongan bernomor dengan hash/ukuran serta retry idempoten (isi berbeda untuk nomor sama ditolak). Database video_uploads melacak owner, lesson, key terenkripsi, status/manifest/cursor/expiry. Putus koneksi dapat melanjutkan upload bila hasil masih ada di browser dan sesi sah; refresh/tutup tab bisa membutuhkan pemilihan sumber dan proses ulang. Tidak menjanjikan resume lintas restart browser.
+- SRS-V7: Server tidak menjalankan executable atau menerima ZIP bebas. Allow-list `source`, `index.m3u8`, `seg_\d{5}\.ts`; batas jumlah 2.000 segmen, total hasil awal <=250 MiB, ukuran segmen <=10 MiB, manifest <=1 MiB. Semua batas di config. Tolak traversal, symlink, URI eksternal, tag HLS tidak diizinkan dan ukuran/hash berbeda. Client dianggap tidak tepercaya: hash bukan bukti konten aman. Server memvalidasi struktur manifest (VOD/endlist, jumlah/durasi/sequence/IV), kelengkapan file, panjang ciphertext AES, dan struktur TS setelah dekripsi bertahap dengan OpenSSL sebelum ready. Validasi ini tidak membuktikan codec/durasi frame secara penuh tanpa decoder server; metadata bukan dasar otorisasi. Simpan hanya privat, jangan mengeksekusi hasil upload, selalu sajikan tipe konten yang ditetapkan server.
+- SRS-V8: `finalize` memvalidasi sejumlah segmen per request dengan cursor tersimpan, batas waktu maksimal 10 detik; browser mengulang hingga selesai. Respons `200` mencakup status validating/ready, progress dan next cursor; tidak ada antrean. Gunakan lock sesi, verifikasi expected bytes/semua segmen, lalu transaksi singkat mengganti pointer video_assets + durasi lesson hanya setelah lengkap. Aset lama tetap dapat diputar hingga aset baru siap; folder versi baru memakai upload UUID. Kegagalan/timeout tidak boleh menerbitkan hasil parsial. Retry stale dengan lease/token pemilik lock; cleanup tidak boleh menghapus finalisasi aktif. Simpan status gagal dan sumber lokal tetap diperlukan untuk proses ulang. Penyimpanan: `{lesson_id}/{upload_id}/hls/source/`; manifest penyajian dibuat/ditulis ulang server, key tidak menjadi file publik.
 
-**Pemrosesan (`ProcessVideoToHls`)**
+UI membedakan Memeriksa browser, Memproses di perangkat, Mengunggah, Memvalidasi, Siap, Gagal/Dibatalkan. video_assets hanya mencerminkan aset yang sudah aktif atau kegagalan pertama; progres staging ada di video_uploads agar penggantian tidak mematikan aset lama. Jangan memakai `dispatch`, ProcessVideoToHls, `proc_open`, atau worker server. Enkripsi browser tidak membuktikan keaslian pengunggah; seluruh endpoint wajib policy admin dan scope sesi.
 
-- SRS-V4: Status `processing`. `ffprobe` mengambil durasi, simpan ke `video_assets` dan `lessons.duration_seconds`.
-- SRS-V5: Buat kunci acak 16 byte per video, simpan terenkripsi (`Crypt`) di `video_assets.encryption_key`, dan tulis file kunci sementara untuk `-hls_key_info_file` (file dihapus setelah selesai). Untuk setiap rendition (`config('video.renditions')`, default 720p dan 480p), jalankan ffmpeg dengan pola:
-
-```text
-ffmpeg -y -i <input> \
-  -vf scale=-2:<height> -c:v libx264 -preset veryfast -profile:v main -crf 23 \
-  -c:a aac -b:a 128k \
-  -hls_time 6 -hls_playlist_type vod \
-  -hls_key_info_file <keyinfo> \
-  -hls_segment_filename <dir>/<rendition>/seg_%05d.ts \
-  <dir>/<rendition>/index.m3u8
-```
-
-- SRS-V6: Jalankan ffmpeg lewat `Symfony\Component\Process\Process` dengan argumen array (bukan string shell), timeout besar, dan tanpa memasukkan nama file dari user ke perintah. Nama file selalu dari ID/UUID internal.
-- SRS-V7: Berhasil → `status = ready`, `processed_at`, simpan daftar rendition, hapus file temporer; file asli boleh dipertahankan di disk privat (`config('video.keep_original')`). Gagal → `status = failed`, `error_message` ringkas (tanpa path), log detail di log aplikasi, job dapat dicoba ulang dari admin.
-- SRS-V8: Struktur penyimpanan: `videos/{lesson_id}/original.<ext>`, `videos/{lesson_id}/hls/{rendition}/seg_*.ts`, `index.m3u8`. Master playlist dibuat saat penyajian, bukan disimpan.
+Referensi: [ffmpeg.wasm overview](https://ffmpegwasm.netlify.app/docs/overview/) dan [FAQ](https://ffmpegwasm.netlify.app/docs/faq/). Web Worker di sini milik browser, berbeda dari queue worker Laravel. Batas dan keberhasilan HLS AES-128 harus ditetapkan berdasarkan UAT user, bukan klaim sudah diverifikasi.
 
 **Memulai pemutaran**
 
@@ -399,7 +399,7 @@ Semua rute stream: middleware `auth`, throttle, dan `SecurityHeaders`. Token di 
 **Sisi klien (`pages/player.js`, vanilla JS + hls.js)**
 
 - SRS-V17: Gunakan `hls.js` bila `Hls.isSupported()`; jika tidak dan `canPlayType('application/vnd.apple.mpegurl')` benar (Safari/iOS), gunakan HLS native.
-- SRS-V18: `<video>` tanpa atribut `controls`; kontrol custom. Atribut `controlsList="nodownload noremoteplayback"`, `disablePictureInPicture`, `playsinline`. Blokir `contextmenu` pada area player.
+- SRS-V18: `<video>` tanpa atribut `controls`; kontrol custom; selector kualitas disembunyikan untuk satu rendition. Atribut `controlsList="nodownload noremoteplayback"`, `disablePictureInPicture`, `playsinline`. Blokir `contextmenu` pada area player.
 - SRS-V19: Watermark: elemen overlay di atas video dengan teks `nama · email` (email disamarkan sebagian bila diinginkan), opasitas rendah, `pointer-events: none`, berpindah posisi tiap 20–30 detik, dan dibangun ulang bila dihapus (MutationObserver). Teks diambil dari respons playback, bukan hardcode.
 - SRS-V20: `visibilitychange`/`blur` → pause + blur area video. CSS `@media print` menyembunyikan konten. Deteksi tombol `PrintScreen` → sembunyikan sementara (best effort).
 - SRS-V21: Kirim heartbeat; hentikan pemutaran saat server menolak. Simpan progres (`learn.progress`) tiap 15 detik dan saat jeda/selesai.
@@ -421,6 +421,35 @@ Semua rute stream: middleware `auth`, throttle, dan `SecurityHeaders`. Token di 
 
 KPI (`card-statistic-*`): total user, course terbit, enrollment aktif, pendapatan bulan ini (pesanan `paid`), pesanan tertunda. Tabel pesanan terbaru dan video gagal diproses. Query harus efisien (agregasi, tanpa N+1).
 
+### 5.10 Pemicu berkala melalui cron-job.org
+
+cron-job.org memanggil endpoint HTTPS yang menjalankan batch service sinkron. Tidak ada queue worker, dispatch, atau Laravel Scheduler. [FAQ resmi cron-job.org](https://cron-job.org/en/faq/) mendokumentasikan POST/header dan batas respons; target request maksimal 10 detik dengan margin terhadap batas hosting/layanan.
+
+**Kontrak endpoint**
+
+- `POST /operations/jobs/{task}`, nama `operations.jobs.store`, controller `Operations/ScheduledJobController`. Nama URL dipertahankan; jobs berarti task berkala, bukan Laravel queued job. Task harus berasal allow-list di bawah, bukan class/command/shell dari request.
+- HTTPS production, header `Authorization: Bearer <OPERATIONS_CRON_TOKEN>` dibandingkan via hash_equals, token acak minimal 32 byte; config kosong menonaktifkan endpoint. Token tidak berada di URL/log/respons/repository.
+- Middleware cron.token, tanpa auth sesi/redirect; CSRF dikecualikan hanya operations/jobs/*, throttle 30 request/menit/IP. GET tidak menjalankan pekerjaan.
+- Respons `200` berisi status completed/partial/busy, processed dan remaining (jumlah atau boolean sesuai query). completed berarti batch eligible saat itu selesai; partial berarti masih ada pekerjaan. `401` token salah, `404` task tidak dikenal, `429` throttle, `503` konfigurasi nonaktif atau dependency gagal. Jangan menggunakan queued/202 sebagai klaim hasil.
+- Setiap request dibatasi jumlah record (default 20), waktu (default 10 detik), serta timeout koneksi/HTTP/SMTP lebih pendek daripada sisa anggaran. Hindari retry menunggu di dalam request. Sisa data dilanjutkan pada pemicu berikutnya menggunakan state persisten; cron-job.org tidak otomatis mengikuti cursor respons.
+- Lock atomik database cache per task, TTL lebih panjang daripada batas request; pelepasan hanya oleh owner. Mutasi bisnis idempoten, transaksi singkat/lock row. Tulis checkpoint setelah tiap unit berhasil, jangan melewati item gagal selamanya: simpan next eligible/retry/backoff dan pastikan siklus scan kembali mencakupnya.
+- Tabel `operation_states` dibuat Phase 2: UUID v7, task string(80) unique, cursor JSON nullable (tanpa default), last_started_at/last_succeeded_at/next_attempt_at timestamp nullable, last_error string nullable, timestamps. Detail cursor/retry hanya ID/status/waktu, tidak rahasia. Cache lock tidak menggantikan checkpoint persisten. Pantau lag/last_success, status partial, serta jumlah gagal di system_logs; jangan mengandalkan HTTP 200 saja.
+
+| Task | Pemicu Asia/Jakarta | Service | Phase |
+|---|---|---|---|
+| expire-enrollments | Tiap jam | ExpireEnrollments | 2 |
+| prune-playback-sessions | Tiap 15 menit | PrunePlaybackSessions | 4 |
+| cleanup-video-uploads | Tiap 15 menit | CleanupVideoUploads | 4 |
+| expire-pending-orders | Tiap 10 menit | ExpirePendingOrders | 5 |
+| reconcile-payments | Tiap 15 menit | ReconcilePayments | 5 (S) |
+| send-access-expiry-reminders | Tiap 15 menit, mulai setelah 08:00 | SendAccessExpiryReminders | 7, hanya jika F-509 dipilih |
+
+Pemicu cleanup lebih sering dari rancangan lama agar batch kecil dapat mengejar backlog. Retensi sesi berakhir/dicabut 30 hari; unggahan tidak aktif >24 jam. Jangan menghapus sesi impor aktif, folder aset yang dirujuk, atau hasil penggantian sebelum swap atomik. Reminder hanya eligible satu kali per enrollment/tanggal akhir pada hari H-7; timestamp/penanda persisten dan lock diperlukan, termasuk keterbatasan hasil SMTP tidak pasti. Aktifkan jadwal hanya saat fiturnya tersedia.
+
+User mengatur URL aktual, POST, header rahasia, zona waktu dan notifikasi gagal melalui dashboard cron-job.org; tidak memerlukan API key layanan di aplikasi. Staging HTTPS/tunnel disediakan user untuk UAT. User memeriksa pemicu berulang, partial continuation, timeout, recovery checkpoint, rotasi token dan backlog. Jika batch tertinggal, sesuaikan frekuensi dalam batas hosting atau rencanakan VPS; jangan diam-diam menambah worker.
+
+Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak berarti lunas/kedaluwarsa. Rekonsiliasi/admin sync menggunakan verifikasi server dan service idempoten yang sama dengan webhook. Polling browser tetap hanya membaca DB. Akses expired tetap ditolak langsung meskipun maintenance terlambat. Backup dikelola user/provider, bukan endpoint perintah bebas.
+
 ## 6. Kebutuhan non-fungsional
 
 **Keamanan**
@@ -428,7 +457,7 @@ KPI (`card-statistic-*`): total user, course terbit, enrollment aktif, pendapata
 - NFR-S1: Seluruh akses data di-scope di server (cegah IDOR): member hanya dapat melihat order/enrollment/progres miliknya.
 - NFR-S2: Header keamanan lewat `SecurityHeaders`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal. `Content-Security-Policy` didefinisikan di Phase 4 setelah daftar sumber script (host asset Otika, cdnjs/hls.js, Google Fonts bila dipakai) diketahui, dengan `media-src 'self' blob:`.
 - NFR-S3: Rate limiting: login, register, forgot/reset, checkout, polling status, stream, webhook.
-- NFR-S4: Kunci Midtrans dan kunci enkripsi video tidak muncul di log, respons, atau Blade. `APP_KEY` dijaga; mengganti `APP_KEY` membuat `encryption_key` video tidak terbaca, jadi dokumentasikan dan sediakan prosedur backup.
+- NFR-S4: Kunci Midtrans dan kunci konten tidak muncul di log/Blade atau respons umum. Pengecualian kunci konten hanya input HTTPS impor admin dan respons endpoint playback key terotorisasi; key browser dibuat lokal sesuai V5. `APP_KEY` dijaga; mengganti `APP_KEY` membuat `encryption_key` video tidak terbaca, jadi dokumentasikan dan sediakan prosedur backup.
 - NFR-S5: Upload divalidasi MIME, ekstensi, ukuran, dan diberi nama acak. HTML dari editor disanitasi.
 - NFR-S6: Password di-hash bawaan Laravel (bcrypt/argon). Sesi di-regenerate saat login.
 
@@ -441,9 +470,9 @@ KPI (`card-statistic-*`): total user, course terbit, enrollment aktif, pendapata
 **Keandalan dan operasional**
 
 - NFR-R1: Operasi pembayaran dan enrollment atomik (transaksi) dan idempoten.
-- NFR-R2: Job queue memiliki `tries` dan `timeout`; job gagal masuk `failed_jobs` dan dapat dicoba ulang dari admin untuk video.
+- NFR-R2: Impor video dan batch operasi memiliki lock, batas waktu, checkpoint, retry terbatas serta status kegagalan persisten; tidak bergantung failed_jobs atau worker. Email sinkron dengan timeout, gagal kirim tidak membatalkan transaksi bisnis.
 - NFR-R3: Cadangan database dan folder `storage/app/private/videos` harus dijadwalkan oleh user/server (di luar kode); dokumentasikan.
-- NFR-R4: Cron `* * * * * php artisan schedule:run` dan worker queue (supervisor atau cron `queue:work --stop-when-empty`) harus aktif di production.
+- NFR-R4: Pemicu cron-job.org sesuai 5.10 aktif di production; pantau hasil batch dan backlog. Tidak memakai Laravel Scheduler/crontab aplikasi atau worker server.
 
 **Kompatibilitas**
 
@@ -472,7 +501,7 @@ ASSET_URL=https://otika.namikulo.com/assets
 
 DB_CONNECTION=pgsql          # production: mysql
 SESSION_DRIVER=database
-QUEUE_CONNECTION=database
+QUEUE_CONNECTION=sync
 CACHE_STORE=database
 
 MAIL_MAILER= MAIL_HOST= MAIL_PORT= MAIL_USERNAME= MAIL_PASSWORD= MAIL_FROM_ADDRESS=
@@ -487,40 +516,53 @@ MIDTRANS_CLIENT_KEY=
 MIDTRANS_ENABLED_CHANNELS=bca,bni,bri,permata,cimb,qris,gopay,shopeepay
 
 VIDEO_DISK=video_private
-VIDEO_FFMPEG_PATH=ffmpeg
-VIDEO_FFPROBE_PATH=ffprobe
-VIDEO_MAX_SIZE_MB=2048
+VIDEO_SOURCE_MAX_SIZE_MB=200
+VIDEO_SOURCE_MAX_DURATION_SECONDS=900
+VIDEO_UPLOAD_MAX_SIZE_MB=250
+VIDEO_SEGMENT_MAX_SIZE_MB=10
+VIDEO_MAX_SEGMENTS=2000
 VIDEO_SESSION_TTL_MINUTES=10
 VIDEO_HEARTBEAT_SECONDS=60
-VIDEO_KEEP_ORIGINAL=true
 VIDEO_ACCEL_REDIRECT=false
+
+OPERATIONS_CRON_TOKEN=
+OPERATIONS_PLAYBACK_RETENTION_DAYS=30
+OPERATIONS_UPLOAD_STALE_HOURS=24
+OPERATIONS_BATCH_SIZE=20
+OPERATIONS_MAX_SECONDS=10
 
 SEED_ADMIN_NAME=
 SEED_ADMIN_EMAIL=
 SEED_ADMIN_PASSWORD=
 ```
 
-Konfigurasi aplikasi dibaca lewat `config('course.*')`, `config('midtrans.*')`, `config('video.*')`. Jangan memanggil `env()` di luar file config.
+Konfigurasi aplikasi dibaca lewat `config('course.*')`, `config('midtrans.*')`, `config('video.*')`, `config('operations.*')`. Jangan memanggil `env()` di luar file config.
 
 ## 8. Catatan deployment (production MySQL)
 
 1. Jalankan migration di MySQL staging sebelum rilis untuk memastikan kompatibilitas.
-2. Pastikan `ffmpeg` dan `ffprobe` terpasang, atau pindahkan pemrosesan video ke luar server.
+2. Pastikan OpenSSL PHP, storage privat, HTTPS, MIME application/wasm, asset worker/core lokal dan browser admin kompatibel. Tidak membutuhkan ffmpeg/ffprobe di hosting.
 3. Atur `upload_max_filesize`, `post_max_size`, `client_max_body_size`, `max_execution_time` untuk potongan unggahan.
 4. Daftarkan URL notifikasi di dashboard Midtrans: `https://<domain>/webhooks/midtrans`.
 5. Pastikan folder `storage/app/private` tidak dapat diakses langsung oleh web server.
-6. Pasang cron scheduler dan worker queue; pantau `failed_jobs`.
+6. Konfigurasikan cron-job.org sesuai 5.10; pantau hasil batch, checkpoint dan backlog. Tidak menjalankan queue:work/Supervisor.
 7. Jalankan `php artisan storage:link`, `config:cache`, `route:cache`, `view:cache` (user).
 
 ## 9. Keterlacakan phase
+
+Detail urutan dan dependensi ada di [roadmap](phases/README.md). Publikasi positif menunggu Phase 4, checkout Phase 5, dan progres Phase 6. F-306/F-307 dipusatkan di Phase 5; F-105 di Phase 6. Phase 2 membuat skema orders hanya sebagai prasyarat FK enrollment, tanpa integrasi pembayaran.
 
 | Phase | Cakupan PRD | Bagian SRS utama |
 |---|---|---|
 | 0 | F-101–F-104 (dasar), BR-12 (log) | 3, 5.1, 6, 7 |
 | 1 | F-201–F-209 (metadata; belum video) | 5.2 |
-| 2 | F-301–F-307 (F-306/F-307 sebagian), F-105 | 5.3 |
+| 2 | F-301–F-305, enrollment manual dan expiry | 5.3, 5.5 (manual), 5.10 |
 | 3 | F-401–F-404 | 5.4 |
-| 4 | F-207, F-602, F-603, F-701–F-706 | 5.7 |
-| 5 | F-501–F-508, F-605, BR-02, BR-04–BR-07 | 5.5, 5.6 |
+| 4 | F-207–F-208, F-602, F-603, F-701–F-706 | 5.7, 5.10 |
+| 5 | F-306–F-307, F-501–F-508, F-605, BR-02, BR-04–BR-07 | 5.5, 5.6, 5.10 |
 | 6 | F-601, F-604, F-507, F-105 | 5.8 |
-| 7 | F-509, dashboard, audit | 5.9, 6, 8 |
+| 7 | F-509 (opsional), dashboard, audit dan kesiapan rilis | 5.9, 5.10, 6, 8 |
+
+## 10. Jalur peningkatan setelah MVP
+
+Saat pindah ke VPS, service impor dan VideoDelivery dapat dipertahankan sambil menambah pemrosesan sumber di server lewat queue. Encoding multikualitas dan retry background memerlukan revisi phase/scope tersendiri; tidak diimplementasikan pada MVP cPanel.

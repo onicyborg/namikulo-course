@@ -61,7 +61,7 @@ Seeder tidak boleh berisi kredensial hardcode. Ambil dari `.env` (mis. `SEED_ADM
 - Sebuah phase dianggap **selesai hanya setelah user memberi feedback hasil test langsung** dan menyatakan lulus. Agent tidak boleh menandai phase selesai atas inisiatif sendiri.
 - Jika user melaporkan bug pada phase aktif, perbaiki di phase tersebut sampai user menyatakan lulus.
 - Jangan berpindah phase tanpa instruksi eksplisit user, misalnya "Phase 1 lulus, lanjut Phase 2".
-- Detail phase berikutnya (`PHASE-N.md`) dibuat setelah phase sebelumnya lulus. Jika file belum ada, jangan mengarang scope; gunakan ringkasan di `docs/phases/README.md` dan minta konfirmasi user.
+- Atas permintaan user, seluruh dokumen Phase 0–7 disiapkan di muka berdasarkan PRD/SRS. Dokumen adalah rencana, bukan izin implementasi atau kelulusan. Cocokkan dengan revisi terbaru dan hasil UAT sebelum memulai setiap phase.
 
 ### 0.4 Skill yang tersedia
 
@@ -90,7 +90,8 @@ Akhiri setiap sesi kerja dengan laporan ringkas berisi:
 - Frontend: **Blade templating murni**. Lihat bagian 4.
 - UI: Otika Admin Template (Bootstrap 4, jQuery, CSS Otika, Feather Icons, Font Awesome, plugin halaman) sesuai `design.md`.
 - Database development: **PostgreSQL**. Database production: **MySQL**. Migration harus berjalan di keduanya (bagian 2).
-- Queue/cache/session: driver `database`, kecuali SRS menentukan lain.
+- MVP cPanel tanpa queue worker server: `QUEUE_CONNECTION=sync`; service dipanggil langsung, bukan mengantrekan pekerjaan. Cache/session memakai `database`. Web Worker ffmpeg.wasm berjalan di browser admin dan diizinkan.
+- Penjadwalan aplikasi memakai **cron-job.org** melalui endpoint HTTPS berautentikasi token. Dilarang memakai Laravel Scheduler (`Schedule`, `schedule:run`, `schedule:work`) atau crontab aplikasi. Endpoint menjalankan task allow-list dalam batch singkat dengan lock dan checkpoint; tanpa dispatch queue atau worker server. Lihat SRS bagian 5.10.
 - Payment gateway: Midtrans Core API dengan UI pembayaran custom (bukan Snap bawaan Midtrans).
 - Jangan memakai starter kit (Breeze, Jetstream, Fortify UI, Livewire, Inertia) dan jangan memakai Vite atau bundler frontend.
 - Jangan mengasumsikan Metronic atau Bootstrap 5. Periksa implementasi aktual sebelum mengubah layout global.
@@ -156,6 +157,7 @@ Migration hanya boleh memakai Schema Builder yang portabel. Wajib:
 - JavaScript yang diizinkan: JavaScript vanilla dan jQuery yang sudah ada di bundle Otika, plus plugin Otika yang tersedia.
 - Library tambahan hanya jika kebutuhannya nyata dan tercantum di daftar izin berikut:
   - `hls.js` — pemutar HLS pada halaman player (Phase 4).
+  - `ffmpeg.wasm` beserta wrapper/core/Web Worker — pemrosesan video di browser admin (Phase 4), disetujui user. Asset distribusi siap pakai dipin versinya dan di-host lokal; tanpa framework/bundler frontend tambahan. Mulai dengan single-thread dan satu kualitas; dukungan HLS AES-128 serta batas perangkat wajib melalui UAT user.
   - Midtrans JS tokenisasi kartu — hanya jika pembayaran kartu diaktifkan (di luar MVP).
 - Library lain (SweetAlert, Toastr, chart baru, dll.) dilarang tanpa persetujuan user.
 - Data dari server ke JS dikirim lewat atribut `data-*`, `@json` di tag `<script>`, atau endpoint JSON. Jangan membangun HTML dari input user tanpa escape.
@@ -263,7 +265,7 @@ Urutan JS: vendor/global (`app.min.js`) → plugin halaman → konfigurasi page 
 - Rate limiting pada login, register, forgot password, checkout, webhook, dan endpoint stream.
 - Akses course dihitung dari tabel `enrollments` (`status = active` dan `expires_at > now()`), selalu diverifikasi di server, tidak pernah hanya di Blade/JS.
 - Admin dapat melihat semua materi untuk keperluan preview tanpa enrollment.
-- Secret (Midtrans server key, kunci enkripsi video) hanya di `.env`/DB terenkripsi; tidak pernah dikirim ke browser atau dicatat di log.
+- Secret server (Midtrans server key, APP_KEY, token operasi) tidak pernah dikirim ke browser atau dicatat di log. Pengecualian terbatas untuk kunci konten HLS: dibuat sementara di browser admin saat persiapan, dikirim via HTTPS ke backend untuk disimpan terenkripsi, dan diberikan lewat endpoint key hanya kepada sesi playback sah. Jangan menyisipkan kunci di HTML, log, URL, atau storage publik.
 
 ---
 
@@ -271,6 +273,7 @@ Urutan JS: vendor/global (`app.min.js`) → plugin halaman → konfigurasi page 
 
 ### Perlindungan video/materi
 
+- Pemrosesan MVP dilakukan di browser admin memakai ffmpeg.wasm; server tidak membutuhkan FFmpeg/ffprobe atau subprocess. Sumber asli tetap lokal. Upload hasil HLS diperiksa dan difinalisasi bertahap sebelum siap.
 - Tidak ada URL file video langsung. Video disimpan di disk **privat** dan disajikan sebagai HLS terenkripsi lewat endpoint ber-token yang divalidasi enrollment aktif.
 - Pemutar menampilkan watermark dinamis (nama + email/ID user) dan menerapkan deterrent sisi klien (blokir klik kanan, tanpa tombol download, pause saat tab tidak aktif, sembunyikan saat print).
 - Batasi satu sesi pemutaran aktif per user.

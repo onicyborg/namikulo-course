@@ -1,6 +1,6 @@
 # PRD — Platform Course Berbayar
 
-Versi 1.0 · Status: Draf untuk persetujuan user · Tanggal: 16 Oktober 2026
+Versi 1.2 · Status: Draf; MVP cPanel dengan pemrosesan browser sesuai arahan user · Tanggal: 16 Oktober 2026
 
 Dokumen ini menjelaskan **apa** yang dibangun dan **mengapa**. Detail teknis ada di [SRS.md](SRS.md). Urutan pengerjaan ada di [phases/README.md](phases/README.md).
 
@@ -79,7 +79,7 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | F-204 | CRUD **bab** dalam sebuah course (mis. Bab I, Bab II) dengan urutan. | M |
 | F-205 | CRUD **video** dalam sebuah bab, jumlah tidak dibatasi (mis. Bab I berisi 4 video, Bab II berisi 5 video). Atribut: judul, deskripsi, urutan, durasi, file video. | M |
 | F-206 | Atur ulang urutan bab dan video. | M |
-| F-207 | Unggah video; sistem memprosesnya menjadi format terlindungi dan menampilkan status (menunggu/diproses/siap/gagal) serta tombol coba lagi. | M |
+| F-207 | Pilih video; browser admin memprosesnya dengan ffmpeg.wasm menjadi HLS terenkripsi satu kualitas, lalu mengunggah hasilnya. Tampilkan progres persiapan/upload/validasi serta state siap/gagal dan coba lagi. Tidak membutuhkan worker server. | M |
 | F-208 | Course hanya dapat terbit jika memiliki minimal satu video berstatus siap. | S |
 | F-209 | Hapus course/bab/video yang sudah punya anggota atau pesanan dilakukan sebagai arsip (soft delete), bukan penghapusan permanen. | M |
 
@@ -185,15 +185,17 @@ Agent memakai asumsi di kolom "Default" sampai user menyatakan lain.
 | ID | Pertanyaan | Default yang dipakai |
 |---|---|---|
 | Q1 | Nama aplikasi dan identitas visual (logo, warna)? | Nama dari `APP_NAME`; warna primer sama dengan tema Otika; logo placeholder. |
-| Q2 | Server production mendukung `ffmpeg`, queue worker, dan cron? Tanpa ini pemrosesan video ke HLS tidak dapat berjalan di server. | Diasumsikan tersedia. Jika tidak, Phase 4 perlu diubah (mis. encode di luar server atau memakai layanan video). |
+| Q2 | Hosting cPanel mendukung HTTPS, PHP yang sesuai, OpenSSL, storage privat dan batas request yang memadai? | Tidak memerlukan FFmpeg/ffprobe, subprocess atau worker server. Video diproses di browser desktop admin; task cron-job.org dijalankan dalam batch singkat. Kecocokan hosting dan browser dikonfirmasi lewat UAT. |
 | Q3 | Apakah akun Midtrans sudah aktif dan kanal pembayaran apa saja yang diaktifkan? | Sandbox dulu; VA BCA/BNI/BRI/Permata/CIMB, QRIS, GoPay/ShopeePay ditampilkan sesuai konfigurasi. |
 | Q4 | Registrasi: perlu verifikasi email? | Tidak wajib di MVP. |
 | Q5 | Perpanjangan sebelum akses berakhir? | Tidak diperbolehkan; beli lagi setelah kedaluwarsa (BR-04). |
 | Q6 | Apakah perlu video pratinjau gratis pada halaman detail? | Tidak di MVP. |
 | Q7 | Batas waktu bayar? | 24 jam. |
 | Q8 | Pengiriman email (SMTP) tersedia untuk reset password dan notifikasi? | Diasumsikan SMTP diisi lewat `.env`. |
-| Q9 | Perkiraan jumlah user, course, dan ukuran video? Menentukan ruang disk dan beban streaming. | Ratusan user, puluhan course; video hingga 2 GB per file. |
+| Q9 | Perkiraan jumlah user, course, dan ukuran video? Menentukan ruang disk dan beban streaming. | Ratusan user, puluhan course. Batas awal usulan video sumber 200 MiB, durasi 15 menit, maksimum 720p, MP4 H.264/AAC; bukan jaminan kapasitas browser. Tetapkan ulang setelah UAT perangkat admin. Batas 2 GB sebelumnya dibatalkan. |
 | Q10 | Materi selain video (PDF/slide)? | Di luar scope MVP. |
+
+Penjadwalan operasional memakai **cron-job.org** untuk memicu endpoint HTTPS yang diamankan, lalu pekerjaan dieksekusi langsung dalam batch kecil dengan batas waktu dan checkpoint. Keterlambatan pemicu tidak boleh membuka akses yang sudah kedaluwarsa. Detail: SRS bagian 5.10.
 
 ## 9. Roadmap phase
 
@@ -217,8 +219,16 @@ Aturan: satu phase selesai setelah feedback uji langsung dari user menyatakan lu
 | Risiko | Dampak | Mitigasi |
 |---|---|---|
 | Ekspektasi proteksi screenshot 100% | Kekecewaan, klaim keliru | Jelaskan batas (bagian 7); siapkan jalur DRM. |
-| Server production tanpa ffmpeg/queue | Phase 4 tertunda | Konfirmasi Q2 sebelum Phase 4. |
+| Browser kehabisan memori/halaman ditutup saat pemrosesan | Persiapan atau upload gagal | Batasi input, satu video sekali proses, cek kompatibilitas, retry dan UAT browser desktop. Tidak menjanjikan dukungan semua perangkat. |
 | Webhook Midtrans terlambat/gagal | User sudah bayar tetapi belum dapat akses | Sinkron status manual oleh admin, pengecekan status terjadwal, log notifikasi. |
 | Perbedaan PostgreSQL (dev) vs MySQL (prod) | Migration gagal di production | Aturan migration portabel di AGENTS.md; user mencoba migrate di MySQL staging sebelum rilis. |
 | Streaming melalui PHP membebani server | Lambat saat banyak penonton | Dukungan `X-Accel-Redirect`/Nginx internal location; cache segmen privat. |
 | Tanpa testing oleh agent | Bug lolos antar phase | UAT tertulis tiap phase, user menguji sebelum phase berikutnya. |
+
+## 11. Keputusan MVP cPanel (16 Oktober 2026)
+
+Admin memakai halaman persiapan video di browser Windows/macOS/Linux yang kompatibel; tidak perlu memilih OS atau memasang alat lokal. Deteksi kemampuan WebAssembly/Web Worker dilakukan sebelum proses; deteksi OS hanya bantuan, bukan gate. Target awal Chrome/Edge desktop, Firefox/Safari hanya setelah UAT; pembatasan ini khusus persiapan video, bukan player member. HP/tablet belum menjadi target persiapan.
+
+Satu kualitas mengikuti sumber yang memenuhi profil (maksimum 720p), tanpa transcoding otomatis atau pilihan kualitas ganda. Input tidak sesuai ditolak dengan petunjuk ekspor ulang. Pengepakan HLS memakai stream copy untuk mengurangi beban perangkat. Browser tetap perlu terbuka; dukungan AES-128 build ffmpeg.wasm terpilih harus dibuktikan sebelum implementasi penuh Phase 4 diluluskan.
+
+Seluruh MVP tidak membutuhkan worker server: email sinkron dengan timeout, pekerjaan berkala melalui cron-job.org dalam batch. Migrasi ke VPS/encoding server dan queue adalah peningkatan setelah MVP, bukan implementasi dua sistem sekaligus.
