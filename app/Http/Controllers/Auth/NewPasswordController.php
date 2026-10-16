@@ -47,7 +47,7 @@ class NewPasswordController extends Controller
             },
         );
 
-        if ($status !== Password::PasswordReset) {
+        if ($status !== Password::PASSWORD_RESET) {
             return back()->withInput($request->only('email'))->withErrors([
                 'email' => 'Tautan reset tidak valid atau sudah kedaluwarsa. Minta tautan baru.',
             ]);

@@ -16,6 +16,7 @@
 
         <form method="POST" action="{{ route('login') }}" data-loading-form>
             @csrf
+            <input type="hidden" name="timezone" data-browser-timezone>
             <div class="form-group">
                 <label for="email">Email</label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}"

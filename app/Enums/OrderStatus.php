@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Enums;
+
+enum OrderStatus: string
+{
+    case Pending = 'pending';
+    case Paid = 'paid';
+    case Expired = 'expired';
+    case Cancelled = 'cancelled';
+    case Failed = 'failed';
+    case Refunded = 'refunded';
+}

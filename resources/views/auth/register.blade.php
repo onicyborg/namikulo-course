@@ -15,6 +15,7 @@
 
         <form method="POST" action="{{ route('register') }}" data-loading-form>
             @csrf
+            <input type="hidden" name="timezone" data-browser-timezone>
             <div class="form-group">
                 <label for="name">Nama lengkap</label>
                 <input id="name" type="text" name="name" value="{{ old('name') }}"

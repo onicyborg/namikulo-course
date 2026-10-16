@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Controllers\Operations;
+
+use App\Http\Controllers\Controller;
+use App\Services\ExpireEnrollments;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
+
+class ScheduledJobController extends Controller
+{
+    public function store(string $task, ExpireEnrollments $expiry): JsonResponse
+    {
+        abort_unless($task === ExpireEnrollments::TASK, 404);
+        $batchSize = max(1, min(100, (int) config('operations.batch_size', 20)));
+        $maxSeconds = max(2, min(10, (int) config('operations.max_seconds', 10)));
+        try {
+            $lock = Cache::store('database')->lock('operations:'.$task, $maxSeconds + 10);
+            if (! $lock->get()) {
+                return response()->json(['status' => 'busy', 'processed' => 0, 'remaining' => true]);
+            }
+            try {
+                return response()->json($expiry->run($batchSize, $maxSeconds));
+            } finally {
+                $lock->release();
+            }
+        } catch (\Throwable) {
+            return response()->json(['message' => 'Operasi gagal; periksa log server dan coba lagi.'], 503);
+        }
+    }
+}

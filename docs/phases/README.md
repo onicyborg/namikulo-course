@@ -1,6 +1,6 @@
 # Roadmap pengembangan
 
-Status: Phase 0 **menunggu UAT user**; Phase 1 **lulus UAT user**; Phase 2 aktif atas instruksi eksplisit user. Phase 0 belum dinyatakan lulus oleh user.
+Status: Phase 0 **menunggu UAT user**; Phase 1 dan 2 **lulus UAT user**. Phase 0 belum dinyatakan lulus oleh user.
 
 Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen tidak mengaktifkan phase atau menyatakan implementasi selesai. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
@@ -10,7 +10,7 @@ Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen 
 |---|---|---|---|
 | [0](PHASE-0.md) | Fondasi, lima layout, autentikasi, role, audit log | F-101–104, BR-12 (fondasi) | Menunggu UAT user |
 | [1](PHASE-1.md) | Kategori, course, bab, metadata video | F-201–206, F-208–209; prasyarat F-207 | Lulus UAT user |
-| [2](PHASE-2.md) | User, enrollment manual, expiry, pemicu cron-job.org | F-301–305, BR-09/12 | Direncanakan |
+| [2](PHASE-2.md) | User, enrollment manual, expiry, pemicu cron-job.org | F-301–305, BR-09/12 | Lulus UAT user |
 | [3](PHASE-3.md) | Landing, katalog, detail | F-401–404 | Direncanakan |
 | [4](PHASE-4.md) | Upload, HLS browser, impor, stream, player terlindungi | F-207–208, F-602–603, F-701–706 | Direncanakan |
 | [5](PHASE-5.md) | Checkout, pembayaran, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-605; BR-02/04–07 | Direncanakan |
@@ -57,4 +57,4 @@ Seluruh kebutuhan M dan UAT integrasi lulus oleh user; keputusan S/C dicatat; st
 
 ## Perintah untuk user sekarang
 
-Ikuti urutan setup dan [UAT Phase 0](PHASE-0.md#panduan-uji-manual-uat). Agent tidak menjalankan migration, seed, aplikasi, atau test.
+Ikuti [perintah dan UAT Phase 2](PHASE-2.md#perintah-untuk-user); lanjutkan UAT Phase 0 bila belum dinyatakan lulus. Agent tidak menjalankan migration, seed, aplikasi, atau test.

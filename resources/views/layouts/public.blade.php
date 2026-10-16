@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url('css/site.css') }}">
     @stack('styles')
 </head>
-<body class="public-page">
+<body class="public-page" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
     <header class="public-header">
         <nav class="container public-nav" aria-label="Navigasi utama">
@@ -30,7 +30,7 @@
         <div class="container">&copy; {{ date('Y') }} {{ config('app.name') }}</div>
     </footer>
     <script src="{{ asset('js/app.min.js') }}"></script>
-    <script src="{{ url('js/app-custom.js') }}"></script>
+    <script src="{{ url('js/app-custom.js') }}?v=2"></script>
     @stack('scripts')
 </body>
 </html>

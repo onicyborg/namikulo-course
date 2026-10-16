@@ -6,7 +6,11 @@ use App\Models\Category;
 use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\Section;
+use App\Models\Enrollment;
+use App\Models\User;
 use App\Policies\ContentPolicy;
+use App\Policies\EnrollmentPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -32,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         foreach ([Category::class, Course::class, Section::class, Lesson::class] as $model) {
             Gate::policy($model, ContentPolicy::class);
         }
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Enrollment::class, EnrollmentPolicy::class);
         RateLimiter::for('login', function (Request $request): Limit {
             $email = Str::lower((string) $request->input('email'));
 
@@ -40,5 +46,6 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('registration', fn (Request $request): Limit => Limit::perMinute(5)->by($request->ip()));
         RateLimiter::for('password-reset', fn (Request $request): Limit => Limit::perMinute(5)->by($request->ip()));
+        RateLimiter::for('operations', fn (Request $request): Limit => Limit::perMinute(30)->by($request->ip()));
     }
 }

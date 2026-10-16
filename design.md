@@ -502,6 +502,8 @@ Urutan: vendor/global, library khusus halaman, konfigurasi page, perilaku templa
 
 ## 15. Accessibility dan state
 
+Semua waktu bertanggal yang berasal dari database diberi nilai UTC eksplisit pada elemen `<time datetime="...">` dan ditampilkan sesuai zona browser dengan JavaScript aplikasi. Jika JavaScript tidak tersedia, tampilkan UTC beserta labelnya. Input `datetime-local` dalam modal admin mengikuti zona perangkat admin; tampilkan petunjuk zona dan konversi ke momen UTC sebelum disimpan. Zona browser adalah zona perangkat, bukan bukti lokasi fisik.
+
 - Setiap gambar memiliki `alt`; dekoratif memakai `alt=""`.
 - Setiap form control memiliki label atau `aria-label`.
 - Tombol aksi memakai `button`, navigasi memakai `a`.

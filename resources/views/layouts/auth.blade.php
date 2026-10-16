@@ -23,7 +23,7 @@
     </main>
     <script src="{{ asset('js/app.min.js') }}"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
-    <script src="{{ url('js/app-custom.js') }}"></script>
+    <script src="{{ url('js/app-custom.js') }}?v=2"></script>
     @stack('scripts')
 </body>
 </html>

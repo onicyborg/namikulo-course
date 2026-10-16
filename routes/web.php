@@ -6,10 +6,14 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\LessonController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CourseMemberController;
+use App\Http\Controllers\Operations\ScheduledJobController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\UserTimezoneController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +47,13 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
+Route::post('/account/timezone', [UserTimezoneController::class, 'update'])
+    ->middleware(['auth', 'active', 'throttle:10,1'])
+    ->name('account.timezone.update');
+
+Route::post('/operations/jobs/{task}', [ScheduledJobController::class, 'store'])
+    ->middleware(['throttle:operations', 'cron.token'])->name('operations.jobs.store');
+
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'active', 'role:'.UserRole::Admin->value])
@@ -63,6 +74,14 @@ Route::prefix('admin')
         Route::post('sections/{section}/lessons', [LessonController::class, 'store'])->name('sections.lessons.store');
         Route::put('sections/{section}/lessons/{lesson}', [LessonController::class, 'update'])->name('sections.lessons.update');
         Route::delete('sections/{section}/lessons/{lesson}', [LessonController::class, 'destroy'])->name('sections.lessons.destroy');
+        Route::get('users/search', [UserController::class, 'search'])->middleware('throttle:30,1')->name('users.search');
+        Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
+        Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
+        Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
+        Route::get('courses/{course}/members', [CourseMemberController::class, 'index'])->name('courses.members');
+        Route::post('courses/{course}/members', [CourseMemberController::class, 'store'])->name('courses.members.store');
+        Route::put('members/{enrollment}', [CourseMemberController::class, 'update'])->name('members.update');
+        Route::post('members/{enrollment}/revoke', [CourseMemberController::class, 'revoke'])->name('members.revoke');
     });
 
 Route::prefix('my')

@@ -23,7 +23,14 @@ class PasswordResetLinkController extends Controller
         ]);
 
         $request->validate(['email' => ['required', 'email']]);
-        Password::sendResetLink($request->only('email'));
+        if (config('mail.default') === 'log') {
+            return back()->with('error', 'Reset password belum tersedia. Hubungi admin untuk mengatur pengiriman email.');
+        }
+        try {
+            Password::sendResetLink($request->only('email'));
+        } catch (\Throwable) {
+            return back()->with('error', 'Tautan reset belum dapat dikirim. Coba lagi nanti.');
+        }
 
         return back()->with('success', 'Jika email terdaftar, tautan reset password akan dikirim.');
     }

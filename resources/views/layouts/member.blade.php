@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url('css/app-custom.css') }}">
     @stack('styles')
 </head>
-<body class="light light-sidebar theme-white">
+<body class="light light-sidebar theme-white" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
     <div class="loader" aria-hidden="true"></div>
     <div id="app">
@@ -26,7 +26,7 @@
     <script src="{{ asset('js/app.min.js') }}"></script>
     @stack('plugin-scripts')
     <script src="{{ asset('js/scripts.js') }}"></script>
-    <script src="{{ url('js/app-custom.js') }}"></script>
+    <script src="{{ url('js/app-custom.js') }}?v=2"></script>
     @stack('scripts')
 </body>
 </html>

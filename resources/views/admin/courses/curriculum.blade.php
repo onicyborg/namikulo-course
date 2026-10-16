@@ -8,7 +8,7 @@
     @if($errors->any())<div class="alert alert-danger" role="alert" tabindex="-1" data-validation-summary>Perubahan belum disimpan: {{ $errors->first() }}</div>@endif
     <div class="row">
         <div class="col-12 col-lg-8">
-            <div class="card"><div class="card-header content-card-header"><div><p class="content-kicker">KURIKULUM</p><h2>{{ $course->title }}</h2><p>Susun bab dan materi. Video dapat disiapkan pada tahap pengembangan berikutnya.</p></div><div class="card-header-action"><button class="btn btn-primary" data-toggle="modal" data-target="#section-create">Tambah bab</button></div></div></div>
+            <div class="card"><div class="card-header content-card-header"><div><p class="content-kicker">KURIKULUM</p><h2>{{ $course->title }}</h2><p>Susun bab dan materi. Video dapat disiapkan pada tahap pengembangan berikutnya.</p></div><div class="card-header-action"><a class="btn btn-outline-primary mr-2" href="{{ route('admin.courses.members', $course) }}">Anggota</a><button class="btn btn-primary" data-toggle="modal" data-target="#section-create">Tambah bab</button></div></div></div>
             @if($course->sections->isEmpty())
                 <div class="card"><div class="card-body"><x-empty-state title="Belum ada bab" description="Tambahkan bab pertama, lalu masukkan materi di dalamnya." /></div></div>
             @else

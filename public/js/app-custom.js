@@ -54,10 +54,73 @@
         });
     }
 
+    function initializeTimezone() {
+        var zone = '';
+        try {
+            zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        } catch (error) {
+            return;
+        }
+
+        document.querySelectorAll('[data-browser-timezone]').forEach(function (input) {
+            input.value = zone;
+        });
+
+        document.querySelectorAll('[data-local-datetime]').forEach(function (element) {
+            var date = new Date(element.dateTime || element.dataset.utc);
+            if (isNaN(date.getTime())) return;
+            element.textContent = new Intl.DateTimeFormat('id-ID', {
+                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+            }).format(date);
+        });
+
+        document.querySelectorAll('[data-local-datetime-input]').forEach(function (input) {
+            if (input.value || !input.dataset.utc) return;
+            var date = new Date(input.dataset.utc);
+            if (isNaN(date.getTime())) return;
+            var pad = function (number) { return String(number).padStart(2, '0'); };
+            input.value = date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+        });
+
+        document.querySelectorAll('[data-local-time-form]').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                form.querySelectorAll('[data-local-datetime-input]').forEach(function (input) {
+                    var utcInput = form.querySelector('[name="' + input.name + '_utc"]');
+                    if (!utcInput) return;
+                    utcInput.value = '';
+                    input.setCustomValidity('');
+                    if (!input.value) return;
+                    var date = new Date(input.value);
+                    var pad = function (number) { return String(number).padStart(2, '0'); };
+                    var roundTrip = date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
+                    if (isNaN(date.getTime()) || roundTrip !== input.value) {
+                        input.setCustomValidity('Waktu ini tidak berlaku di zona waktu perangkat Anda.');
+                        event.preventDefault();
+                        input.reportValidity();
+                        return;
+                    }
+                    utcInput.value = date.toISOString();
+                });
+            }, true);
+        });
+
+        var body = document.body;
+        var csrf = document.querySelector('meta[name="csrf-token"]');
+        if (!zone || !body.dataset.timezoneUrl || body.dataset.savedTimezone === zone || !csrf) return;
+        fetch(body.dataset.timezoneUrl, {
+            method: 'POST', credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf.content },
+            body: JSON.stringify({ timezone: zone })
+        }).then(function (response) {
+            if (response.ok) body.dataset.savedTimezone = zone;
+        }).catch(function () {});
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initializeLoadingForms();
         initializePasswordToggles();
         initializeDeleteModal();
+        initializeTimezone();
 
         var summary = document.querySelector('[data-validation-summary]');
         if (summary) {

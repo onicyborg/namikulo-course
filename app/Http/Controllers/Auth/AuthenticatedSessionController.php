@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -31,6 +32,11 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        $timezone = $request->input('timezone');
+        if (! is_string($timezone) || ! Validator::make(['timezone' => $timezone], ['timezone' => ['required', 'timezone']])->passes()) {
+            $timezone = null;
+        }
+
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             $logger->log('login_failed', description: 'Percobaan masuk gagal.');
 
@@ -49,12 +55,12 @@ class AuthenticatedSessionController extends Controller
             $logger->log('login_failed', $user, 'users', $user->getKey(), description: 'Percobaan masuk pada akun nonaktif.');
 
             throw ValidationException::withMessages([
-                'email' => 'Email atau password tidak sesuai.',
+                'email' => 'Akun Anda sedang dinonaktifkan. Hubungi admin untuk bantuan.',
             ]);
         }
 
         $request->session()->regenerate();
-        $user->forceFill(['last_login_at' => now()])->save();
+        $user->forceFill(['last_login_at' => now()] + ($timezone ? ['timezone' => $timezone] : []))->save();
         $logger->log('login', $user, 'users', $user->getKey(), description: 'Pengguna berhasil masuk.');
 
         return redirect()->to($this->destination($request, $user));

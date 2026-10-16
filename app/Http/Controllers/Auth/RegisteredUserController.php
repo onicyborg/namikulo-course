@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -35,13 +36,19 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        $user = DB::transaction(function () use ($validated, $logger, $request): User {
+        $timezone = $request->input('timezone');
+        if (! is_string($timezone) || ! Validator::make(['timezone' => $timezone], ['timezone' => ['required', 'timezone']])->passes()) {
+            $timezone = null;
+        }
+
+        $user = DB::transaction(function () use ($validated, $timezone, $logger, $request): User {
             $user = User::query()->create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'password' => $validated['password'],
                 'role' => UserRole::Member,
                 'is_active' => true,
+                'timezone' => $timezone,
             ]);
 
             $logger->log(

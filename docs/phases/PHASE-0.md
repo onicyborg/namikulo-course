@@ -10,7 +10,7 @@ User menginstruksikan mulai Phase 0. Periksa skeleton Laravel, composer scripts,
 
 ## Scope dan urutan implementasi
 
-1. Konfigurasikan Laravel 12, Asia/Jakarta, locale id, PostgreSQL lokal dan cache/session database; QUEUE_CONNECTION=sync tanpa worker server. Pisahkan asset Otika dan aplikasi.
+1. Konfigurasikan Laravel 12, UTC untuk aplikasi/database, locale id, PostgreSQL lokal dan cache/session database; QUEUE_CONNECTION=sync tanpa worker server. Pisahkan asset Otika dan aplikasi.
 2. Selaraskan skeleton: hilangkan kebutuhan Vite/build frontend dan skrip otomatis migrate yang tidak sesuai. Jangan menjalankan skrip setup bawaan. Tidak memasang starter kit.
 3. Buat users UUID v7, role enum, is_active, profil dasar; sesuaikan sessions.user_id. Sediakan tabel framework dan system_logs sesuai SRS (system_logs hanya created_at). Jika migration sudah dipakai, buat migration baru serta rencana konversi data yang disetujui user.
 4. Implementasikan ActivityLogger dengan sanitasi rekursif data sensitif, model/relasi/fillable, middleware role/active dan header keamanan dasar di bootstrap/app.php.
@@ -26,7 +26,7 @@ Nama file teknis mengikuti struktur SRS dan kode aktual; daftar file final wajib
 
 ## Variabel lingkungan
 
-APP_NAME, APP_URL, APP_TIMEZONE=Asia/Jakarta, APP_LOCALE=id, ASSET_URL; DB_*; SESSION_DRIVER=database, QUEUE_CONNECTION=sync, CACHE_STORE=database; MAIL_*; SEED_ADMIN_NAME/EMAIL/PASSWORD. Rahasia hanya di lingkungan user.
+APP_NAME, APP_URL, APP_TIMEZONE=UTC, APP_LOCALE=id, ASSET_URL; DB_*; SESSION_DRIVER=database, QUEUE_CONNECTION=sync, CACHE_STORE=database; MAIL_*; SEED_ADMIN_NAME/EMAIL/PASSWORD. Rahasia hanya di lingkungan user.
 
 ## Perintah untuk user
 

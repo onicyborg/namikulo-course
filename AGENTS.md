@@ -146,7 +146,7 @@ Migration hanya boleh memakai Schema Builder yang portabel. Wajib:
 - Form normal: redirect + flash message. AJAX: JSON minimal `{ message, errors: { field: [message] } }`.
 - Jangan mencatat password, token, secret, server key, dan data sensitif ke log.
 - Logika bisnis (pembayaran, enrollment, playback) ditaruh di `app/Services`, bukan di controller atau Blade.
-- Zona waktu aplikasi `Asia/Jakarta`, locale `id`.
+- Zona waktu aplikasi dan koneksi database `UTC`, locale `id`. Simpan seluruh timestamp sebagai momen UTC. Browser mendeteksi zona IANA perangkat untuk tampilan dan input; zona member terakhir yang tervalidasi disimpan di `users.timezone` untuk aturan kalender seperti enam bulan akses. Perbandingan akses dan expiry tetap memakai UTC. Jangan menafsirkan input `datetime-local` sebagai UTC tanpa konversi.
 
 ---
 

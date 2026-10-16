@@ -10,6 +10,8 @@ Dokumen ini menjelaskan **apa** yang dibangun dan **mengapa**. Detail teknis ada
 
 Platform untuk menjual dan menyelenggarakan course berbasis video. Admin membuat course yang tersusun dari beberapa bab, tiap bab berisi beberapa video. Pengunjung melihat course unggulan di landing page, membeli course lewat pembayaran online (Midtrans, tampilan custom), lalu belajar selama 6 bulan sejak pembayaran. Materi dilindungi agar tidak mudah diunduh atau disebarkan.
 
+Waktu akses berlaku pada momen yang sama di seluruh wilayah. Tampilan jam mengikuti zona perangkat pengguna. Durasi kalender enam bulan mengikuti zona member yang terakhir terdeteksi; bila belum tersedia, gunakan UTC. Pindah zona perangkat kemudian tidak menggeser batas akses yang sudah diberikan.
+
 Referensi tampilan: portal course dengan hero, langkah belajar, statistik, dan grid course (gambar yang diberikan user). Target: tampilan lebih modern dan lebih mudah dipakai.
 
 ## 2. Tujuan
@@ -144,7 +146,7 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | ID | Aturan |
 |---|---|
 | BR-01 | Setiap course harus dibeli untuk diakses. Tidak ada akses gratis kecuali diberikan admin secara manual. |
-| BR-02 | Satu pembelian memberi akses **6 bulan** sejak `paid_at` (waktu pembayaran terkonfirmasi), dihitung dengan penambahan bulan kalender. Contoh: bayar 31 Agustus → berakhir 28 Februari. |
+| BR-02 | Satu pembelian memberi akses **6 bulan** sejak `paid_at` (waktu pembayaran terkonfirmasi), dihitung dengan penambahan bulan kalender di zona member terakhir yang diketahui, atau UTC bila belum diketahui. Contoh: bayar 31 Agustus → berakhir 28 Februari. Batas momen UTC yang sudah diberikan tidak bergeser bila member kemudian pindah zona. |
 | BR-03 | Setelah `expires_at` lewat, user tidak dapat membuka video, kurikulum terkunci, dan halaman course menampilkan tombol beli lagi. Riwayat pesanan tetap terlihat. |
 | BR-04 | Satu user tidak dapat membeli course yang masih aktif. Setelah kedaluwarsa, pembelian baru memulai periode 6 bulan baru dari waktu bayar. |
 | BR-05 | Satu pesanan hanya untuk satu course. Harga yang berlaku dibekukan di pesanan saat dibuat. |

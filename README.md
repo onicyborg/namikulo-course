@@ -2,7 +2,7 @@
 
 Platform course video berbayar dengan area admin dan member, pembayaran Midtrans Core API melalui UI custom, serta akses belajar enam bulan. Nama tampilan aplikasi mengikuti `APP_NAME`.
 
-**Status:** Phase 0 menunggu UAT user; Phase 1 lulus UAT user. Phase 2 aktif atas instruksi user, sedangkan Phase 3–7 masih target pengembangan.
+**Status:** Phase 0 menunggu UAT user; Phase 1 lulus UAT user; Phase 2 sudah diimplementasikan dan menunggu UAT user. Phase 3–7 masih target pengembangan.
 
 ## Pedoman proyek
 
@@ -21,6 +21,7 @@ Prioritas bila bertentangan: AGENTS.md > SRS > PRD > design. Pekerjaan hanya pad
 - Laravel 12, PHP sesuai `composer.json` (saat dokumen dibuat: `^8.2`).
 - Blade murni, Bootstrap 4, jQuery dan Otika; tanpa SPA atau bundler frontend.
 - PostgreSQL development, MySQL 8 production; tabel aplikasi UUID v7.
+- Timestamp dan logika expiry disimpan dalam UTC; tampilan dan input waktu mengikuti zona browser. Zona member terakhir dipakai untuk hitungan enam bulan kalender.
 - MVP tanpa worker server: queue sync sebagai konfigurasi, service sinkron; cache/session database.
 - Midtrans Core API via Laravel HTTP client; SMTP untuk email.
 - Persiapan video di browser admin dengan ffmpeg.wasm, HLS AES-128 satu kualitas, disk privat, token sesi, watermark dan hls.js pada Phase 4.
@@ -34,7 +35,8 @@ Asset Otika memakai `asset()` dan `ASSET_URL`; asset aplikasi memakai `url()`/`S
 2. Jalankan `composer install` bila folder `vendor` belum tersedia.
 3. Jalankan `php artisan key:generate` hanya bila `APP_KEY` pada instalasi baru masih kosong.
 4. Jalankan migration dan seeder sesuai urutan pada [Phase 0](docs/phases/PHASE-0.md#perintah-untuk-user), lalu perintah [Phase 1](docs/phases/PHASE-1.md#perintah-untuk-user). PHP extension DOM diperlukan untuk membersihkan HTML deskripsi course.
-5. Jalankan UAT Phase 0 dan [Phase 1](docs/phases/PHASE-1.md#panduan-uji-manual-uat), lalu laporkan hasilnya. Phase 1 dimulai atas instruksi eksplisit user sebelum Phase 0 dinyatakan lulus.
+   Bila database sudah memiliki timestamp dari konfigurasi Asia/Jakarta, ikuti [panduan cutover UTC](docs/timezone-cutover.md) sebelum memakai konfigurasi baru.
+5. Jalankan UAT Phase 0 dan [Phase 2](docs/phases/PHASE-2.md#panduan-uji-manual-uat), lalu laporkan hasilnya. Phase 1 telah dinyatakan lulus oleh user; Phase 0 masih menunggu konfirmasi UAT.
 
 Proyek tidak memakai npm, Vite, atau build frontend. Asset Otika dimuat dari `ASSET_URL`; CSS dan JavaScript aplikasi berada di `public/`.
 

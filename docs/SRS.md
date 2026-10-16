@@ -12,6 +12,7 @@ Kata "harus" = wajib; "sebaiknya" = dianjurkan; "boleh" = opsional.
 
 - Aplikasi monolit Laravel 12 dengan Blade. Tanpa SPA, tanpa build frontend.
 - Database: PostgreSQL (development), MySQL 8 (production). Migration portabel.
+- Semua timestamp aplikasi dan koneksi DB memakai UTC. Browser membaca zona IANA perangkat untuk menampilkan jam lokal dan mengirim input waktu sebagai momen UTC; server tetap memvalidasi zona serta kecocokan jam lokal. `users.timezone` menyimpan zona terakhir yang terdeteksi untuk perhitungan kalender saat browser member tidak sedang terbuka. Jika belum ada, aturan kalender memakai UTC. Perubahan zona setelah akses dibuat tidak menggeser batas UTC yang sudah tersimpan.
 - MVP cPanel tanpa queue worker: service sinkron, QUEUE_CONNECTION=sync; cache/session database. cron-job.org memicu batch langsung lewat HTTPS (5.10), tanpa Laravel Scheduler/crontab aplikasi.
 - Penyimpanan:
   - Disk `public` (`storage/app/public`): thumbnail course, avatar.
@@ -86,6 +87,7 @@ Kolom `id` (UUID v7, PK), `created_at`, `updated_at` ada di semua tabel kecuali 
 | avatar_path | string null | |
 | is_active | boolean | default true |
 | last_login_at | timestamp null | |
+| timezone | string(64) null | zona IANA terakhir yang tervalidasi dari browser; null berarti belum diketahui |
 | remember_token | string(100) null | |
 
 **categories** — `name` string, `slug` string unique, `sort_order` unsignedInteger default 0.
@@ -275,7 +277,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 ### 5.1 Autentikasi dan otorisasi
 
 - SRS-A1: Registrasi membuat user `role = member`, `is_active = true`. Validasi: nama wajib, email unik, password minimal 8 karakter dan terkonfirmasi.
-- SRS-A2: Login memeriksa `is_active`; user nonaktif ditolak dengan pesan umum. Setelah login: admin → `admin.dashboard`, member → `member.dashboard`, atau URL tujuan semula (`intended`) bila sah.
+- SRS-A2: Login memeriksa `is_active` setelah email dan password terverifikasi. Kredensial yang salah menerima pesan umum; akun nonaktif dengan kredensial yang benar ditolak dengan pesan bahwa akun dinonaktifkan dan arahan menghubungi admin. Setelah login: admin → `admin.dashboard`, member → `member.dashboard`, atau URL tujuan semula (`intended`) bila sah.
 - SRS-A3: Login dibatasi throttle (mis. 5 percobaan/menit per email+IP). Sesi di-regenerate setelah login.
 - SRS-A4: Middleware `role:admin|member` didaftarkan sebagai alias di `bootstrap/app.php`. User yang salah role menerima 403.
 - SRS-A5: `ActivityLogger` mencatat `login`, `logout`, dan percobaan login gagal (tanpa password).
@@ -297,7 +299,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 
 - SRS-U1: Tambah/ubah user lewat modal. Admin tidak boleh menonaktifkan atau menurunkan role dirinya sendiri; harus selalu tersisa minimal satu admin aktif.
 - SRS-U2: Reset password oleh admin menghasilkan password sementara yang ditampilkan sekali, atau mengirim tautan reset. Tidak disimpan di log.
-- SRS-U3: Tambah anggota manual: pilih user (select2), `starts_at` default sekarang, `expires_at = starts_at + access_months` (dapat diubah), `source = admin`, `granted_by`, `note` opsional. Jika user sudah memiliki enrollment aktif di course tersebut, tolak dan sarankan perpanjang.
+- SRS-U3: Tambah anggota manual: pilih user (select2), `starts_at` default sekarang, `expires_at = starts_at + access_months` (dapat diubah), `source = admin`, `granted_by`, `note` opsional. Input admin mengikuti zona IANA browser dan dikonversi ke UTC sebelum disimpan. Durasi kalender enam bulan dihitung di zona member terakhir yang tersimpan, lalu hasilnya dikonversi ke UTC; jika belum diketahui, gunakan UTC. Jika user sudah memiliki enrollment aktif di course tersebut, tolak dan sarankan perpanjang.
 - SRS-U4: Perpanjang/ubah tanggal berakhir wajib mencatat `note` dan masuk `system_logs`. Cabut = `status = revoked`, `revoked_at`, `revoked_by`; sesi pemutaran user pada course itu dicabut.
 - SRS-U5: Daftar user dan anggota memakai DataTables client-side; bila data > 2.000 baris, beralih ke server-side dan dokumentasikan endpoint-nya.
 
@@ -312,7 +314,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 ### 5.5 Akses dan enrollment
 
 - SRS-E1: `EnrollmentService::activeFor(User $user, Course $course): ?Enrollment` mengembalikan enrollment dengan `status = active` **dan** `expires_at > now()`. Seluruh pemeriksaan akses (halaman belajar, playback, key, segmen, heartbeat) memakai method ini; kolom `status` saja tidak dipercaya.
-- SRS-E2: Pembuatan enrollment dari pembelian: `starts_at = payment.paid_at`, `expires_at = starts_at->copy()->addMonthsNoOverflow($course->access_months)`.
+- SRS-E2: Pembuatan enrollment dari pembelian: `starts_at = payment.paid_at` dalam UTC. Untuk `expires_at`, ubah start ke zona member terakhir yang tersimpan (atau UTC bila belum ada), tambahkan `access_months` kalender tanpa overflow, lalu simpan kembali sebagai UTC.
 - SRS-E3: Service `ExpireEnrollments` (dipicu cron-job.org tiap jam; bagian 5.10) mengubah `active` → `expired` bila `expires_at <= now()` dan mencabut sesi pemutarannya.
 - SRS-E4: Pembelian dilarang bila `activeFor` ada (BR-04). Setelah kedaluwarsa, enrollment baru dibuat (baris baru), baris lama tetap sebagai riwayat.
 - SRS-E5: Admin (`role = admin`) dianggap memiliki akses pratinjau ke semua course tanpa enrollment, dan sesi pratinjau tidak mengubah progres.
@@ -436,7 +438,7 @@ cron-job.org memanggil endpoint HTTPS yang menjalankan batch service sinkron. Ti
 - Lock atomik database cache per task, TTL lebih panjang daripada batas request; pelepasan hanya oleh owner. Mutasi bisnis idempoten, transaksi singkat/lock row. Tulis checkpoint setelah tiap unit berhasil, jangan melewati item gagal selamanya: simpan next eligible/retry/backoff dan pastikan siklus scan kembali mencakupnya.
 - Tabel `operation_states` dibuat Phase 2: UUID v7, task string(80) unique, cursor JSON nullable (tanpa default), last_started_at/last_succeeded_at/next_attempt_at timestamp nullable, last_error string nullable, timestamps. Detail cursor/retry hanya ID/status/waktu, tidak rahasia. Cache lock tidak menggantikan checkpoint persisten. Pantau lag/last_success, status partial, serta jumlah gagal di system_logs; jangan mengandalkan HTTP 200 saja.
 
-| Task | Pemicu Asia/Jakarta | Service | Phase |
+| Task | Interval pemicu cron-job.org | Service | Phase |
 |---|---|---|---|
 | expire-enrollments | Tiap jam | ExpireEnrollments | 2 |
 | prune-playback-sessions | Tiap 15 menit | PrunePlaybackSessions | 4 |
@@ -445,7 +447,7 @@ cron-job.org memanggil endpoint HTTPS yang menjalankan batch service sinkron. Ti
 | reconcile-payments | Tiap 15 menit | ReconcilePayments | 5 (S) |
 | send-access-expiry-reminders | Tiap 15 menit, mulai setelah 08:00 | SendAccessExpiryReminders | 7, hanya jika F-509 dipilih |
 
-Pemicu cleanup lebih sering dari rancangan lama agar batch kecil dapat mengejar backlog. Retensi sesi berakhir/dicabut 30 hari; unggahan tidak aktif >24 jam. Jangan menghapus sesi impor aktif, folder aset yang dirujuk, atau hasil penggantian sebelum swap atomik. Reminder hanya eligible satu kali per enrollment/tanggal akhir pada hari H-7; timestamp/penanda persisten dan lock diperlukan, termasuk keterbatasan hasil SMTP tidak pasti. Aktifkan jadwal hanya saat fiturnya tersedia.
+Pemicu cleanup lebih sering dari rancangan lama agar batch kecil dapat mengejar backlog. Retensi sesi berakhir/dicabut 30 hari; unggahan tidak aktif >24 jam. Jangan menghapus sesi impor aktif, folder aset yang dirujuk, atau hasil penggantian sebelum swap atomik. Reminder hanya eligible satu kali per enrollment/tanggal akhir pada hari H-7 menurut zona member yang tersimpan (UTC bila tidak diketahui); timestamp/penanda persisten dan lock diperlukan, termasuk keterbatasan hasil SMTP tidak pasti. Aktifkan jadwal hanya saat fiturnya tersedia.
 
 User mengatur URL aktual, POST, header rahasia, zona waktu dan notifikasi gagal melalui dashboard cron-job.org; tidak memerlukan API key layanan di aplikasi. Staging HTTPS/tunnel disediakan user untuk UAT. User memeriksa pemicu berulang, partial continuation, timeout, recovery checkpoint, rotasi token dan backlog. Jika batch tertinggal, sesuaikan frekuensi dalam batas hosting atau rencanakan VPS; jangan diam-diam menambah worker.
 
@@ -496,7 +498,7 @@ Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak be
 APP_NAME=
 APP_ENV=local
 APP_URL=
-APP_TIMEZONE=Asia/Jakarta
+APP_TIMEZONE=UTC
 APP_LOCALE=id
 ASSET_URL=https://otika.namikulo.com/assets
 
