@@ -6,6 +6,8 @@ use App\Enums\EnrollmentSource;
 use App\Enums\EnrollmentStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Order;
+use App\Enums\OrderStatus;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +22,22 @@ class EnrollmentService
         return Enrollment::query()->where('user_id', $user->id)->where('course_id', $course->id)
             ->where('status', EnrollmentStatus::Active->value)->where('expires_at', '>', now())
             ->latest('expires_at')->first();
+    }
+
+    public function stateFor(?User $user, Course $course): string
+    {
+        if (! $user) return 'guest';
+        if ($user->isAdmin()) return 'active';
+        if ($this->activeFor($user, $course)) return 'active';
+        if (Order::query()->where('user_id', $user->id)->where('course_id', $course->id)
+            ->where('status', OrderStatus::Pending->value)->where('expires_at', '>', now())->exists()) {
+            return 'pending_order';
+        }
+        if (Enrollment::query()->where('user_id', $user->id)->where('course_id', $course->id)->exists()) {
+            return 'expired';
+        }
+
+        return 'can_buy';
     }
 
     public function grantManual(User $user, Course $course, User $actor, Carbon $startsAt, ?Carbon $expiresAt = null, ?string $note = null): Enrollment

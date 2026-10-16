@@ -15,11 +15,12 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\UserTimezoneController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Site\CoursePageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('site.home');
-})->name('site.home');
+Route::get('/', [CoursePageController::class, 'home'])->name('site.home');
+Route::get('/courses', [CoursePageController::class, 'index'])->name('site.courses.index');
+Route::get('/courses/{course:slug}', [CoursePageController::class, 'show'])->name('site.courses.show');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -59,6 +60,7 @@ Route::prefix('admin')
     ->middleware(['auth', 'active', 'role:'.UserRole::Admin->value])
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('courses/{course}/preview', [CoursePageController::class, 'preview'])->name('courses.preview');
         Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
         Route::resource('courses', CourseController::class)->except(['show', 'create', 'edit']);
         Route::post('courses/{course}/publish', [CourseController::class, 'publish'])->name('courses.publish');

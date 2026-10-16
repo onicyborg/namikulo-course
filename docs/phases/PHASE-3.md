@@ -1,6 +1,6 @@
 # Phase 3: Landing, katalog dan detail course
 
-Status: **Direncanakan, belum diimplementasikan atau lulus UAT**.
+Status: **Lulus UAT user untuk scope Phase 3; integrasi konten terbit dan pembayaran tetap diuji pada phase terkait**.
 
 Acuan: PRD F-401–F-404; SRS 5.4; design 19.2–19.5. Lihat [roadmap](README.md), [PRD](../PRD.md), [SRS](../SRS.md), [design](../../design.md), dan [AGENTS](../../AGENTS.md). Jika ada konflik, prioritas AGENTS > SRS > PRD > design.
 
@@ -17,9 +17,9 @@ Phase 2 lulus dan user menginstruksikan lanjut. Tinjau identitas visual user; gu
 5. Publik hanya published; admin preview draft dengan banner. UI yang bergantung Phase 4/5 diberi state belum tersedia tanpa link rusak. Jangan membuat payment atau sesi playback pada phase ini.
 6. Title/meta description/Open Graph, empty/loading/error/permission, keyboard/kontras dan reduced motion. Urutan populer yang hanya disebut design tidak ditambahkan karena SRS membatasi sort.
 
-## Artefak yang direncanakan dan batas scope
+## Artefak dan batas scope
 
-Site controllers, route publik, views/components, site.css dan JS halaman; perluasan stateFor service bila dibutuhkan; metadata SEO. Tidak menambah skema produk atau dependency frontend.
+Controller situs, route publik, view/component course, `site.css`, skrip navbar, `EnrollmentService::stateFor`, dan metadata SEO telah dibuat. Tidak ada skema produk atau dependency frontend baru.
 
 Nama file teknis mengikuti struktur SRS dan kode aktual; daftar file final wajib disertakan pada serah-terima. Migration yang sudah dipakai user tidak diedit. Tidak mengerjakan phase berikutnya tanpa instruksi user.
 
@@ -29,7 +29,7 @@ Tidak ada variabel wajib baru. APP_NAME/APP_URL dan identitas visual harus sesua
 
 ## Perintah untuk user
 
-Perintah berikut **baru dijalankan sesudah implementasi tersedia**, dengan urutan final diperiksa kembali pada serah-terima. Agent tidak menjalankan migrate/seed atau pengujian.
+Jalankan setelah file aplikasi terbaru tersedia. Agent tidak menjalankan migrate/seed atau pengujian.
 
 1. `php artisan optimize:clear`
 2. Buka halaman publik dan preview admin untuk UAT. Tidak ada migrate/seeder wajib bila skema Phase 1/2 sudah lengkap.
@@ -50,4 +50,4 @@ Dilakukan user. Tambahkan pemeriksaan umum [roadmap](README.md#prosedur-tiap-pha
 
 Karena publikasi membutuhkan video siap, UAT konten terbit nyata menjadi gate integrasi Phase 4/5. User boleh meluluskan layout/preview/empty state Phase 3 dengan dependensi ini tercatat.
 
-Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Perbaiki temuan pada phase ini sebelum meminta lanjut. Laporan akhir memuat ringkasan/file, perintah user, .env, UAT, asumsi/keterbatasan, dan kalimat: **“Sudah diimplementasikan, menunggu pengujian user. Tidak ada test yang dijalankan oleh agent.”** Gunakan kalimat implementasi itu hanya setelah kode benar-benar dibuat; dokumen ini masih rencana.
+Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Perbaiki temuan pada phase ini sebelum meminta lanjut. Laporan akhir memuat ringkasan/file, perintah user, .env, UAT, asumsi/keterbatasan, dan kalimat: **“Sudah diimplementasikan, menunggu pengujian user. Tidak ada test yang dijalankan oleh agent.”**
