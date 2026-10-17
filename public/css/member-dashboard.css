@@ -125,6 +125,21 @@
     overflow: hidden;
 }
 .member-course-expiry { margin: 12px 0; color: var(--app-muted); }
+.member-dashboard .member-learning-progress-meta { display: flex; justify-content: space-between; gap: 12px; max-width: 500px; margin-top: 12px; color: var(--app-muted); font-size: .84rem; }
+.member-dashboard .member-learning-progress-meta strong { color: var(--app-ink); }
+.member-dashboard .member-course-content .progress { max-width: 500px; height: 8px; margin: 8px 0 12px; }
+.member-dashboard-secondary .card-header, .member-dashboard-recommendations .card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.member-dashboard-secondary .card-header h2, .member-dashboard-recommendations .card-header h2 { margin: 0; color: var(--app-ink); font-size: 1.05rem; }
+.member-dashboard-small-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--app-line); }
+.member-dashboard-small-row:last-child { border-bottom: 0; }
+.member-dashboard-small-row div { min-width: 0; }
+.member-dashboard-small-row strong { display: block; overflow-wrap: anywhere; }
+.member-dashboard-small-row small { display: block; margin-top: 4px; color: var(--app-muted); }
+.member-dashboard-small-row a { flex: 0 0 auto; font-weight: 700; }
+.member-recommendation { height: 100%; padding: 10px 0; }
+.member-recommendation h3 { color: var(--app-ink); font-size: 1.02rem; line-height: 1.4; }
+.member-recommendation p { display: -webkit-box; color: var(--app-muted); -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.member-recommendation a { font-weight: 700; }
 
 .member-course-actions {
     display: flex;

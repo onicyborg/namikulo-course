@@ -18,6 +18,8 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\UserTimezoneController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\OrderController as MemberOrderController;
+use App\Http\Controllers\Member\CourseController as MemberCourseController;
+use App\Http\Controllers\Member\ProfileController as MemberProfileController;
 use App\Http\Controllers\Member\LearnController;
 use App\Http\Controllers\Stream\HlsStreamController;
 use App\Http\Controllers\Site\CoursePageController;
@@ -62,15 +64,18 @@ Route::post('/account/timezone', [UserTimezoneController::class, 'update'])
 
 Route::middleware(['auth', 'active'])->group(function (): void {
     Route::get('/learn/{lesson}', [LearnController::class, 'show'])->name('learn.show');
-    Route::post('/learn/{lesson}/playback', [LearnController::class, 'playback'])->middleware('throttle:10,1')->name('learn.playback');
-    Route::post('/learn/heartbeat/{token}', [LearnController::class, 'heartbeat'])->middleware('throttle:90,1')->name('learn.heartbeat');
-    Route::prefix('stream/{token}')->name('stream.')->middleware('throttle:600,1')->group(function (): void {
+    Route::post('/learn/{lesson}/playback', [LearnController::class, 'playback'])->middleware('throttle:60,1,playback:')->name('learn.playback');
+    Route::post('/learn/heartbeat/{token}', [LearnController::class, 'heartbeat'])->middleware('throttle:90,1,heartbeat:')->name('learn.heartbeat');
+    Route::prefix('stream/{token}')->name('stream.')->middleware('throttle:600,1,stream:')->group(function (): void {
         Route::get('master.m3u8', [HlsStreamController::class, 'master'])->name('master');
         Route::get('source/index.m3u8', [HlsStreamController::class, 'playlist'])->name('playlist');
         Route::get('key.bin', [HlsStreamController::class, 'key'])->name('key');
         Route::get('source/{name}', [HlsStreamController::class, 'segment'])->where('name', 'seg_\d{5}\.ts')->name('segment');
     });
 });
+
+Route::post('/learn/lessons/{lesson}/progress', [LearnController::class, 'progress'])
+    ->middleware(['auth', 'active', 'role:'.UserRole::Member->value, 'throttle:120,1,progress:'])->name('learn.progress');
 
 Route::post('/operations/jobs/{task}', [ScheduledJobController::class, 'store'])
     ->middleware(['throttle:operations', 'cron.token'])->name('operations.jobs.store');
@@ -135,6 +140,10 @@ Route::prefix('my')
     ->middleware(['auth', 'active', 'role:'.UserRole::Member->value])
     ->group(function (): void {
         Route::get('/dashboard', MemberDashboardController::class)->name('dashboard');
+        Route::get('/courses', [MemberCourseController::class, 'index'])->name('courses.index');
+        Route::get('/courses/{course:slug}', [MemberCourseController::class, 'show'])->withTrashed()->name('courses.show');
+        Route::get('/profile', [MemberProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile', [MemberProfileController::class, 'update'])->name('profile.update');
         Route::get('/orders', [MemberOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}/invoice', [MemberOrderController::class, 'invoice'])->middleware('throttle:10,1')->name('orders.invoice');
     });

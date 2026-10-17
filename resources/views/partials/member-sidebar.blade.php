@@ -15,9 +15,19 @@
                     <i data-feather="home" aria-hidden="true"></i><span>Dashboard</span>
                 </a>
             </li>
+            <li class="dropdown {{ request()->routeIs('member.courses.*') ? 'active' : '' }}">
+                <a href="{{ route('member.courses.index') }}" class="nav-link">
+                    <i data-feather="book-open" aria-hidden="true"></i><span>Course Saya</span>
+                </a>
+            </li>
             <li class="dropdown {{ request()->routeIs('member.orders.*') ? 'active' : '' }}">
                 <a href="{{ route('member.orders.index') }}" class="nav-link">
                     <i data-feather="file-text" aria-hidden="true"></i><span>Transaksi</span>
+                </a>
+            </li>
+            <li class="dropdown {{ request()->routeIs('member.profile.*') ? 'active' : '' }}">
+                <a href="{{ route('member.profile.edit') }}" class="nav-link">
+                    <i data-feather="user" aria-hidden="true"></i><span>Profil</span>
                 </a>
             </li>
         </ul>

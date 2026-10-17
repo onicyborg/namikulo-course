@@ -1,6 +1,6 @@
 # Phase 6: Area member dan progres belajar
 
-Status: **Direncanakan, belum diimplementasikan atau lulus UAT**.
+Status: **Lulus UAT user pada 17 Oktober 2026**.
 
 Acuan: PRD F-105, F-601, F-604, F-507; SRS 5.8; design 19.8. Lihat [roadmap](README.md), [PRD](../PRD.md), [SRS](../SRS.md), [design](../../design.md), dan [AGENTS](../../AGENTS.md). Jika ada konflik, prioritas AGENTS > SRS > PRD > design.
 
@@ -29,7 +29,7 @@ Tidak ada variabel wajib baru. MAIL, disk public avatar dan driver existing teta
 
 ## Perintah untuk user
 
-Perintah berikut **baru dijalankan sesudah implementasi tersedia**, dengan urutan final diperiksa kembali pada serah-terima. Agent tidak menjalankan migrate/seed atau pengujian.
+Perintah berikut dijalankan user setelah mengambil perubahan. Agent tidak menjalankan migrate/seed atau pengujian.
 
 1. `php artisan migrate`
 2. `php artisan storage:link` jika belum tersedia.
@@ -49,9 +49,10 @@ Dilakukan user. Tambahkan pemeriksaan umum [roadmap](README.md#prosedur-tiap-pha
 | 4. Buka riwayat dan order milik member lain | Pemilik dapat melanjutkan pending; user lain ditolak. |
 | 5. Ubah profil/avatar/password benar dan password lama salah | Perubahan sah tersimpan; input gagal dijelaskan; upload berbahaya ditolak. |
 | 6. Jalankan alur daftar → beli → bayar → belajar → resume melalui mobile | Navigasi lengkap tanpa route sementara atau tombol mati. |
+| 7. Buka materi, kembali ke detail course, lalu buka kembali beberapa kali | Pemutar membuka sesi baru tanpa terhalang batas permintaan normal; respons 429 menjelaskan waktu tunggu bila batas benar-benar tercapai. |
 
 ## Kriteria kelulusan, asumsi dan keterbatasan
 
 Asumsi penanda selesai via ended perlu dicatat pada serah-terima; jika user meminta ambang lain, revisi spesifikasi dahulu. UAT integrasi menutup state/progres yang ditunda Phase 3–5.
 
-Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Perbaiki temuan pada phase ini sebelum meminta lanjut. Laporan akhir memuat ringkasan/file, perintah user, .env, UAT, asumsi/keterbatasan, dan kalimat: **“Sudah diimplementasikan, menunggu pengujian user. Tidak ada test yang dijalankan oleh agent.”** Gunakan kalimat implementasi itu hanya setelah kode benar-benar dibuat; dokumen ini masih rencana.
+Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Perbaiki temuan pada phase ini sebelum meminta lanjut. Laporan akhir memuat ringkasan/file, perintah user, .env, UAT, asumsi/keterbatasan, dan kalimat: **“Sudah diimplementasikan, menunggu pengujian user. Tidak ada test yang dijalankan oleh agent.”**

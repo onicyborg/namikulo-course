@@ -17,12 +17,17 @@
     <ul class="navbar-nav navbar-right">
         <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user" aria-label="Menu akun {{ auth()->user()->name }}" aria-haspopup="true" aria-expanded="false">
-                <span class="nav-user-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                @if(auth()->user()->avatar_path)
+                    <img class="nav-user-avatar nav-user-avatar-image" src="{{ url('storage/'.auth()->user()->avatar_path) }}" alt="" width="32" height="32">
+                @else
+                    <span class="nav-user-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                @endif
                 <span class="nav-user-name d-none d-sm-inline-block" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</span>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
                 <div class="dropdown-title">{{ auth()->user()->role->label() }}</div>
                 <div class="dropdown-divider"></div>
+                @if(auth()->user()->isMember())<a href="{{ route('member.profile.edit') }}" class="dropdown-item">Profil saya</a>@endif
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="dropdown-item text-danger">Keluar</button>

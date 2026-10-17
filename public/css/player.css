@@ -36,6 +36,8 @@
 .learn-section li.is-current { border-radius: 5px; background: #314169; }
 .learn-section a { color: #e7eaff; }
 .learn-section li.is-current a { font-weight: 700; }
+.learn-lesson-state { display: block; margin-top: 3px; color: #b4c0db; font-size: .75rem; }
+.learn-progress-feedback { color: #c5cbd8; font-size: .85rem; }
 .player-page :focus-visible { outline: 3px solid #aab4ff !important; outline-offset: 2px; }
 @media (max-width: 991.98px) { .learn-layout { grid-template-columns: 1fr; } .learn-curriculum { min-height: 0; border-top: 1px solid #303848; border-left: 0; } }
 @media (max-width: 575.98px) { .learn-header { gap: 10px; padding: 10px 14px; } .learn-header > a span { display: none; } .learn-preview { font-size: .68rem; } .learn-controls { padding: 10px 12px; } .learn-controls [data-volume] { width: 65px; } .learn-body { padding: 24px 18px 45px; } }

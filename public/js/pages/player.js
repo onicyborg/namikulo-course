@@ -14,12 +14,21 @@
         var speed = root.querySelector('[data-speed]');
         var fullscreen = root.querySelector('[data-fullscreen]');
         var time = root.querySelector('[data-time]');
+        var progressFeedback = root.querySelector('[data-progress-feedback]');
+        var currentLessonState = root.querySelector('.is-current [data-lesson-state]');
         var csrf = document.querySelector('meta[name="csrf-token"]');
         var hls = null;
         var heartbeatTimer = null;
         var watermarkTimer = null;
         var watermarkText = '';
         var stopped = false;
+        var progressUrl = null;
+        var progressToken = null;
+        var progressTimer = null;
+        var hasPlayed = false;
+        var resumed = false;
+        var lastPlaybackPosition = null;
+        var pendingWatchedSeconds = 0;
 
         function showMessage(text) { screenMessage.textContent = text; screenMessage.hidden = false; }
         function hideMessage() { screenMessage.hidden = true; }
@@ -40,9 +49,35 @@
             if (hls) { hls.destroy(); hls = null; }
             if (heartbeatTimer) clearInterval(heartbeatTimer);
             if (watermarkTimer) clearInterval(watermarkTimer);
+            if (progressTimer) clearInterval(progressTimer);
             play.disabled = true;
             seek.disabled = true;
             showMessage(text);
+        }
+
+        function saveProgress(eventName, keepalive) {
+            if (!progressUrl || !progressToken || !hasPlayed || !Number.isFinite(video.currentTime)) return;
+            var position = Math.max(0, Math.floor(video.currentTime));
+            var watched = Math.floor(pendingWatchedSeconds);
+            pendingWatchedSeconds -= watched;
+            fetch(progressUrl, { method: 'POST', credentials: 'same-origin', keepalive: !!keepalive,
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf.content },
+                body: JSON.stringify({ token: progressToken, position_seconds: position, watched_seconds: watched, event: eventName })
+            }).then(function (response) {
+                if (response.status === 403 || response.status === 401) {
+                    stop('Sesi video atau akses course telah berakhir. Muat ulang halaman.');
+                    return;
+                }
+                if (!response.ok) throw new Error('progress');
+                return response.json();
+            }).then(function (data) {
+                if (!data || !progressFeedback) return;
+                progressFeedback.textContent = data.completed ? 'Materi selesai.' : 'Posisi belajar tersimpan.';
+                if (currentLessonState) currentLessonState.textContent = data.completed ? 'Selesai' : 'Sedang dipelajari';
+            }).catch(function () {
+                if (!stopped) pendingWatchedSeconds += watched;
+                if (progressFeedback && !stopped) progressFeedback.textContent = 'Progres belum tersimpan. Periksa koneksi sebelum menutup halaman.';
+            });
         }
 
         async function heartbeat(url) {
@@ -58,8 +93,15 @@
             try {
                 var response = await fetch(root.dataset.startUrl, { method: 'POST', credentials: 'same-origin',
                     headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': csrf.content } });
+                if (response.status === 429) {
+                    var retrySeconds = Number(response.headers.get('Retry-After'));
+                    showMessage('Terlalu banyak permintaan pemutaran. Tunggu ' + (retrySeconds > 0 ? Math.ceil(retrySeconds) : 60) + ' detik, lalu muat ulang halaman.');
+                    return;
+                }
                 if (!response.ok) { showMessage('Akses video tidak tersedia atau sesi Anda berakhir. Muat ulang halaman.'); return; }
                 var data = await response.json();
+                progressUrl = data.progress_url || null;
+                progressToken = data.progress_token || null;
                 watermarkText = data.watermark || '';
                 watermark.textContent = watermarkText;
                 moveWatermark();
@@ -83,6 +125,9 @@
                     return;
                 }
                 heartbeatTimer = setInterval(function () { heartbeat(data.heartbeat_url); }, Number(data.heartbeat_seconds || 60) * 1000);
+                if (progressUrl && progressToken) {
+                    progressTimer = setInterval(function () { if (!video.paused && !video.ended) saveProgress('tick', false); }, 15000);
+                }
                 play.disabled = false;
                 seek.disabled = false;
                 showMessage('Video siap. Tekan Putar untuk mulai belajar.');
@@ -93,10 +138,30 @@
             if (video.paused) video.play().catch(function () { showMessage('Browser menolak pemutaran. Tekan Putar lagi.'); });
             else video.pause();
         });
-        video.addEventListener('play', function () { play.textContent = 'Jeda'; play.setAttribute('aria-label', 'Jeda video'); hideMessage(); });
-        video.addEventListener('pause', function () { play.textContent = 'Putar'; play.setAttribute('aria-label', 'Putar video'); });
+        video.addEventListener('loadedmetadata', function () {
+            if (resumed || !Number.isFinite(video.duration)) return;
+            resumed = true;
+            var lastPosition = Number(root.dataset.resumeSeconds || 0);
+            if (lastPosition > 0 && lastPosition < video.duration - 2) video.currentTime = lastPosition;
+        });
+        video.addEventListener('play', function () { hasPlayed = true; play.textContent = 'Jeda'; play.setAttribute('aria-label', 'Jeda video'); hideMessage(); });
+        video.addEventListener('pause', function () {
+            lastPlaybackPosition = null;
+            play.textContent = 'Putar'; play.setAttribute('aria-label', 'Putar video');
+            if (!video.ended && !stopped) saveProgress('pause', false);
+        });
+        video.addEventListener('ended', function () { saveProgress('ended', false); });
+        video.addEventListener('seeking', function () { lastPlaybackPosition = null; });
+        video.addEventListener('seeked', function () { lastPlaybackPosition = video.currentTime; });
         video.addEventListener('error', function () { if (!stopped) stop('Video tidak dapat diputar. Periksa koneksi lalu muat ulang.'); });
         video.addEventListener('timeupdate', function () {
+            if (!video.paused && !video.seeking && Number.isFinite(video.currentTime)) {
+                if (lastPlaybackPosition !== null) {
+                    var advanced = video.currentTime - lastPlaybackPosition;
+                    if (advanced > 0 && advanced <= Math.max(2, video.playbackRate * 2)) pendingWatchedSeconds += advanced;
+                }
+                lastPlaybackPosition = video.currentTime;
+            }
             time.textContent = duration(video.currentTime) + ' / ' + duration(video.duration);
             if (Number.isFinite(video.duration) && video.duration > 0) seek.value = String(Math.round(video.currentTime / video.duration * 100));
         });
@@ -115,6 +180,7 @@
         window.addEventListener('blur', obscure);
         window.addEventListener('focus', function () { stage.classList.remove('is-obscured'); });
         window.addEventListener('beforeprint', obscure);
+        window.addEventListener('pagehide', function () { if (!stopped && !video.ended) saveProgress('pause', true); });
         document.addEventListener('keydown', function (event) {
             if (event.key === 'PrintScreen') { obscure(); setTimeout(function () { if (!document.hidden) stage.classList.remove('is-obscured'); }, 3000); }
         });

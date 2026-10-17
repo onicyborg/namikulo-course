@@ -38,6 +38,7 @@
     --app-line: #e7e9f2;
     --app-focus: #2538c7;
 }
+.nav-user-avatar-image { object-fit: cover; }
 
 body {
     font-family: "Namikulo Nunito", "Segoe UI", Arial, sans-serif;

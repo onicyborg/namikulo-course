@@ -37,6 +37,8 @@ class HlsVideoDelivery implements VideoDelivery
 
         return ['manifest_url' => route('stream.master', ['token' => $token]),
             'heartbeat_url' => route('learn.heartbeat', ['token' => $token]),
+            'progress_url' => $user->isMember() ? route('learn.progress', $lesson) : null,
+            'progress_token' => $user->isMember() ? $token : null,
             'ttl_seconds' => config('video.session_ttl_minutes') * 60,
             'heartbeat_seconds' => config('video.heartbeat_seconds'),
             'watermark' => $user->name.' · '.$user->email];

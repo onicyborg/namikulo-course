@@ -53,6 +53,8 @@ Potongan diunggah maksimal 5 MiB/request, dengan retry idempoten. Jika tab ditut
 
 Satu user hanya dapat memiliki satu sesi playback aktif. Membuka sesi kedua mencabut sesi pertama. Token stream dikirim ke player lewat respons playback dan diverifikasi bersama sesi login, enrollment, serta expiry di setiap request. URL stream adalah endpoint terotorisasi, bukan URL file. Watermark dan pemblokiran tindakan browser hanya menghambat penyebaran; screenshot atau rekaman layar tidak bisa dijamin terblokir.
 
+Batas permintaan playback, heartbeat, progres, dan stream memakai kunci throttle terpisah per user. Permintaan segmen HLS tidak mengurangi kuota membuka sesi video. Jika batas playback benar-benar tercapai, respons 429 memberi waktu tunggu melalui header `Retry-After`; player menampilkan waktu tersebut.
+
 ## UAT yang diperlukan
 
 1. Sebagai admin, proses MP4 pendek representatif dan amati browser console/network. Hasil yang diharapkan: file WASM dan Worker lokal termuat, tahap mencapai **Siap**, kartu status berubah menjadi **Siap** tanpa refresh, dan tersedia aksi **Pratinjau video** serta **Siapkan video pengganti**. `video_assets.status=ready` dan HLS dapat diputar dengan audio/video normal. Inilah gate utama dukungan AES-128 build.

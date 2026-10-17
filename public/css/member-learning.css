@@ -1,0 +1,42 @@
+.member-learning .card { border: 1px solid var(--app-line); box-shadow: 0 4px 18px rgba(32, 38, 58, .04); }
+.member-learning .card-header { min-height: 64px; }
+.member-learning .card-header h2, .member-learning-header h2 { margin: 0; color: var(--app-ink); font-size: 1.15rem; }
+.member-learning-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.member-learning-header p { margin: 4px 0 0; color: var(--app-muted); }
+.member-learning-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.member-learning-row { display: flex; align-items: flex-start; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--app-line); }
+.member-learning-row:last-child { border-bottom: 0; }
+.member-learning-thumb { display: flex; flex: 0 0 200px; align-items: center; justify-content: center; width: 200px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 7px; background: #eef0fa; color: var(--app-primary); }
+.member-learning-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.member-learning-thumb svg { width: 30px; height: 30px; }
+.member-learning-copy { flex: 1 1 auto; min-width: 0; }
+.member-learning-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.member-learning-title h3 { margin: 0; font-size: 1.08rem; line-height: 1.4; overflow-wrap: anywhere; }
+.member-learning-title .badge { flex: 0 0 auto; }
+.member-learning-copy > p { margin: 7px 0 12px; color: var(--app-muted); }
+.member-learning-copy .progress, .member-learning-detail .progress { max-width: 530px; height: 8px; margin: 8px 0 12px; border-radius: 8px; }
+.member-learning-progress-meta { display: flex; justify-content: space-between; gap: 12px; max-width: 530px; color: var(--app-muted); font-size: .84rem; }
+.member-learning-progress-meta strong { color: var(--app-ink); }
+.member-learning-date { font-size: .86rem; }
+.member-learning-back { margin-bottom: 16px; }
+.member-learning-back a { font-weight: 700; }
+.member-learning-overline { margin-bottom: 8px; color: var(--app-primary-dark); font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.member-learning-detail h1 { color: var(--app-ink); font-size: clamp(1.45rem, 3vw, 2rem); overflow-wrap: anywhere; }
+.member-learning-detail p { color: var(--app-muted); }
+.member-learning-section + .member-learning-section { margin-top: 26px; padding-top: 23px; border-top: 1px solid var(--app-line); }
+.member-learning-section h3 { color: var(--app-ink); font-size: 1.04rem; }
+.member-learning-section > p { color: var(--app-muted); }
+.member-learning-section ol { margin: 14px 0 0; padding: 0; list-style: none; }
+.member-learning-section li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-top: 1px solid var(--app-line); }
+.member-learning-section li:first-child { border-top: 0; }
+.member-learning-section li strong { display: block; overflow-wrap: anywhere; }
+.member-learning-section li small { display: block; margin-top: 4px; color: var(--app-muted); }
+.member-learning-section li a { flex: 0 0 auto; font-weight: 700; }
+.member-learning-access p { margin: 18px 0; color: var(--app-muted); }
+.member-profile-avatar { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }
+.member-profile-avatar img, .member-profile-avatar > span { display: flex; flex: 0 0 72px; align-items: center; justify-content: center; width: 72px; height: 72px; border-radius: 50%; object-fit: cover; background: var(--app-primary); color: #fff; font-size: 1.6rem; }
+.member-profile-avatar > div { min-width: 0; }
+.member-profile-avatar label { display: block; margin-bottom: 6px; font-weight: 700; }
+.member-profile-avatar .form-control-file { max-width: 100%; }
+@media (max-width: 767.98px) { .member-learning-header, .member-learning-row, .member-learning-title { flex-direction: column; } .member-learning-thumb { flex: none; width: 100%; max-width: 360px; } }
+@media (max-width: 575.98px) { .member-learning-section li { align-items: flex-start; } .member-profile-avatar { align-items: flex-start; flex-direction: column; } }
