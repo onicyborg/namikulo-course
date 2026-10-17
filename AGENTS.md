@@ -15,30 +15,21 @@ Jika dokumen saling bertentangan, urutan prioritasnya: **AGENTS.md > SRS.md > PR
 
 ## 0. Aturan kerja agent (prioritas tertinggi)
 
-### 0.1 Agent TIDAK melakukan testing
+### 0.1 Pengujian oleh agent dan UAT user
 
-Seluruh pengujian dilakukan oleh user secara langsung. Agent fokus mengembangkan fitur.
+Atas permintaan user, agent boleh melakukan pengujian pada aplikasi **lokal atau staging yang disediakan khusus untuk pengujian**. Gunakan Chrome DevTools MCP untuk memeriksa tampilan, interaksi, console, network, responsivitas, dan alur lintas halaman. Konfigurasi proyek serta langkah penggunaan ada di [panduan pengujian browser](docs/BROWSER-TESTING.md). Pengujian agent melengkapi UAT; kelulusan phase dan persetujuan rilis tetap diberikan user.
 
-Dilarang:
+- Agent boleh menjalankan aplikasi lokal (`php artisan serve`) dan test runner yang relevan (`php artisan test`/PHPUnit atau pengujian browser melalui MCP), serta menulis test yang menguji perilaku nyata dalam scope phase aktif. Laporkan perintah, skenario, hasil, dan bagian yang belum tercakup secara jujur. Jangan mengklaim seluruh aplikasi telah diuji jika hanya sebagian yang diperiksa.
+- Test yang membuat/mengubah data harus memakai **database test terpisah** dan konfigurasi yang dipastikan berbeda dari database development/production. Jangan menjalankan `migrate:fresh`, seed, rollback, atau test destruktif pada database user. Bila lingkungan test belum tersedia, batasi diri pada pemeriksaan browser yang tidak mengubah data dan jelaskan keterbatasannya.
+- Jangan memakai akun production, kredensial nyata, atau transaksi Midtrans production untuk pengujian. Alur pembayaran end-to-end memakai sandbox dan data uji yang disediakan user; jangan memanggil API Midtrans dari terminal hanya untuk mencoba transaksi.
+- Browser MCP menggunakan profil terisolasi. Jangan merekam/menampilkan password, cookie, token, server key, payload pembayaran sensitif, atau data pribadi dalam screenshot, log, maupun laporan. Simpan artefak pengujian di lokasi sementara atau direktori yang diabaikan Git.
+- Perintah migration/seed pada database development, staging non-test, dan production tetap hanya dijalankan user sesuai bagian 0.2. Pengujian tidak memberi izin untuk deploy, mengubah data production, atau menyatakan phase lulus tanpa feedback user.
 
-- Menjalankan `php artisan test`, `phpunit`, `pest`, `dusk`, Playwright, Cypress, atau test runner apa pun.
-- Menulis file test (`tests/**`) kecuali user memintanya secara eksplisit.
-- Menjalankan aplikasi untuk menguji (`php artisan serve`, `curl` ke endpoint, membuka browser headless, screenshot UI).
-- Memanggil API Midtrans sandbox/production dari terminal untuk mencoba alur pembayaran.
-- Mengklaim "sudah diuji" di laporan. Gunakan frasa "sudah diimplementasikan, menunggu pengujian user".
-
-Diperbolehkan (bukan testing, hanya perkakas pengembangan):
-
-- `php artisan make:*`, `php artisan route:list`, `php artisan optimize:clear`, `composer dump-autoload`.
-- `composer require/install` dan `npm`/`npx` hanya bila benar-benar dibutuhkan phase aktif dan dependensinya diizinkan (lihat bagian 4).
-- `git status`, `git diff`, `git diff --check`, `git add`, `git commit` bila user memintanya.
-- Membaca file, mencari kode, dan membaca log yang sudah ada.
-
-Sebagai pengganti testing, setiap phase WAJIB menyertakan **Panduan Uji Manual (UAT)** di laporan serah-terima: daftar langkah yang dapat diikuti user beserta hasil yang diharapkan.
+Setiap phase WAJIB menyertakan **Panduan Uji Manual (UAT)** berisi langkah dan hasil yang diharapkan, termasuk bila agent sudah menjalankan pengujian otomatis/browser.
 
 ### 0.2 Migrate & seed hanya dijalankan user
 
-Agent tidak boleh menjalankan perintah yang mengubah isi database:
+Agent tidak boleh menjalankan perintah yang mengubah isi database development, staging non-test, atau production. Pengecualian hanya untuk database test terpisah yang sudah diverifikasi sesuai bagian 0.1. Perintah berikut dilarang pada database user:
 
 - `php artisan migrate`, `migrate:fresh`, `migrate:refresh`, `migrate:rollback`, `migrate:reset`
 - `php artisan db:seed`, `db:wipe`
@@ -58,7 +49,7 @@ Seeder tidak boleh berisi kredensial hardcode. Ambil dari `.env` (mis. `SEED_ADM
 
 - Pekerjaan dibagi menjadi phase (Phase 0, 1, 2, ...) sesuai `docs/phases/README.md`.
 - Kerjakan **hanya phase aktif**. Jangan mengerjakan fitur phase berikutnya, bahkan bila "sekalian".
-- Sebuah phase dianggap **selesai hanya setelah user memberi feedback hasil test langsung** dan menyatakan lulus. Agent tidak boleh menandai phase selesai atas inisiatif sendiri.
+- Sebuah phase dianggap **selesai hanya setelah user meninjau hasil pengujian dan menyatakan lulus**. Agent tidak boleh menandai phase selesai atas inisiatif sendiri.
 - Jika user melaporkan bug pada phase aktif, perbaiki di phase tersebut sampai user menyatakan lulus.
 - Jangan berpindah phase tanpa instruksi eksplisit user, misalnya "Phase 1 lulus, lanjut Phase 2".
 - Atas permintaan user, seluruh dokumen Phase 0–7 disiapkan di muka berdasarkan PRD/SRS. Dokumen adalah rencana, bukan izin implementasi atau kelulusan. Cocokkan dengan revisi terbaru dan hasil UAT sebelum memulai setiap phase.
@@ -80,7 +71,7 @@ Akhiri setiap sesi kerja dengan laporan ringkas berisi:
 3. Variabel `.env` baru atau berubah.
 4. Panduan Uji Manual (UAT) per fitur dengan hasil yang diharapkan.
 5. Asumsi yang diambil dan keterbatasan yang diketahui.
-6. Pernyataan bahwa tidak ada test yang dijalankan.
+6. Pengujian yang dijalankan agent beserta hasilnya, atau alasan spesifik bila belum dapat dijalankan.
 
 ---
 
@@ -160,6 +151,7 @@ Migration hanya boleh memakai Schema Builder yang portabel. Wajib:
   - `ffmpeg.wasm` beserta wrapper/core/Web Worker — pemrosesan video di browser admin (Phase 4), disetujui user. Asset distribusi siap pakai dipin versinya dan di-host lokal; tanpa framework/bundler frontend tambahan. Mulai dengan single-thread dan satu kualitas; dukungan HLS AES-128 serta batas perangkat wajib melalui UAT user.
   - Midtrans JS tokenisasi kartu — hanya jika pembayaran kartu diaktifkan (di luar MVP).
 - Library lain (SweetAlert, Toastr, chart baru, dll.) dilarang tanpa persetujuan user.
+- Chrome DevTools MCP hanya perkakas pengujian agent di luar aplikasi; jangan memuat paketnya ke frontend atau menambahkannya ke dependency runtime proyek.
 - Data dari server ke JS dikirim lewat atribut `data-*`, `@json` di tag `<script>`, atau endpoint JSON. Jangan membangun HTML dari input user tanpa escape.
 
 ---
@@ -294,23 +286,23 @@ Tabel `system_logs` dibuat di Phase 0. Catat created, updated, deleted, assigned
 
 ---
 
-## 13. Serah-terima phase (pengganti quality gate)
+## 13. Serah-terima phase dan quality gate
 
-Karena agent tidak melakukan testing, kualitas dijaga dengan:
+Kualitas dijaga dengan:
 
 1. Review mandiri kode terhadap checklist halaman baru (bagian 15) dan SRS.
-2. `git diff --check` dan `php artisan route:list` boleh dijalankan sebagai pemeriksaan statis.
+2. `git diff --check` dan `php artisan route:list` sebagai pemeriksaan statis; pengujian browser/test runner pada lingkungan yang aman sesuai bagian 0.1.
 3. Pemeriksaan antislop pada UI dan teks.
-4. Laporan serah-terima (bagian 0.5) dengan UAT lengkap.
+4. Laporan serah-terima (bagian 0.5) dengan hasil pengujian agent dan UAT lengkap.
 5. Menunggu feedback user. Phase selesai hanya setelah user menyatakan lulus.
 
-User menguji: render view, auth, otorisasi, CSRF, validasi, flash/AJAX, 404 asset, browser console, dan tampilan pada 375px, 768px, 1024px, dan desktop.
+Agent memeriksa sejauh lingkungan test tersedia, lalu user mengonfirmasi UAT: render view, auth, otorisasi, CSRF, validasi, flash/AJAX, 404 asset, browser console, dan tampilan pada 375px, 768px, 1024px, dan desktop.
 
 ---
 
 ## 14. Anti-pattern
 
-- Menjalankan test, `migrate`, atau `db:seed`; mengerjakan phase di luar phase aktif.
+- Menjalankan test yang memutasi database user, `migrate` atau `db:seed` di luar database test terpisah; mengerjakan phase di luar phase aktif.
 - Memakai Vue/React/Alpine/Livewire/Inertia/htmx, Vite, atau starter kit.
 - Memakai Metronic, Bootstrap 5, `data-bs-*`, `btn-close`, `me-*`, `ms-*`, `data-kt-*`.
 - Mengedit vendor Otika, `app.min.js`, `scripts.js`.
@@ -338,4 +330,4 @@ User menguji: render view, auth, otorisasi, CSRF, validasi, flash/AJAX, 404 asse
 - [ ] Migration UUID v7 dan kompatibel MySQL + PostgreSQL.
 - [ ] Flash/AJAX response jelas; state loading, empty, success, error, permission tersedia.
 - [ ] Responsif dan aksesibel (label, alt, fokus keyboard).
-- [ ] Laporan serah-terima + UAT ditulis; tidak ada test dijalankan.
+- [ ] Hasil pengujian agent, keterbatasan, laporan serah-terima, dan UAT ditulis.

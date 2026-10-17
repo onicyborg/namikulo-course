@@ -1,0 +1,13 @@
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = [
+    "-y",
+    "chrome-devtools-mcp@1.11.0",
+    "--headless",
+    "--isolated",
+    "--viewport=1440x900",
+    "--no-usage-statistics",
+    "--no-performance-crux",
+    "--workspace=/home/geats/Project Pribadi/namikulo-course",
+]
+startup_timeout_sec = 30

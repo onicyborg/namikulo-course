@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\EnrollmentStatus;
 use App\Models\Enrollment;
+use App\Models\Course;
 use App\Models\OperationState;
 use App\Models\PlaybackSession;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +46,8 @@ class ExpireEnrollments
                     if ($locked->status !== EnrollmentStatus::Active || $locked->expires_at->isFuture()) return false;
                     $old = $locked->getAttributes();
                     $locked->update(['status' => EnrollmentStatus::Expired]);
-                    if (! $this->enrollments->activeFor($locked->user, $locked->course)) {
+                    $course = Course::withTrashed()->findOrFail($locked->course_id);
+                    if (! $this->enrollments->activeFor($locked->user, $course)) {
                         PlaybackSession::query()->where('user_id', $locked->user_id)->whereNull('revoked_at')
                             ->whereHas('lesson', fn ($lesson) => $lesson->where('course_id', $locked->course_id))
                             ->update(['revoked_at' => now()]);

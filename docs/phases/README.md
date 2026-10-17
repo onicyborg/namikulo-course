@@ -1,6 +1,6 @@
 # Roadmap pengembangan
 
-Status: Phase 0 **menunggu UAT user**; Phase 1–6 **lulus UAT user**; Phase 7 **aktif**. Phase 0 belum dinyatakan lulus oleh user.
+Status: Phase 0 **menunggu UAT user**; Phase 1–6 **lulus UAT user**; Phase 7 **diimplementasikan, menunggu UAT user dan staging MySQL**. Proyek belum siap rilis.
 
 Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen tidak mengaktifkan phase atau menyatakan implementasi selesai. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
@@ -15,7 +15,7 @@ Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen 
 | [4](PHASE-4.md) | Upload, HLS browser, impor, stream, player terlindungi | F-207–208, F-602–603, F-701–706 | Lulus UAT user |
 | [5](PHASE-5.md) | Checkout, pembayaran, transaksi member, invoice PDF, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-510, F-605; BR-02/04–07 | Lulus UAT user |
 | [6](PHASE-6.md) | Dashboard member, course saya, progres, profil | F-105, F-601, F-604 | Lulus UAT user |
-| [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis | F-509 (opsional), NFR, dashboard MVP | Aktif |
+| [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis | F-509 (opsional), NFR, dashboard MVP | Menunggu UAT |
 
 Prioritas M wajib rilis; S direncanakan pada phase terkait dan setiap penundaan membutuhkan keputusan user yang dicatat. F-509 berkategori C: default ditunda, implementasi hanya jika user memilih. Fitur di luar MVP PRD 4.2 tidak masuk roadmap ini.
 
@@ -34,12 +34,12 @@ Prioritas M wajib rilis; S direncanakan pada phase terkait dan setiap penundaan 
 
 1. User mengaktifkan phase setelah phase sebelumnya lulus (Phase 0 cukup instruksi mulai).
 2. Agent membaca dokumen terbaru dan implementasi/migration aktual; jangan mengubah migration yang sudah dipakai user.
-3. Implementasikan hanya scope aktif. Agent tidak menulis/menjalankan test, menjalankan aplikasi untuk uji, atau mengubah isi database.
-4. Review kode/dokumen terhadap SRS, pedoman UI, authorization, validasi dan kompatibilitas database. Pemeriksaan statis yang diizinkan mengikuti AGENTS.md.
-5. Serahkan daftar file, perintah user berurutan, `.env`, UAT dengan hasil diharapkan, asumsi/keterbatasan, dan pernyataan tidak menjalankan test.
-6. User menguji dan memberi hasil. Status dapat berubah menjadi “Menunggu UAT”, “Perlu perbaikan”, atau “Lulus oleh user”. Jangan mengisi kelulusan sebelum ada feedback eksplisit.
+3. Implementasikan hanya scope aktif. Agent boleh menguji melalui [Chrome DevTools MCP](../BROWSER-TESTING.md) atau test runner pada lingkungan test terpisah sesuai AGENTS.md; database user tetap tidak dimutasi oleh agent.
+4. Review kode/dokumen terhadap SRS, pedoman UI, authorization, validasi dan kompatibilitas database. Catat hasil pemeriksaan statis dan pengujian yang benar-benar dijalankan.
+5. Serahkan daftar file, perintah user berurutan, `.env`, hasil pengujian agent, UAT dengan hasil diharapkan, serta asumsi/keterbatasan.
+6. User meninjau dan menguji sesuai kebutuhan, lalu memberi hasil. Status dapat berubah menjadi “Menunggu UAT”, “Perlu perbaikan”, atau “Lulus oleh user”. Jangan mengisi kelulusan sebelum ada feedback eksplisit.
 
-UAT semua halaman: role benar/salah, validasi dan CSRF, `old()`, flash/loading/empty/error, aset tanpa 404, console, keyboard, serta lebar 375/768/1024 px dan desktop. UAT dijalankan user; tabel pada tiap phase menambah skenario khusus.
+UAT semua halaman: role benar/salah, validasi dan CSRF, `old()`, flash/loading/empty/error, aset tanpa 404, console, keyboard, serta lebar 375/768/1024 px dan desktop. Agent boleh memeriksa skenario tersebut di lingkungan test; user tetap memberi keputusan kelulusan. Tabel pada tiap phase menambah skenario khusus.
 
 ## Keputusan yang perlu dijaga
 
@@ -57,4 +57,4 @@ Seluruh kebutuhan M dan UAT integrasi lulus oleh user; keputusan S/C dicatat; st
 
 ## Perintah untuk user sekarang
 
-Phase 6 lulus UAT user untuk alur yang dicoba dan user menginstruksikan Phase 7. Konfigurasi production tetap mengikuti [panduan pembayaran](../payment-operations.md). UAT Phase 0 masih menunggu konfirmasi bila diperlukan. Agent tidak menjalankan migration, seed, aplikasi, atau test.
+Phase 7 sudah diimplementasikan dan menunggu UAT user. Jalankan migration indeks baru pada staging MySQL dan ikuti [panduan UAT Phase 7](PHASE-7.md#panduan-uji-manual-uat). UAT Phase 0 masih menunggu konfirmasi. Production dan status siap rilis mengikuti [checklist rilis](../RELEASE-CHECKLIST.md), bukan penyelesaian coding. Agent tidak menjalankan migration atau seed pada database user.

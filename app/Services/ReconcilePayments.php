@@ -11,7 +11,7 @@ class ReconcilePayments
 {
     public const TASK = 'reconcile-payments';
 
-    public function __construct(private readonly PaymentService $payments) {}
+    public function __construct(private readonly PaymentService $payments, private readonly ActivityLogger $logger) {}
 
     public function run(int $batchSize, int $maxSeconds): array
     {
@@ -40,11 +40,15 @@ class ReconcilePayments
             }
             $remaining = Payment::query()->whereIn('status', $statuses)
                 ->where('created_at', '<=', now()->subMinutes(10))->exists();
-            if (! $remaining) $state->update(['cursor' => null, 'last_succeeded_at' => now()]);
+            if (! $remaining) $state->update(['cursor' => null, 'last_succeeded_at' => now(), 'last_error' => null, 'next_attempt_at' => null]);
+            $this->logger->log('operation', null, 'operation_states', $state->id, null,
+                ['status' => $remaining ? 'partial' : 'completed', 'processed' => $processed, 'remaining' => $remaining], 'Batch sinkron pembayaran');
             return ['status' => $remaining ? 'partial' : 'completed', 'processed' => $processed, 'remaining' => $remaining];
         } catch (\Throwable $exception) {
             $state->update(['last_error' => $exception::class, 'next_attempt_at' => now()->addMinutes(5)]);
-            return ['status' => 'partial', 'processed' => $processed, 'remaining' => true];
+            $this->logger->log('operation_failed', null, 'operation_states', $state->id, null,
+                ['error' => $exception::class, 'processed' => $processed], 'Batch sinkron pembayaran gagal');
+            throw $exception;
         }
     }
 }

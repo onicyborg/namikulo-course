@@ -22,6 +22,8 @@
             <li class="dropdown {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"><a href="{{ route('admin.orders.index') }}" class="nav-link"><i data-feather="credit-card" aria-hidden="true"></i><span>Pesanan</span></a></li>
             <li class="menu-header">PENGGUNA</li>
             <li class="dropdown {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"><a href="{{ route('admin.users.index') }}" class="nav-link"><i data-feather="users" aria-hidden="true"></i><span>User</span></a></li>
+            <li class="menu-header">OPERASI</li>
+            <li class="dropdown {{ request()->routeIs('admin.operations.*') ? 'active' : '' }}"><a href="{{ route('admin.operations.index') }}" class="nav-link"><i data-feather="activity" aria-hidden="true"></i><span>Tugas &amp; log</span></a></li>
         </ul>
     </aside>
 </div>

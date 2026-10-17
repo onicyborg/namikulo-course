@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseMemberController;
 use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\OperationController;
 use App\Http\Controllers\Operations\ScheduledJobController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -59,7 +60,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 Route::post('/account/timezone', [UserTimezoneController::class, 'update'])
-    ->middleware(['auth', 'active', 'throttle:10,1'])
+    ->middleware(['auth', 'active', 'throttle:10,1,timezone:'])
     ->name('account.timezone.update');
 
 Route::middleware(['auth', 'active'])->group(function (): void {
@@ -81,14 +82,14 @@ Route::post('/operations/jobs/{task}', [ScheduledJobController::class, 'store'])
     ->middleware(['throttle:operations', 'cron.token'])->name('operations.jobs.store');
 
 Route::post('/webhooks/midtrans', MidtransWebhookController::class)
-    ->middleware('throttle:60,1')->name('webhooks.midtrans');
+    ->middleware('throttle:60,1,webhook:')->name('webhooks.midtrans');
 
 Route::middleware(['auth', 'active', 'role:'.UserRole::Member->value])->group(function (): void {
     Route::get('/checkout/{course:slug}', [CheckoutController::class, 'show'])->name('checkout.show');
-    Route::post('/checkout/{course:slug}', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('checkout.store');
+    Route::post('/checkout/{course:slug}', [CheckoutController::class, 'store'])->middleware('throttle:10,1,checkout:')->name('checkout.store');
     Route::get('/orders/{order}/pay', [OrderPaymentController::class, 'show'])->name('orders.pay');
-    Route::get('/orders/{order}/status', [OrderPaymentController::class, 'status'])->middleware('throttle:30,1')->name('orders.status');
-    Route::post('/orders/{order}/cancel', [OrderPaymentController::class, 'cancel'])->middleware('throttle:10,1')->name('orders.cancel');
+    Route::get('/orders/{order}/status', [OrderPaymentController::class, 'status'])->middleware('throttle:30,1,order-status:')->name('orders.status');
+    Route::post('/orders/{order}/cancel', [OrderPaymentController::class, 'cancel'])->middleware('throttle:10,1,order-cancel:')->name('orders.cancel');
 });
 
 Route::prefix('admin')
@@ -96,15 +97,16 @@ Route::prefix('admin')
     ->middleware(['auth', 'active', 'role:'.UserRole::Admin->value])
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('operations', [OperationController::class, 'index'])->name('operations.index');
         Route::get('courses/{course}/preview', [CoursePageController::class, 'preview'])->name('courses.preview');
         Route::get('lessons/{lesson}/video/prepare', [VideoUploadController::class, 'prepare'])->name('lessons.video.prepare');
         Route::delete('lessons/{lesson}/video', [VideoUploadController::class, 'destroy'])->name('lessons.video.destroy');
-        Route::post('lessons/{lesson}/video/uploads', [VideoUploadController::class, 'store'])->middleware('throttle:10,1')->name('lessons.video.uploads.store');
-        Route::post('video-uploads/{upload}/manifest', [VideoUploadController::class, 'manifest'])->middleware('throttle:30,1')->name('video-uploads.manifest');
-        Route::post('video-uploads/{upload}/chunks/{name}/{index}', [VideoUploadController::class, 'chunk'])->where('name', 'seg_\d{5}\.ts')->whereNumber('index')->middleware('throttle:120,1')->name('video-uploads.chunk');
-        Route::post('video-uploads/{upload}/finalize', [VideoUploadController::class, 'finalize'])->middleware('throttle:30,1')->name('video-uploads.finalize');
-        Route::get('video-uploads/{upload}/status', [VideoUploadController::class, 'status'])->middleware('throttle:30,1')->name('video-uploads.status');
-        Route::post('video-uploads/{upload}/cancel', [VideoUploadController::class, 'cancel'])->middleware('throttle:30,1')->name('video-uploads.cancel');
+        Route::post('lessons/{lesson}/video/uploads', [VideoUploadController::class, 'store'])->middleware('throttle:10,1,upload-start:')->name('lessons.video.uploads.store');
+        Route::post('video-uploads/{upload}/manifest', [VideoUploadController::class, 'manifest'])->middleware('throttle:30,1,upload-manifest:')->name('video-uploads.manifest');
+        Route::post('video-uploads/{upload}/chunks/{name}/{index}', [VideoUploadController::class, 'chunk'])->where('name', 'seg_\d{5}\.ts')->whereNumber('index')->middleware('throttle:120,1,upload-chunk:')->name('video-uploads.chunk');
+        Route::post('video-uploads/{upload}/finalize', [VideoUploadController::class, 'finalize'])->middleware('throttle:30,1,upload-finalize:')->name('video-uploads.finalize');
+        Route::get('video-uploads/{upload}/status', [VideoUploadController::class, 'status'])->middleware('throttle:30,1,upload-status:')->name('video-uploads.status');
+        Route::post('video-uploads/{upload}/cancel', [VideoUploadController::class, 'cancel'])->middleware('throttle:30,1,upload-cancel:')->name('video-uploads.cancel');
         Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
         Route::resource('courses', CourseController::class)->except(['show', 'create', 'edit']);
         Route::post('courses/{course}/publish', [CourseController::class, 'publish'])->name('courses.publish');
@@ -120,16 +122,16 @@ Route::prefix('admin')
         Route::post('sections/{section}/lessons', [LessonController::class, 'store'])->name('sections.lessons.store');
         Route::put('sections/{section}/lessons/{lesson}', [LessonController::class, 'update'])->name('sections.lessons.update');
         Route::delete('sections/{section}/lessons/{lesson}', [LessonController::class, 'destroy'])->name('sections.lessons.destroy');
-        Route::get('users/search', [UserController::class, 'search'])->middleware('throttle:30,1')->name('users.search');
+        Route::get('users/search', [UserController::class, 'search'])->middleware('throttle:30,1,user-search:')->name('users.search');
         Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
         Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
         Route::get('courses/{course}/members', [CourseMemberController::class, 'index'])->name('courses.members');
         Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
-        Route::post('orders/{order}/sync', [AdminOrderController::class, 'sync'])->middleware('throttle:10,1')->name('orders.sync');
-        Route::post('orders/{order}/retry-email', [AdminOrderController::class, 'retryEmail'])->middleware('throttle:5,1')->name('orders.retry-email');
-        Route::post('orders/{order}/payments/{payment}/retry-instructions-email', [AdminOrderController::class, 'retryInstructionsEmail'])->middleware('throttle:5,1')->name('orders.retry-instructions-email');
+        Route::post('orders/{order}/sync', [AdminOrderController::class, 'sync'])->middleware('throttle:10,1,admin-sync:')->name('orders.sync');
+        Route::post('orders/{order}/retry-email', [AdminOrderController::class, 'retryEmail'])->middleware('throttle:5,1,admin-email:')->name('orders.retry-email');
+        Route::post('orders/{order}/payments/{payment}/retry-instructions-email', [AdminOrderController::class, 'retryInstructionsEmail'])->middleware('throttle:5,1,admin-email:')->name('orders.retry-instructions-email');
         Route::post('courses/{course}/members', [CourseMemberController::class, 'store'])->name('courses.members.store');
         Route::put('members/{enrollment}', [CourseMemberController::class, 'update'])->name('members.update');
         Route::post('members/{enrollment}/revoke', [CourseMemberController::class, 'revoke'])->name('members.revoke');
@@ -145,5 +147,5 @@ Route::prefix('my')
         Route::get('/profile', [MemberProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [MemberProfileController::class, 'update'])->name('profile.update');
         Route::get('/orders', [MemberOrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{order}/invoice', [MemberOrderController::class, 'invoice'])->middleware('throttle:10,1')->name('orders.invoice');
+        Route::get('/orders/{order}/invoice', [MemberOrderController::class, 'invoice'])->middleware('throttle:10,1,invoice:')->name('orders.invoice');
     });

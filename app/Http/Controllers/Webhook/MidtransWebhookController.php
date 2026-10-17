@@ -22,12 +22,13 @@ class MidtransWebhookController extends Controller
         $secret = (string) config('midtrans.server_key');
         $valid = $secret !== '' && $orderId !== '' && $code !== '' && $amount !== ''
             && hash_equals(hash('sha512', $orderId.$code.$amount.$secret), $signature);
+        $storedPayload = PaymentNotification::safePayload($payload);
 
         $notification = PaymentNotification::query()->create([
             'midtrans_order_id' => mb_substr($orderId, 0, 50),
             'transaction_status' => mb_substr(is_string($payload['transaction_status'] ?? null) ? $payload['transaction_status'] : '', 0, 30),
             'signature_valid' => $valid,
-            'payload' => $payload,
+            'payload' => $storedPayload,
             'process_result' => $valid ? 'received' : 'invalid_signature',
         ]);
         if (! $valid) return response()->json(['message' => 'Tanda tangan tidak valid.'], 403);

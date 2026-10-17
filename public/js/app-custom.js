@@ -54,6 +54,17 @@
         });
     }
 
+    function normalizeSidebarTabOrder() {
+        var sidebar = document.querySelector('.main-sidebar');
+        if (!sidebar) return;
+
+        var normalize = function () {
+            if (Number(sidebar.getAttribute('tabindex')) > 0) sidebar.setAttribute('tabindex', '0');
+        };
+        normalize();
+        new MutationObserver(normalize).observe(sidebar, { attributes: true, attributeFilter: ['tabindex'] });
+    }
+
     function initializeTimezone() {
         var zone = '';
         try {
@@ -120,6 +131,7 @@
         initializeLoadingForms();
         initializePasswordToggles();
         initializeDeleteModal();
+        normalizeSidebarTabOrder();
         initializeTimezone();
 
         var summary = document.querySelector('[data-validation-summary]');

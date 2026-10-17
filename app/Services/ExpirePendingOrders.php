@@ -50,11 +50,15 @@ class ExpirePendingOrders
             }
             $remaining = Order::query()->where('status', OrderStatus::Pending->value)
                 ->where('expires_at', '<=', now())->exists();
-            if (! $remaining) $state->update(['cursor' => null, 'last_succeeded_at' => now()]);
+            if (! $remaining) $state->update(['cursor' => null, 'last_succeeded_at' => now(), 'last_error' => null, 'next_attempt_at' => null]);
+            $this->logger->log('operation', null, 'operation_states', $state->id, null,
+                ['status' => $remaining ? 'partial' : 'completed', 'processed' => $processed, 'remaining' => $remaining], 'Batch kedaluwarsa pesanan');
             return ['status' => $remaining ? 'partial' : 'completed', 'processed' => $processed, 'remaining' => $remaining];
         } catch (\Throwable $exception) {
             $state->update(['last_error' => $exception::class, 'next_attempt_at' => now()->addMinutes(5)]);
-            return ['status' => 'partial', 'processed' => $processed, 'remaining' => true];
+            $this->logger->log('operation_failed', null, 'operation_states', $state->id, null,
+                ['error' => $exception::class, 'processed' => $processed], 'Batch kedaluwarsa pesanan gagal');
+            throw $exception;
         }
     }
 }

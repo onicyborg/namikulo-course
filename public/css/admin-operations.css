@@ -1,0 +1,20 @@
+.admin-operations .card { border: 1px solid var(--app-line); }
+.section-header-breadcrumb .breadcrumb-item a { color: #4654b5; }
+.section-header-breadcrumb .breadcrumb-item.active { color: #52616f; }
+.admin-operations .card-header h2 { margin: 0; color: var(--app-ink); font-size: 1.1rem; }
+.admin-operations .text-muted { color: #52616f !important; }
+.admin-operations .btn-primary { background-color: #4654b5; border-color: #4654b5; color: #fff; }
+.admin-operations .badge-success { background-color: #237b45; color: #fff; }
+.admin-operations .badge-warning { background-color: #8a5700; color: #fff; }
+.admin-operations .badge-danger { background-color: #a72f34; color: #fff; }
+.admin-operations .table { margin-bottom: 0; }
+.admin-operations td, .admin-operations th { vertical-align: middle; }
+.admin-operations td { min-width: 100px; }
+.admin-operations td:first-child { min-width: 190px; }
+.admin-operations-error { max-width: 220px; margin-top: 5px; color: #a72f34; overflow-wrap: anywhere; }
+.admin-operations-note { margin: 12px 0 0; color: var(--app-muted); font-size: .84rem; }
+.admin-operations-filters { margin-bottom: 8px; }
+.admin-operations-filter-actions { display: flex; gap: 6px; }
+.admin-log-id { max-width: 180px; overflow-wrap: anywhere; }
+.admin-log-agent { max-width: 220px; overflow-wrap: anywhere; }
+@media (max-width: 767.98px) { .main-content .section-header { margin-left: 0 !important; margin-right: 0 !important; } }

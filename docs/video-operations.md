@@ -55,6 +55,8 @@ Satu user hanya dapat memiliki satu sesi playback aktif. Membuka sesi kedua menc
 
 Batas permintaan playback, heartbeat, progres, dan stream memakai kunci throttle terpisah per user. Permintaan segmen HLS tidak mengurangi kuota membuka sesi video. Jika batas playback benar-benar tercapai, respons 429 memberi waktu tunggu melalui header `Retry-After`; player menampilkan waktu tersebut.
 
+Endpoint segmen privat mendukung satu rentang HTTP `Range` per request dan mengalirkan hanya byte yang diminta. Rentang tidak valid menerima 416; setiap request tetap memeriksa sesi dan akses aktif. Ini perlu dikonfirmasi lewat Network panel browser pada UAT Phase 7.
+
 ## UAT yang diperlukan
 
 1. Sebagai admin, proses MP4 pendek representatif dan amati browser console/network. Hasil yang diharapkan: file WASM dan Worker lokal termuat, tahap mencapai **Siap**, kartu status berubah menjadi **Siap** tanpa refresh, dan tersedia aksi **Pratinjau video** serta **Siapkan video pengganti**. `video_assets.status=ready` dan HLS dapat diputar dengan audio/video normal. Inilah gate utama dukungan AES-128 build.

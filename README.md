@@ -2,7 +2,7 @@
 
 Platform course video berbayar dengan area admin dan member, pembayaran Midtrans Core API melalui UI custom, serta akses belajar enam bulan. Nama tampilan aplikasi mengikuti `APP_NAME`.
 
-**Status:** Phase 0 menunggu UAT user; Phase 1–6 lulus UAT user; Phase 7 aktif.
+**Status:** Phase 0 menunggu UAT user; Phase 1–6 lulus UAT user; Phase 7 diimplementasikan dan menunggu UAT. Belum siap rilis.
 
 ## Pedoman proyek
 
@@ -41,6 +41,8 @@ Asset Otika memakai `asset()` dan `ASSET_URL`; asset aplikasi memakai `url()`/`S
 
 Proyek tidak memakai npm, Vite, atau build frontend. Asset Otika dimuat dari `ASSET_URL`; CSS dan JavaScript aplikasi berada di `public/`.
 
+Untuk persiapan staging/production, baca [deployment](docs/DEPLOYMENT.md), [operasi](docs/OPERATIONS.md), dan [checklist rilis](docs/RELEASE-CHECKLIST.md). F-509 pengingat akses H-7 tetap ditunda; tidak ada jadwal cron untuk fitur itu.
+
 ## Operasi dan rilis
 
 Kontrak endpoint, daftar task, interval, token, serta batas batch tercantum di [SRS bagian 5.10](docs/SRS.md#510-pemicu-berkala-melalui-cron-joborg). MVP tidak membutuhkan worker server/FFmpeg hosting. Web Worker ffmpeg.wasm hanya berjalan di browser admin. Respons completed/partial dan checkpoint batch harus dipantau.
@@ -51,4 +53,4 @@ Detail batas cPanel, penyimpanan privat, versi asset lokal, konfigurasi dan pemu
 
 Target awal persiapan video adalah browser desktop kompatibel; batas usulan sumber 200 MiB/15 menit/maksimum 720p perlu UAT. Belum menjamin semua OS/browser atau perangkat mampu memprosesnya.
 
-Agent tidak menjalankan migration, seed, aplikasi, atau test. Semua pengujian dilakukan user mengikuti panduan UAT phase aktif.
+Agent boleh menguji aplikasi lokal melalui [Chrome DevTools MCP](docs/BROWSER-TESTING.md) atau lingkungan test terpisah. Migration/seed pada database user tetap dijalankan user, dan user tetap menetapkan kelulusan UAT phase aktif.
