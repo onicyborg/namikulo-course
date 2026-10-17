@@ -117,8 +117,9 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | F-505 | Setelah lunas, akses aktif otomatis selama 6 bulan sejak waktu pembayaran. | M |
 | F-506 | Pesanan kedaluwarsa otomatis bila lewat batas bayar; pesanan dapat dibatalkan atau metode diganti. | M |
 | F-507 | Member dapat melihat riwayat pesanan dan membuka kembali instruksi bayar yang masih berlaku. | M |
-| F-508 | Notifikasi email saat pembayaran berhasil. | S |
+| F-508 | Email instruksi dikirim setelah tagihan berhasil dibuat (nominal, batas bayar, VA/QRIS atau tautan pembayaran) dan email konfirmasi dikirim setelah pembayaran berhasil. | S |
 | F-509 | Pengingat email saat akses tersisa 7 hari. | C |
+| F-510 | Member dapat mengunduh invoice PDF untuk pesanan lunas; invoice memiliki nomor tetap, identitas penjual dan pembeli, rincian course, nominal, metode, serta tanggal pembayaran. | M |
 
 ### 5.6 Belajar
 

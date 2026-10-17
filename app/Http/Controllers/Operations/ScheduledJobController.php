@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use App\Services\ExpireEnrollments;
 use App\Services\PrunePlaybackSessions;
 use App\Services\CleanupVideoUploads;
+use App\Services\ExpirePendingOrders;
+use App\Services\ReconcilePayments;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 class ScheduledJobController extends Controller
 {
-    public function store(string $task, ExpireEnrollments $expiry, PrunePlaybackSessions $playback, CleanupVideoUploads $uploads): JsonResponse
+    public function store(string $task, ExpireEnrollments $expiry, PrunePlaybackSessions $playback, CleanupVideoUploads $uploads, ExpirePendingOrders $orders, ReconcilePayments $payments): JsonResponse
     {
-        $services = [ExpireEnrollments::TASK => $expiry, PrunePlaybackSessions::TASK => $playback, CleanupVideoUploads::TASK => $uploads];
+        $services = [ExpireEnrollments::TASK => $expiry, PrunePlaybackSessions::TASK => $playback, CleanupVideoUploads::TASK => $uploads,
+            ExpirePendingOrders::TASK => $orders, ReconcilePayments::TASK => $payments];
         abort_unless(isset($services[$task]), 404);
         $batchSize = max(1, min(100, (int) config('operations.batch_size', 20)));
         $maxSeconds = max(2, min(10, (int) config('operations.max_seconds', 10)));

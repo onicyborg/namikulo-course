@@ -1,12 +1,14 @@
 # Phase 5: Midtrans, checkout dan akses pembelian
 
-Status: **Direncanakan, belum diimplementasikan atau lulus UAT**.
+Status: **Lulus UAT user; lanjut ke Phase 6 atas instruksi user**.
 
 Acuan: PRD F-306–F-307, F-501–F-508, F-605, BR-02/04–07; SRS 5.5–5.6/5.10; design 19.6. Lihat [roadmap](README.md), [PRD](../PRD.md), [SRS](../SRS.md), [design](../../design.md), dan [AGENTS](../../AGENTS.md). Jika ada konflik, prioritas AGENTS > SRS > PRD > design.
 
 ## Prasyarat
 
 Phase 4 lulus dan user menginstruksikan lanjut. Akun sandbox dan kanal aktif disediakan user. Agent membaca dokumentasi resmi Core API terbaru tanpa memanggil API untuk mencoba.
+
+Implementasi dan langkah operasional ada di [panduan pembayaran](../payment-operations.md). User menyatakan alur yang dicoba sudah baik dan menginstruksikan lanjut Phase 6. Pemeriksaan seluruh kanal dan konfigurasi production tetap menjadi gerbang rilis.
 
 ## Scope dan urutan implementasi
 
@@ -15,13 +17,15 @@ Phase 4 lulus dan user menginstruksikan lanjut. Akun sandbox dan kanal aktif dis
 3. UI custom VA/QRIS/e-wallet, salin, countdown, instruksi, loading klik ganda, cancel/ganti metode. Ikuti SRS: ganti metode membatalkan payment lama dan membuat attempt baru pada order yang sama; setiap attempt memakai ID gateway unik. Jangan menciptakan order baru hanya karena teks design lama menyebut membatalkan pesanan.
 4. Webhook signature hash_equals dan Get Status, cocokkan order/amount, lock payment/order, idempoten unique enrollment.order_id, status tidak turun dari paid oleh notifikasi terlambat. paid_at berasal pembayaran terkonfirmasi; akses addMonthsNoOverflow.
 5. Polling hanya baca DB milik user; hentikan saat tab tidak aktif/status final. Webhook/verifikasi server yang memberi akses. Sinkron admin dan rekonsiliasi memakai service verifikasi yang sama.
-6. Buat admin daftar/detail pesanan, filter/pencarian/sinkron, audit log dan email sukses sinkron setelah commit (S), timeout SMTP, penanda pengiriman/percobaan pada orders dan retry manual admin. Kegagalan SMTP tidak menggagalkan pembayaran; hasil pengiriman saat timeout dapat tidak pasti.
+6. Buat admin daftar/detail pesanan, filter/pencarian/sinkron, audit log, email instruksi saat tagihan siap, dan email sukses setelah pembayaran terverifikasi (S). Gunakan layout HTML bersama, alternatif teks, timeout SMTP, penanda pengiriman/percobaan pada payments dan orders, serta retry manual admin. Kegagalan SMTP tidak menggagalkan pembayaran; hasil pengiriman saat timeout dapat tidak pasti.
 7. Batch service expire-pending-orders tiap 10 menit dan reconcile-payments tiap 15 menit (S). Get Status gagal tidak boleh dianggap expired/paid; retry terbatas, log dan pemulihan. Refund/partial_refund/chargeback untuk review admin, tidak mencabut akses otomatis.
 8. Hubungkan CTA publik, pending state, hasil sukses ke player, pembelian ulang setelah expiry. Riwayat member lengkap Phase 6.
 
 ## Artefak yang direncanakan dan batas scope
 
 Migration payments/notifications (orders sudah ada); service/controllers checkout/webhook/admin orders; config midtrans; Blade/JS bayar; service batch expiry/reconcile/email; perluasan enrollment; integrasi public/player. Tanpa Snap, SDK, kartu kredit, keranjang atau refund otomatis.
+
+**Perluasan atas permintaan user saat Phase 5 aktif:** menu transaksi member untuk membuka ulang pembayaran pending, serta invoice PDF untuk order lunas. Snapshot invoice dibuat saat unduhan pertama. Identitas penjual berasal dari `.env`; invoice ini adalah dokumen pembayaran, bukan faktur pajak.
 
 Nama file teknis mengikuti struktur SRS dan kode aktual; daftar file final wajib disertakan pada serah-terima. Migration yang sudah dipakai user tidak diedit. Tidak mengerjakan phase berikutnya tanpa instruksi user.
 
@@ -53,7 +57,8 @@ Dilakukan user. Tambahkan pemeriksaan umum [roadmap](README.md#prosedur-tiap-pha
 | 4. Simulasikan status sukses hanya di browser/polling | Tidak memberi akses; akses hanya setelah verifikasi backend. |
 | 5. Biarkan batas bayar lewat, webhook tertunda dan API gagal; gunakan sync/cron | Server konfirmasi status; tidak salah expired; retry/pemulihan tercatat. |
 | 6. Pembayaran pada akhir bulan lalu pembelian ulang setelah expiry | Enam bulan kalender tanpa overflow; enrollment lama tetap sebagai riwayat. |
-| 7. Buka order milik user lain dan periksa email/log | IDOR ditolak; pengiriman bersamaan dicegah, hasil SMTP tidak pasti ditangani dengan review; tidak ada server key/token di respons/log. |
+| 7. Buka order milik user lain dan periksa email/log | IDOR ditolak; email instruksi berisi metode, nominal, batas bayar, VA atau QRIS dan tautan bayar; email sukses berisi detail course dan akses. Klik/refresh berulang tidak mengirim email instruksi ganda. Pengiriman bersamaan dicegah, hasil SMTP tidak pasti ditangani dengan review; tidak ada server key/token di respons/log. |
+| 8. Buka menu Transaksi, lanjutkan tagihan, unduh invoice order lunas | Daftar hanya memuat pesanan sendiri; tagihan aktif dapat dibuka ulang; invoice PDF memiliki nomor dan nominal tetap, sementara order belum lunas atau milik orang lain ditolak 404. |
 | 8. Simulasikan refund/chargeback sandbox sesuai dukungan kanal | Penanda review admin, tidak otomatis mencabut enrollment. |
 
 ## Kriteria kelulusan, asumsi dan keterbatasan

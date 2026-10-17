@@ -25,6 +25,37 @@ class EnrollmentService
             ->latest('expires_at')->first();
     }
 
+    public function createFromOrder(Order $order): Enrollment
+    {
+        return DB::transaction(function () use ($order): Enrollment {
+            $order = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+            if ($order->status !== OrderStatus::Paid || ! $order->paid_at) {
+                throw new \LogicException('Pesanan belum terkonfirmasi lunas.');
+            }
+            $existing = Enrollment::query()->where('order_id', $order->id)->first();
+            if ($existing) return $existing;
+
+            $user = User::query()->findOrFail($order->user_id);
+            $start = $order->paid_at->copy()->utc();
+            $course = Course::withTrashed()->findOrFail($order->course_id);
+            $end = $start->copy()->setTimezone($user->timezone ?: 'UTC')
+                ->addMonthsNoOverflow($course->access_months)->utc();
+            $enrollment = Enrollment::query()->create([
+                'user_id' => $order->user_id,
+                'course_id' => $order->course_id,
+                'order_id' => $order->id,
+                'source' => EnrollmentSource::Purchase,
+                'status' => EnrollmentStatus::Active,
+                'starts_at' => $start,
+                'expires_at' => $end,
+            ]);
+            $this->logger->log('assigned', null, 'enrollments', $enrollment->id, null,
+                ['order_id' => $order->id, 'course_id' => $order->course_id, 'expires_at' => $end->toIso8601String()]);
+
+            return $enrollment;
+        });
+    }
+
     public function stateFor(?User $user, Course $course): string
     {
         if (! $user) return 'guest';

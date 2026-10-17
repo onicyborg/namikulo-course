@@ -1,6 +1,6 @@
 # Roadmap pengembangan
 
-Status: Phase 0 **menunggu UAT user**; Phase 1–4 **lulus UAT user**; Phase 5 **aktif**. Phase 0 belum dinyatakan lulus oleh user.
+Status: Phase 0 **menunggu UAT user**; Phase 1–5 **lulus UAT user**; Phase 6 **aktif**. Phase 0 belum dinyatakan lulus oleh user.
 
 Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen tidak mengaktifkan phase atau menyatakan implementasi selesai. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
@@ -13,8 +13,8 @@ Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen 
 | [2](PHASE-2.md) | User, enrollment manual, expiry, pemicu cron-job.org | F-301–305, BR-09/12 | Lulus UAT user |
 | [3](PHASE-3.md) | Landing, katalog, detail | F-401–404 | Lulus UAT user |
 | [4](PHASE-4.md) | Upload, HLS browser, impor, stream, player terlindungi | F-207–208, F-602–603, F-701–706 | Lulus UAT user |
-| [5](PHASE-5.md) | Checkout, pembayaran, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-605; BR-02/04–07 | Aktif |
-| [6](PHASE-6.md) | Dashboard member, course saya, progres, pesanan, profil | F-105, F-601, F-604, F-507 | Direncanakan |
+| [5](PHASE-5.md) | Checkout, pembayaran, transaksi member, invoice PDF, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-510, F-605; BR-02/04–07 | Lulus UAT user |
+| [6](PHASE-6.md) | Dashboard member, course saya, progres, profil | F-105, F-601, F-604 | Aktif |
 | [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis | F-509 (opsional), NFR, dashboard MVP | Direncanakan |
 
 Prioritas M wajib rilis; S direncanakan pada phase terkait dan setiap penundaan membutuhkan keputusan user yang dicatat. F-509 berkategori C: default ditunda, implementasi hanya jika user memilih. Fitur di luar MVP PRD 4.2 tidak masuk roadmap ini.
@@ -27,7 +27,7 @@ Prioritas M wajib rilis; S direncanakan pada phase terkait dan setiap penundaan 
 - Phase 3 menguji empty state dan katalog tanpa memaksa publikasi. Konten terbit nyata, akses aktif dan pending order diuji kembali pada Phase 4–6. CTA checkout tidak boleh menuju route yang belum tersedia; sementara tampilkan informasi pembelian belum tersedia, lalu aktifkan di Phase 5.
 - Phase 4 menguji player dengan enrollment manual Phase 2. Guard akses wajib sudah berfungsi; pembelian belum diperlukan.
 - Phase 4 menyiapkan kontrol/proses playback. Penyimpanan progres dan perhitungan persentase dibuat Phase 6. Jangan menampilkan progres fiktif atau memanggil endpoint yang belum ada.
-- Phase 5 menyediakan halaman pembayaran dan akses langsung ke player. Daftar riwayat pesanan member serta dashboard lengkap diselesaikan Phase 6.
+- Phase 5 menyediakan halaman pembayaran, akses langsung ke player, daftar transaksi member, dan invoice PDF sesuai permintaan user. Dashboard member lengkap dan progres diselesaikan Phase 6.
 - SRS awal menempatkan F-306/F-307 sebagian dan F-105 di Phase 2. Roadmap ini memusatkan pesanan/sinkron pada Phase 5 dan profil member pada Phase 6 agar tidak mendahului dependensi; Phase 2 fokus administrasi user/anggota. Tabel keterlacakan SRS diselaraskan.
 
 ## Prosedur tiap phase
@@ -57,4 +57,4 @@ Seluruh kebutuhan M dan UAT integrasi lulus oleh user; keputusan S/C dicatat; st
 
 ## Perintah untuk user sekarang
 
-Phase 4 lulus UAT pada perangkat user. Phase 5 dimulai sesuai instruksi user. UAT Phase 0 masih menunggu konfirmasi bila diperlukan. Agent tidak menjalankan migration, seed, aplikasi, atau test.
+Phase 5 lulus UAT user untuk alur yang dicoba dan user menginstruksikan Phase 6. Konfigurasi production tetap mengikuti [panduan pembayaran](../payment-operations.md). UAT Phase 0 masih menunggu konfirmasi bila diperlukan. Agent tidak menjalankan migration, seed, aplikasi, atau test.

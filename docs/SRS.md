@@ -161,7 +161,7 @@ Kolom UUID v7 `id`, `user_id`/`lesson_id` foreignUuid, `status` string(20) (prep
 | transaction_id | string null | dari Midtrans, index |
 | payment_type | string(30) | `bank_transfer`/`qris`/`gopay`/`shopeepay` |
 | channel | string(30) null | `bca`/`bni`/`bri`/`permata`/`cimb`/... |
-| status | string(20) | `pending`/`settlement`/`capture`/`deny`/`cancel`/`expire`/`failure`/`refund` |
+| status | string(20) | `initiating`/`unknown` untuk charge yang belum pasti; lalu `pending`/`settlement`/`capture`/`deny`/`cancel`/`expire`/`failure`/`refund` |
 | fraud_status | string(20) null | |
 | gross_amount | unsignedBigInteger | |
 | va_number | string null | |
@@ -170,8 +170,12 @@ Kolom UUID v7 `id`, `user_id`/`lesson_id` foreignUuid, `status` string(20) (prep
 | expires_at | timestamp null | |
 | paid_at | timestamp null | |
 | raw_response | json null | respons charge, dibersihkan |
+| instruction_email_sent_at | timestamp null | email instruksi tercatat terkirim |
+| instruction_email_last_attempt_at | timestamp null | percobaan pengiriman terakhir |
 
 **payment_notifications** — `payment_id` foreignUuid null (nullOnDelete), `midtrans_order_id` string index, `transaction_status` string(30), `signature_valid` boolean, `payload` json, `processed_at` timestamp null, `process_result` string(50) null.
+
+**order_invoices** — UUID v7 primary key; `order_id` foreignUuid unique (restrictOnDelete), `invoice_number` string unique, snapshot `order_number`, identitas penjual (nama wajib, alamat/email/NPWP opsional), nama/email pembeli, judul course, metode pembayaran, nominal Rupiah `unsignedBigInteger`, `display_timezone`, dan `issued_at` timestamp UTC. Nomor invoice deterministik `INV-{order_number}`. Tidak menyimpan HTML/PDF; dokumen dibuat dari snapshot saat diminta.
 
 **enrollments**
 
@@ -226,6 +230,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | GET | `/my/courses` | `member.courses.index` |
 | GET | `/my/courses/{course:slug}` | `member.courses.show` |
 | GET | `/my/orders` | `member.orders.index` |
+| GET | `/my/orders/{order}/invoice` | `member.orders.invoice` |
 | GET/PUT | `/my/profile` | `member.profile.edit` / `.update` |
 | GET | `/checkout/{course:slug}` | `checkout.show` |
 | POST | `/checkout/{course:slug}` | `checkout.store` |
@@ -328,11 +333,12 @@ Aturan umum: seluruh logika di `OrderService` dan `PaymentService`; `MidtransCli
 1. Validasi: user login, course terbit, `activeFor` kosong, metode ada di `config('midtrans.enabled_channels')`.
 2. Dalam transaksi dengan `lockForUpdate` pada pesanan tertunda milik user+course:
    - Jika ada order `pending` dengan payment `pending` yang belum kedaluwarsa dan metode sama → arahkan ke instruksi bayar yang ada.
-   - Jika metode berbeda → batalkan payment lama (Midtrans Cancel API, lalu tandai lokal `cancel`) dan buat payment baru dengan `midtrans_order_id` baru (`{order_number}-{n}`).
+   - Jika metode berbeda → coba batalkan payment lama melalui Midtrans Cancel API. Bila hasilnya belum terkonfirmasi, periksa Get Status; jika masih `pending`, coba Expire API sebagai jalur pemulihan. Tandai lokal `cancel` atau `expire` hanya setelah respons gateway yang cocok atau Get Status terverifikasi menyatakan status final. Buat payment baru dengan `midtrans_order_id` baru (`{order_number}-{n}`) hanya setelah payment lama tidak dapat dibayar lagi.
    - Jika belum ada order → buat `orders` (`amount` = harga efektif course saat itu, `expires_at = now + pending_order_ttl_hours`).
 3. Panggil `POST /v2/charge` sesuai metode (Virtual Account bank, QRIS, GoPay, ShopeePay), dengan `transaction_details.order_id` = `midtrans_order_id`, `gross_amount` integer Rupiah, `customer_details`, `item_details`, dan masa berlaku (`custom_expiry`) sesuai sisa waktu order.
 4. Simpan respons yang diperlukan ke `payments` (`va_number`, `qr_url`, `deeplink_url`, `expires_at`, `transaction_id`, `raw_response` yang sudah dibersihkan dari data sensitif).
-5. Redirect ke `orders.pay`. Jika Midtrans gagal, simpan error ringkas ke log (tanpa kunci), tampilkan pesan ramah, dan jangan meninggalkan payment menggantung `pending` tanpa transaction_id.
+5. Setelah charge tersimpan sebagai `pending`, kirim email instruksi ke member secara sinkron dan tepat satu percobaan otomatis per payment attempt. Bila charge awal berstatus belum pasti, kirim ketika rekonsiliasi memverifikasi status `pending`. Email berisi course, nomor order, nominal, metode, batas bayar dalam zona member, VA atau QRIS, serta tautan `orders.pay`. Untuk QRIS/GoPay dengan kode QR, coba ambil PNG dari URL aksi Midtrans yang telah divalidasi dan tanam sebagai inline image; bila gagal, tampilkan URL gambar di HTML email dan tautan halaman bayar. Catat `payments.instruction_email_sent_at` dan `instruction_email_last_attempt_at` lewat migration baru. Kegagalan SMTP atau pengambilan QR tidak membatalkan tagihan. Admin dapat mengirim ulang secara manual hanya untuk payment pending yang masih aktif dan belum tercatat terkirim; hasil timeout SMTP dapat tidak pasti.
+6. Redirect ke `orders.pay`. Jika Midtrans gagal, simpan error ringkas ke log (tanpa kunci), tampilkan pesan ramah, dan jangan meninggalkan payment menggantung `pending` tanpa transaction_id.
 
 **Halaman instruksi bayar dan status**
 
@@ -344,7 +350,7 @@ Aturan umum: seluruh logika di `OrderService` dan `PaymentService`; `MidtransCli
 
 1. Simpan payload mentah ke `payment_notifications` (dengan `signature_valid`).
 2. Verifikasi signature: `hash('sha512', order_id . status_code . gross_amount . server_key)` dibandingkan dengan `signature_key` memakai `hash_equals`. Gunakan `gross_amount` **persis seperti string yang diterima** (mis. `"250000.00"`). Jika tidak valid → respons 403 dan hentikan.
-3. Temukan `payments` berdasarkan `midtrans_order_id`. Jika tidak ada → respons 404.
+3. Notifikasi uji dari dashboard Midtrans dengan `order_id` berawalan `payment_notif_test_{merchant_id}_`, `merchant_id` sesuai konfigurasi, dan signature valid dicatat lalu dibalas HTTP 200 tanpa mengubah pesanan, pembayaran, atau enrollment. Untuk notifikasi transaksi, temukan `payments` berdasarkan `midtrans_order_id`. Jika tidak ada → respons 404.
 4. Konfirmasi ke Midtrans dengan **Get Status API** dan gunakan hasilnya sebagai kebenaran. Cocokkan `gross_amount` dengan `orders.amount`; jika berbeda, tandai anomali di log dan jangan beri akses.
 5. Dalam satu transaksi dengan `lockForUpdate` pada payment dan order:
    - `settlement`, atau `capture` dengan `fraud_status = accept` → payment `settlement`/`capture`, order `paid`, `paid_at` = waktu transaksi dari Midtrans (atau `now()` bila tidak ada), lalu `EnrollmentService::createFromOrder($order)`.
@@ -356,7 +362,7 @@ Aturan umum: seluruh logika di `OrderService` dan `PaymentService`; `MidtransCli
    - Status tidak boleh turun dari `paid` ke status non-lunas oleh notifikasi yang datang terlambat/urutan terbalik.
 6. `createFromOrder` idempoten: bila sudah ada enrollment untuk `order_id` tersebut, tidak membuat baru. Unique index pada `enrollments.order_id` adalah pengaman terakhir.
 7. Selalu balas HTTP 200 setelah notifikasi sah diproses (termasuk bila sudah pernah diproses) agar Midtrans tidak mengirim ulang tanpa henti.
-8. Catat hasil di `payment_notifications.process_result` dan `system_logs`. Email sukses (S) dikirim sinkron setelah commit dengan timeout SMTP; kegagalan email tidak membatalkan pembayaran/enrollment atau mengubah respons webhook menjadi gagal. Simpan `orders.payment_email_sent_at` dan `payment_email_last_attempt_at` (timestamp nullable, migration Phase 5) sebagai penanda hasil/percobaan, dan sediakan retry manual admin berotorisasi. Lock per order mencegah pengiriman bersamaan; timeout SMTP setelah pengiriman dapat menghasilkan hasil tidak pasti, jadi jangan menjanjikan exactly-once email atau retry otomatis tanpa batas.
+8. Catat hasil di `payment_notifications.process_result` dan `system_logs`. Email sukses (S) dikirim sinkron setelah commit dengan timeout SMTP; kegagalan email tidak membatalkan pembayaran/enrollment atau mengubah respons webhook menjadi gagal. Simpan `orders.payment_email_sent_at` dan `payment_email_last_attempt_at` (timestamp nullable, migration Phase 5) sebagai penanda hasil/percobaan, dan sediakan retry manual admin berotorisasi. Lock per order mencegah pengiriman bersamaan; timeout SMTP setelah pengiriman dapat menghasilkan hasil tidak pasti, jadi jangan menjanjikan exactly-once email atau retry otomatis tanpa batas. Email instruksi dan email sukses memakai layout HTML responsif yang sama dengan alternatif teks polos; tidak memuat aset eksternal untuk tata letak.
 
 **Penjadwalan**
 
@@ -418,6 +424,7 @@ Semua rute stream: middleware `auth`, throttle, dan `SecurityHeaders`. Token di 
 - SRS-M2: `member.courses.show` menampilkan kurikulum dengan status per video (belum/sedang/selesai) dan tautan ke `learn.show`.
 - SRS-M3: Progres course = jumlah lesson selesai / total lesson (lesson yang dihapus tidak dihitung).
 - SRS-M4: Riwayat pesanan menampilkan nomor, course, nominal, status, tanggal; pesanan `pending` memiliki tombol "Lanjutkan pembayaran".
+- SRS-M4a: Member dapat mengunduh invoice PDF hanya untuk order miliknya dengan status `paid`; request lain mendapat 404. Invoice pertama membuat satu snapshot `order_invoices` (UUID v7, `order_id` unique) dengan nomor deterministik `INV-{order_number}`, waktu pembayaran UTC dan zona tampilan member, nama/email pembeli, identitas penjual dari `config('invoice.*')`, course, nominal, dan metode. Unduhan berikutnya memakai snapshot yang sama. PDF dibuat di server dari HTML lokal dengan Dompdf, tanpa aset remote atau subprocess, lalu dikirim sebagai attachment dengan cache privat. Jangan menyebutnya faktur pajak atau menghitung pajak tanpa data dan ketentuan yang telah ditetapkan.
 - SRS-M5: Profil: ubah nama, telepon, avatar, password (verifikasi password lama).
 
 ### 5.9 Dashboard admin
@@ -507,7 +514,7 @@ SESSION_DRIVER=database
 QUEUE_CONNECTION=sync
 CACHE_STORE=database
 
-MAIL_MAILER= MAIL_HOST= MAIL_PORT= MAIL_USERNAME= MAIL_PASSWORD= MAIL_FROM_ADDRESS=
+MAIL_MAILER= MAIL_HOST= MAIL_PORT= MAIL_USERNAME= MAIL_PASSWORD= MAIL_FROM_ADDRESS= MAIL_TIMEOUT=5
 
 COURSE_ACCESS_MONTHS=6
 COURSE_PENDING_ORDER_TTL_HOURS=24
@@ -517,6 +524,7 @@ MIDTRANS_MERCHANT_ID=
 MIDTRANS_SERVER_KEY=
 MIDTRANS_CLIENT_KEY=
 MIDTRANS_ENABLED_CHANNELS=bca,bni,bri,permata,cimb,qris,gopay,shopeepay
+INVOICE_SELLER_NAME= INVOICE_SELLER_ADDRESS= INVOICE_SELLER_EMAIL= INVOICE_SELLER_TAX_ID=
 
 VIDEO_DISK=video_private
 VIDEO_SOURCE_MAX_SIZE_MB=200
@@ -550,10 +558,11 @@ Konfigurasi aplikasi dibaca lewat `config('course.*')`, `config('midtrans.*')`, 
 5. Pastikan folder `storage/app/private` tidak dapat diakses langsung oleh web server.
 6. Konfigurasikan cron-job.org sesuai 5.10; pantau hasil batch, checkpoint dan backlog. Tidak menjalankan queue:work/Supervisor.
 7. Jalankan `php artisan storage:link`, `config:cache`, `route:cache`, `view:cache` (user).
+8. Untuk invoice PDF, jalankan `composer install` pada deployment dan pastikan PHP memiliki ekstensi `dom` dan `mbstring`; folder `storage/framework/cache` harus dapat ditulis proses PHP.
 
 ## 9. Keterlacakan phase
 
-Detail urutan dan dependensi ada di [roadmap](phases/README.md). Publikasi positif menunggu Phase 4, checkout Phase 5, dan progres Phase 6. F-306/F-307 dipusatkan di Phase 5; F-105 di Phase 6. Phase 2 membuat skema orders hanya sebagai prasyarat FK enrollment, tanpa integrasi pembayaran.
+Detail urutan dan dependensi ada di [roadmap](phases/README.md). Publikasi positif menunggu Phase 4, checkout Phase 5, dan progres Phase 6. F-306/F-307 serta F-507/F-510 dipusatkan di Phase 5 sesuai permintaan user; F-105 di Phase 6. Phase 2 membuat skema orders hanya sebagai prasyarat FK enrollment, tanpa integrasi pembayaran.
 
 | Phase | Cakupan PRD | Bagian SRS utama |
 |---|---|---|

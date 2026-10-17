@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseMemberController;
 use App\Http\Controllers\Admin\VideoUploadController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Operations\ScheduledJobController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -16,9 +17,13 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\UserTimezoneController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\OrderController as MemberOrderController;
 use App\Http\Controllers\Member\LearnController;
 use App\Http\Controllers\Stream\HlsStreamController;
 use App\Http\Controllers\Site\CoursePageController;
+use App\Http\Controllers\Checkout\CheckoutController;
+use App\Http\Controllers\Checkout\OrderPaymentController;
+use App\Http\Controllers\Webhook\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CoursePageController::class, 'home'])->name('site.home');
@@ -70,6 +75,17 @@ Route::middleware(['auth', 'active'])->group(function (): void {
 Route::post('/operations/jobs/{task}', [ScheduledJobController::class, 'store'])
     ->middleware(['throttle:operations', 'cron.token'])->name('operations.jobs.store');
 
+Route::post('/webhooks/midtrans', MidtransWebhookController::class)
+    ->middleware('throttle:60,1')->name('webhooks.midtrans');
+
+Route::middleware(['auth', 'active', 'role:'.UserRole::Member->value])->group(function (): void {
+    Route::get('/checkout/{course:slug}', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout/{course:slug}', [CheckoutController::class, 'store'])->middleware('throttle:10,1')->name('checkout.store');
+    Route::get('/orders/{order}/pay', [OrderPaymentController::class, 'show'])->name('orders.pay');
+    Route::get('/orders/{order}/status', [OrderPaymentController::class, 'status'])->middleware('throttle:30,1')->name('orders.status');
+    Route::post('/orders/{order}/cancel', [OrderPaymentController::class, 'cancel'])->middleware('throttle:10,1')->name('orders.cancel');
+});
+
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth', 'active', 'role:'.UserRole::Admin->value])
@@ -104,6 +120,11 @@ Route::prefix('admin')
         Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
         Route::get('courses/{course}/members', [CourseMemberController::class, 'index'])->name('courses.members');
+        Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+        Route::post('orders/{order}/sync', [AdminOrderController::class, 'sync'])->middleware('throttle:10,1')->name('orders.sync');
+        Route::post('orders/{order}/retry-email', [AdminOrderController::class, 'retryEmail'])->middleware('throttle:5,1')->name('orders.retry-email');
+        Route::post('orders/{order}/payments/{payment}/retry-instructions-email', [AdminOrderController::class, 'retryInstructionsEmail'])->middleware('throttle:5,1')->name('orders.retry-instructions-email');
         Route::post('courses/{course}/members', [CourseMemberController::class, 'store'])->name('courses.members.store');
         Route::put('members/{enrollment}', [CourseMemberController::class, 'update'])->name('members.update');
         Route::post('members/{enrollment}/revoke', [CourseMemberController::class, 'revoke'])->name('members.revoke');
@@ -114,4 +135,6 @@ Route::prefix('my')
     ->middleware(['auth', 'active', 'role:'.UserRole::Member->value])
     ->group(function (): void {
         Route::get('/dashboard', MemberDashboardController::class)->name('dashboard');
+        Route::get('/orders', [MemberOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}/invoice', [MemberOrderController::class, 'invoice'])->middleware('throttle:10,1')->name('orders.invoice');
     });

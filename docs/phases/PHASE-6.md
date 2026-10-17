@@ -14,7 +14,7 @@ Phase 5 lulus dan user menginstruksikan lanjut. Gunakan order/enrollment/video n
 2. Simpan posisi terakhir setiap 15 detik dan saat pause/selesai; tandai selesai tanpa menganggap seek sebagai waktu menonton. Default konservatif: event ended yang tervalidasi akses/posisi menandai selesai; jangan membuat ambang 80/90% tanpa keputusan produk. Ini progres belajar, bukan bukti menonton yang tidak dapat dimanipulasi.
 3. Resume playback, indikator belum/sedang/selesai, persentase dari lesson selesai dibagi lesson tersedia, aman jika total nol. Preview admin tidak menyimpan progres.
 4. Dashboard member, course aktif/kedaluwarsa, sisa akses dan badge <14/<3 hari, pesanan pending, rekomendasi course terbit bila tersedia. Course saya/detail/kurikulum dan tombol belajar/beli lagi sesuai server state.
-5. Riwayat pesanan dengan instruksi bayar pending. Profil nama/telepon/avatar/password dengan verifikasi password lama, validasi upload dan ownership.
+5. Riwayat pesanan dan invoice sudah dipindahkan lebih awal ke Phase 5 atas permintaan user; pada Phase 6 pastikan navigasi member tetap konsisten. Kerjakan profil nama/telepon/avatar/password dengan verifikasi password lama, validasi upload dan ownership.
 6. Integrasikan state arsip/expired/revoked, loading/empty/error, sidebar dan navigasi. Pencarian/agregasi eager loading; tidak membocorkan course/order user lain.
 
 ## Artefak yang direncanakan dan batas scope

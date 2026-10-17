@@ -37,15 +37,15 @@
             @if($preview)
                 <span class="site-state-tag">Mode pratinjau</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}">Pratinjau video</a>@endif<a class="btn btn-outline-primary btn-block" href="{{ route('admin.courses.curriculum', $course) }}">Kelola course</a>
             @elseif($accessState === 'guest')
-                <a class="btn btn-primary btn-block" href="{{ route('register') }}">Buat akun</a><a class="site-card-secondary" href="{{ route('login') }}">Sudah punya akun? Masuk</a><p class="site-card-note">Pembelian online sedang disiapkan.</p>
+                <a class="btn btn-primary btn-block" href="{{ route('checkout.show', $course->slug) }}">Masuk untuk membeli</a><a class="site-card-secondary" href="{{ route('register') }}">Belum punya akun? Daftar</a>
             @elseif($accessState === 'active')
                 <span class="site-state-tag">Akses Anda aktif</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}">Mulai belajar</a>@else<p class="site-card-note">Video course belum siap diputar.</p>@endif
             @elseif($accessState === 'pending_order')
-                <span class="site-state-tag">Pembayaran menunggu konfirmasi</span><p class="site-card-note">Halaman instruksi pembayaran akan tersedia saat fitur pembelian diluncurkan.</p>
+                <span class="site-state-tag">Pembayaran menunggu konfirmasi</span>@if($pendingOrder)<a class="btn btn-primary btn-block mt-2" href="{{ route('orders.pay', $pendingOrder) }}">Lihat instruksi bayar</a>@endif
             @elseif($accessState === 'expired')
-                <span class="site-state-tag">Akses sebelumnya tidak aktif</span><p class="site-card-note">Pembelian ulang akan tersedia saat checkout diluncurkan.</p>
+                <span class="site-state-tag">Akses sebelumnya tidak aktif</span><a class="btn btn-primary btn-block mt-2" href="{{ route('checkout.show', $course->slug) }}">Beli akses lagi</a>
             @else
-                <span class="site-state-tag">Pembelian belum tersedia</span><p class="site-card-note">Anda sudah dapat melihat isi course. Checkout sedang disiapkan.</p>
+                <a class="btn btn-primary btn-block" href="{{ route('checkout.show', $course->slug) }}">Beli course</a>
             @endif
         </aside>
     </div>

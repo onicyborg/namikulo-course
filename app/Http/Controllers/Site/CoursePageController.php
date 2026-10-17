@@ -104,6 +104,8 @@ class CoursePageController extends Controller
             'safeDescription' => $sanitizer->clean($course->description),
             'firstReadyLesson' => $course->sections->flatMap->lessons
                 ->first(fn ($lesson) => $lesson->videoAsset?->status === VideoStatus::Ready),
+            'pendingOrder' => $request->user()?->orders()->where('course_id', $course->id)
+                ->where('status', 'pending')->latest()->first(),
         ]);
     }
 

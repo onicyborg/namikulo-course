@@ -688,6 +688,8 @@ Jangan menjanjikan "tidak bisa direkam" di antarmuka. Tampilkan catatan netral: 
 
 Sidebar: Dashboard, Course Saya, Pesanan, Profil. Dashboard menampilkan course aktif dengan progres, sisa waktu akses (badge, kuning bila <14 hari, merah bila <3 hari), dan rekomendasi course. Empty state mengarahkan ke katalog. Halaman Pesanan memakai tabel Otika dengan badge status dan tautan ke instruksi bayar untuk pesanan tertunda.
 
+Atas permintaan user, menu **Transaksi** dan invoice PDF diselesaikan lebih awal dalam Phase 5. Halaman transaksi memakai tabel responsif Otika dengan course, nomor pesanan, tanggal, nominal, status, dan tindakan kontekstual. Invoice A4 memakai tipografi sederhana dan satu warna aksen proyek; tampilkan nomor invoice, identitas penjual/pembeli, satu baris course, total dibayar, metode, dan waktu pembayaran. Jangan mengarang alamat, NPWP, atau perincian pajak.
+
 ### 19.9 Admin: builder kurikulum
 
 - Halaman listing kategori dan course memakai seluruh lebar `.section-body` yang tersedia. Hindari `max-width` tetap pada wrapper tabel; batasi lebar hanya pada halaman dengan konten bacaan atau builder yang membutuhkan fokus.

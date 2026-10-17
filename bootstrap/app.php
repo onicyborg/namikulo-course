@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('web', SecurityHeaders::class);
-        $middleware->validateCsrfTokens(except: ['operations/jobs/*']);
+        $middleware->validateCsrfTokens(except: ['operations/jobs/*', 'webhooks/midtrans']);
 
         $middleware->alias([
             'active' => EnsureActiveUser::class,

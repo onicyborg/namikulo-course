@@ -15,6 +15,11 @@
                     <i data-feather="home" aria-hidden="true"></i><span>Dashboard</span>
                 </a>
             </li>
+            <li class="dropdown {{ request()->routeIs('member.orders.*') ? 'active' : '' }}">
+                <a href="{{ route('member.orders.index') }}" class="nav-link">
+                    <i data-feather="file-text" aria-hidden="true"></i><span>Transaksi</span>
+                </a>
+            </li>
         </ul>
     </aside>
 </div>

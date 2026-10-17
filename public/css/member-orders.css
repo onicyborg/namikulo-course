@@ -1,0 +1,19 @@
+.member-orders-card > .card-header { min-height: 88px; }
+.member-orders-card > .card-header h2 { margin: 0 0 4px; font-size: 18px; line-height: 1.3; }
+.member-orders-card > .card-header p { margin: 0; color: #6b7690; font-size: 13px; }
+.member-orders-filter { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; margin-bottom: 24px; }
+.member-orders-filter label { flex-basis: 100%; margin-bottom: -4px; font-weight: 600; }
+.member-orders-filter select { max-width: 260px; }
+.member-orders-table th { white-space: nowrap; }
+.member-orders-table td { vertical-align: middle !important; }
+.member-order-title { display: block; color: #1b2437; font-size: 14px; line-height: 1.4; }
+.member-order-number { display: block; margin-top: 3px; color: #6b7690; font-size: 12px; }
+.member-order-amount { white-space: nowrap; font-weight: 700; color: #1b2437; }
+.member-order-actions { min-width: 240px; }
+.member-order-actions .btn { margin: 2px 4px 2px 0; white-space: nowrap; }
+@media (max-width: 575.98px) {
+    .member-orders-card > .card-header { padding: 18px; }
+    .member-orders-card > .card-body { padding: 18px; }
+    .member-orders-filter select { flex: 1 1 100%; max-width: none; }
+    .member-orders-filter .btn { flex: 1 1 auto; }
+}
