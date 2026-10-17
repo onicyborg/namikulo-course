@@ -2,7 +2,7 @@
 
 Platform course video berbayar dengan area admin dan member, pembayaran Midtrans Core API melalui UI custom, serta akses belajar enam bulan. Nama tampilan aplikasi mengikuti `APP_NAME`.
 
-**Status:** Phase 0 menunggu UAT user; Phase 1–3 lulus UAT user. Phase 4–7 masih target pengembangan.
+**Status:** Phase 0 menunggu UAT user; Phase 1–4 lulus UAT user; Phase 5 aktif. Phase 6–7 belum dimulai.
 
 ## Pedoman proyek
 
@@ -36,13 +36,15 @@ Asset Otika memakai `asset()` dan `ASSET_URL`; asset aplikasi memakai `url()`/`S
 3. Jalankan `php artisan key:generate` hanya bila `APP_KEY` pada instalasi baru masih kosong.
 4. Jalankan migration dan seeder sesuai urutan pada [Phase 0](docs/phases/PHASE-0.md#perintah-untuk-user), lalu perintah [Phase 1](docs/phases/PHASE-1.md#perintah-untuk-user). PHP extension DOM diperlukan untuk membersihkan HTML deskripsi course.
    Bila database sudah memiliki timestamp dari konfigurasi Asia/Jakarta, ikuti [panduan cutover UTC](docs/timezone-cutover.md) sebelum memakai konfigurasi baru.
-5. UAT Phase 1–3 telah dinyatakan lulus oleh user. Lanjutkan UAT Phase 0 bila masih diperlukan; Phase 4 menunggu instruksi berikutnya.
+5. Untuk Phase 4, jalankan perintah dan UAT pada [panduan operasi video](docs/video-operations.md). UAT Phase 0 masih menunggu konfirmasi bila diperlukan.
 
 Proyek tidak memakai npm, Vite, atau build frontend. Asset Otika dimuat dari `ASSET_URL`; CSS dan JavaScript aplikasi berada di `public/`.
 
 ## Operasi dan rilis
 
 Kontrak endpoint, daftar task, interval, token, serta batas batch tercantum di [SRS bagian 5.10](docs/SRS.md#510-pemicu-berkala-melalui-cron-joborg). MVP tidak membutuhkan worker server/FFmpeg hosting. Web Worker ffmpeg.wasm hanya berjalan di browser admin. Respons completed/partial dan checkpoint batch harus dipantau.
+
+Detail batas cPanel, penyimpanan privat, versi asset lokal, konfigurasi dan pemulihan impor ada di [panduan operasi video](docs/video-operations.md). Dukungan HLS AES-128 pada build dan perangkat admin harus dikonfirmasi melalui UAT user.
 
 [Phase 7](docs/phases/PHASE-7.md) menetapkan UAT staging MySQL, konfigurasi production, backup/pemulihan, dan persetujuan rilis. Database, file privat, serta `APP_KEY` harus dicadangkan; secret tidak boleh masuk repository.
 

@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Operations;
 
 use App\Http\Controllers\Controller;
 use App\Services\ExpireEnrollments;
+use App\Services\PrunePlaybackSessions;
+use App\Services\CleanupVideoUploads;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
 class ScheduledJobController extends Controller
 {
-    public function store(string $task, ExpireEnrollments $expiry): JsonResponse
+    public function store(string $task, ExpireEnrollments $expiry, PrunePlaybackSessions $playback, CleanupVideoUploads $uploads): JsonResponse
     {
-        abort_unless($task === ExpireEnrollments::TASK, 404);
+        $services = [ExpireEnrollments::TASK => $expiry, PrunePlaybackSessions::TASK => $playback, CleanupVideoUploads::TASK => $uploads];
+        abort_unless(isset($services[$task]), 404);
         $batchSize = max(1, min(100, (int) config('operations.batch_size', 20)));
         $maxSeconds = max(2, min(10, (int) config('operations.max_seconds', 10)));
         try {
@@ -20,7 +23,7 @@ class ScheduledJobController extends Controller
                 return response()->json(['status' => 'busy', 'processed' => 0, 'remaining' => true]);
             }
             try {
-                return response()->json($expiry->run($batchSize, $maxSeconds));
+                return response()->json($services[$task]->run($batchSize, $maxSeconds));
             } finally {
                 $lock->release();
             }

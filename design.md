@@ -675,7 +675,7 @@ Komponen:
 - Bagian deskripsi di bawah video.
 
 **Elemen perlindungan di UI** (deterrent; lihat PRD bagian 7 untuk batasannya):
-- Watermark dinamis: teks nama + email/ID user, semi-transparan, berpindah posisi tiap 20–30 detik di atas video. Tidak boleh mengganggu pembacaan.
+- Watermark dinamis: teks nama + email/ID user, sangat samar (sekitar 16% putih, ketebalan normal, tanpa bayangan), berpindah posisi tiap 20–30 detik di atas video. Jaga agar materi tetap mudah dibaca; identitas watermark dapat lebih sulit dilihat pada bagian video yang terang.
 - `controlsList="nodownload noremoteplayback"`, `disablePictureInPicture`, blokir `contextmenu` pada area player, `user-select: none` di area materi.
 - `@media print { body { display: none } }`.
 - Saat tab tidak aktif atau jendela kehilangan fokus: video di-pause dan area di-blur, tampilkan pesan netral.

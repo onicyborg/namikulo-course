@@ -7,6 +7,7 @@ use App\Enums\EnrollmentStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Order;
+use App\Models\PlaybackSession;
 use App\Enums\OrderStatus;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -83,6 +84,7 @@ class EnrollmentService
             }
             $old = $enrollment->getAttributes();
             $enrollment->update(['expires_at' => $expiresAt, 'status' => $expiresAt->isFuture() ? EnrollmentStatus::Active : EnrollmentStatus::Expired, 'note' => $note]);
+            if (! $expiresAt->isFuture()) $this->revokePlayback($enrollment);
             $this->logger->log('updated', $actor, 'enrollments', $enrollment->id, $old, $enrollment->getAttributes(), 'Tanggal akhir akses diubah');
             return $enrollment;
         });
@@ -98,8 +100,17 @@ class EnrollmentService
             }
             $old = $enrollment->getAttributes();
             $enrollment->update(['status' => EnrollmentStatus::Revoked, 'revoked_at' => now(), 'revoked_by' => $actor->id, 'note' => $note]);
+            $this->revokePlayback($enrollment);
             $this->logger->log('unassigned', $actor, 'enrollments', $enrollment->id, $old, $enrollment->getAttributes(), 'Akses dicabut');
             return $enrollment;
         });
+    }
+
+    private function revokePlayback(Enrollment $enrollment): void
+    {
+        if ($this->activeFor($enrollment->user, $enrollment->course)) return;
+        PlaybackSession::query()->where('user_id', $enrollment->user_id)->whereNull('revoked_at')
+            ->whereHas('lesson', fn ($lesson) => $lesson->where('course_id', $enrollment->course_id))
+            ->update(['revoked_at' => now()]);
     }
 }

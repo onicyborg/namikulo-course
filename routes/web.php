@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\SectionController;
 use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\CourseMemberController;
+use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\Operations\ScheduledJobController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\UserTimezoneController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
+use App\Http\Controllers\Member\LearnController;
+use App\Http\Controllers\Stream\HlsStreamController;
 use App\Http\Controllers\Site\CoursePageController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +55,18 @@ Route::post('/account/timezone', [UserTimezoneController::class, 'update'])
     ->middleware(['auth', 'active', 'throttle:10,1'])
     ->name('account.timezone.update');
 
+Route::middleware(['auth', 'active'])->group(function (): void {
+    Route::get('/learn/{lesson}', [LearnController::class, 'show'])->name('learn.show');
+    Route::post('/learn/{lesson}/playback', [LearnController::class, 'playback'])->middleware('throttle:10,1')->name('learn.playback');
+    Route::post('/learn/heartbeat/{token}', [LearnController::class, 'heartbeat'])->middleware('throttle:90,1')->name('learn.heartbeat');
+    Route::prefix('stream/{token}')->name('stream.')->middleware('throttle:600,1')->group(function (): void {
+        Route::get('master.m3u8', [HlsStreamController::class, 'master'])->name('master');
+        Route::get('source/index.m3u8', [HlsStreamController::class, 'playlist'])->name('playlist');
+        Route::get('key.bin', [HlsStreamController::class, 'key'])->name('key');
+        Route::get('source/{name}', [HlsStreamController::class, 'segment'])->where('name', 'seg_\d{5}\.ts')->name('segment');
+    });
+});
+
 Route::post('/operations/jobs/{task}', [ScheduledJobController::class, 'store'])
     ->middleware(['throttle:operations', 'cron.token'])->name('operations.jobs.store');
 
@@ -61,6 +76,14 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
         Route::get('courses/{course}/preview', [CoursePageController::class, 'preview'])->name('courses.preview');
+        Route::get('lessons/{lesson}/video/prepare', [VideoUploadController::class, 'prepare'])->name('lessons.video.prepare');
+        Route::delete('lessons/{lesson}/video', [VideoUploadController::class, 'destroy'])->name('lessons.video.destroy');
+        Route::post('lessons/{lesson}/video/uploads', [VideoUploadController::class, 'store'])->middleware('throttle:10,1')->name('lessons.video.uploads.store');
+        Route::post('video-uploads/{upload}/manifest', [VideoUploadController::class, 'manifest'])->middleware('throttle:30,1')->name('video-uploads.manifest');
+        Route::post('video-uploads/{upload}/chunks/{name}/{index}', [VideoUploadController::class, 'chunk'])->where('name', 'seg_\d{5}\.ts')->whereNumber('index')->middleware('throttle:120,1')->name('video-uploads.chunk');
+        Route::post('video-uploads/{upload}/finalize', [VideoUploadController::class, 'finalize'])->middleware('throttle:30,1')->name('video-uploads.finalize');
+        Route::get('video-uploads/{upload}/status', [VideoUploadController::class, 'status'])->middleware('throttle:30,1')->name('video-uploads.status');
+        Route::post('video-uploads/{upload}/cancel', [VideoUploadController::class, 'cancel'])->middleware('throttle:30,1')->name('video-uploads.cancel');
         Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
         Route::resource('courses', CourseController::class)->except(['show', 'create', 'edit']);
         Route::post('courses/{course}/publish', [CourseController::class, 'publish'])->name('courses.publish');

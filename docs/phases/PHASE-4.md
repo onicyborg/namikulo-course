@@ -1,6 +1,6 @@
 # Phase 4: Persiapan video di browser, impor HLS dan player
 
-Status: **Direncanakan, belum diimplementasikan atau lulus UAT**.
+Status: **Lulus UAT user pada perangkat yang digunakan** (17 Oktober 2026). Admin berhasil menyiapkan dan mengunggah HLS AES-128; member dapat memutar materi. Dukungan perangkat/browser lain tetap mengikuti hasil UAT masing-masing.
 
 Acuan: [PRD](../PRD.md) F-207–208, F-602–603, F-701–706 dan keputusan MVP cPanel; [SRS](../SRS.md) 5.7/5.10; [design](../../design.md) 19.7/19.9; [AGENTS](../../AGENTS.md). Prioritas AGENTS > SRS > PRD > design. Lihat [roadmap](README.md).
 
@@ -35,7 +35,7 @@ VIDEO_FFMPEG_PATH, VIDEO_FFPROBE_PATH, VIDEO_MAX_SIZE_MB lama dan VIDEO_KEEP_ORI
 
 ## Perintah untuk user
 
-Hanya setelah implementasi tersedia:
+Setelah menarik perubahan Phase 4:
 
 1. Isi .env sesuai konfigurasi; pastikan HTTPS, OpenSSL, storage privat, MIME application/wasm dan batas POST/upload >=5 MiB + overhead.
 2. `php artisan migrate`
@@ -67,4 +67,4 @@ Tambahkan UAT umum role/CSRF/keyboard/asset/console/responsif roadmap. Cakupan O
 
 User harus meluluskan gate HLS AES-128, batas input perangkat nyata, validasi impor serta playback/otorisasi. ffmpeg.wasm membutuhkan RAM/CPU browser; refresh dapat menghilangkan hasil sementara. Metadata codec/durasi tidak dapat dibuktikan penuh server tanpa decoder; otorisasi tidak bergantung metadata. Tidak ada jaminan screenshot/rekam layar terblokir.
 
-Migrasi ke VPS/queue/encoding multikualitas ditunda setelah MVP. Phase tetap direncanakan sampai implementasi dan UAT user. Serah-terima wajib mencakup file, perintah, env, UAT, asumsi dan pernyataan tidak ada test oleh agent.
+Migrasi ke VPS/queue/encoding multikualitas ditunda setelah MVP. Phase belum lulus sampai user menyelesaikan UAT. Petunjuk operasional terperinci ada di [panduan operasi video](../video-operations.md).

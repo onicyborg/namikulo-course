@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\EnrollmentStatus;
 use App\Models\Enrollment;
 use App\Models\OperationState;
+use App\Models\PlaybackSession;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -12,7 +13,7 @@ class ExpireEnrollments
 {
     public const TASK = 'expire-enrollments';
 
-    public function __construct(private readonly ActivityLogger $logger) {}
+    public function __construct(private readonly ActivityLogger $logger, private readonly EnrollmentService $enrollments) {}
 
     public function run(int $batchSize, int $maxSeconds): array
     {
@@ -44,6 +45,11 @@ class ExpireEnrollments
                     if ($locked->status !== EnrollmentStatus::Active || $locked->expires_at->isFuture()) return false;
                     $old = $locked->getAttributes();
                     $locked->update(['status' => EnrollmentStatus::Expired]);
+                    if (! $this->enrollments->activeFor($locked->user, $locked->course)) {
+                        PlaybackSession::query()->where('user_id', $locked->user_id)->whereNull('revoked_at')
+                            ->whereHas('lesson', fn ($lesson) => $lesson->where('course_id', $locked->course_id))
+                            ->update(['revoked_at' => now()]);
+                    }
                     $this->logger->log('updated', null, 'enrollments', $locked->id, $old, $locked->getAttributes(), 'Akses kedaluwarsa');
                     return true;
                 });

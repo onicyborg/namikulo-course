@@ -22,7 +22,7 @@
 
             <section class="site-detail-section" aria-labelledby="description-title"><h2 id="description-title">Tentang course ini</h2>@if($safeDescription)<div class="site-rich-text">{!! $safeDescription !!}</div>@else<p>Deskripsi lengkap belum tersedia. Lihat ringkasan dan daftar materi di bawah.</p>@endif</section>
 
-            <section class="site-detail-section" aria-labelledby="curriculum-title"><div class="site-section-heading"><div><h2 id="curriculum-title">Kurikulum</h2><p>Judul materi dapat dilihat sebelum membeli. Video tersedia setelah akses aktif dan pemutar diluncurkan.</p></div></div>
+            <section class="site-detail-section" aria-labelledby="curriculum-title"><div class="site-section-heading"><div><h2 id="curriculum-title">Kurikulum</h2><p>Judul materi dapat dilihat sebelum membeli. Video siap dapat diputar saat akses course aktif.</p></div></div>
                 @forelse($course->sections as $section)
                     <div class="site-curriculum-section"><button class="site-curriculum-toggle" type="button" data-toggle="collapse" data-target="#section-{{ $section->id }}" aria-expanded="{{ $loop->first ? 'true' : 'false' }}" aria-controls="section-{{ $section->id }}"><span><strong>{{ $section->title }}</strong><small>{{ $section->lessons->count() }} materi</small></span><span aria-hidden="true">⌄</span></button>
                         <div id="section-{{ $section->id }}" class="collapse {{ $loop->first ? 'show' : '' }}"><ul class="site-lesson-list">@forelse($section->lessons as $lesson)<li><span aria-hidden="true">▸</span><span>{{ $lesson->title }}</span><small>{{ $lesson->duration_seconds ? floor($lesson->duration_seconds / 60).' menit' : 'Durasi belum tersedia' }}</small><span class="sr-only">Video belum dapat diputar di halaman ini</span></li>@empty<li>Belum ada materi di bab ini.</li>@endforelse</ul></div>
@@ -35,11 +35,11 @@
 
         <aside class="site-purchase-card" aria-label="Harga dan akses"><div class="site-price">@if($course->discount_price !== null)<del>Rp {{ number_format($course->price, 0, ',', '.') }}</del>@endif<strong>{{ ($course->discount_price ?? $course->price) === 0 ? 'Gratis' : 'Rp '.number_format($course->discount_price ?? $course->price, 0, ',', '.') }}</strong></div><p>Satu pembelian memberi akses {{ $course->access_months }} bulan sejak pembayaran terkonfirmasi.</p>
             @if($preview)
-                <span class="site-state-tag">Mode pratinjau</span><a class="btn btn-outline-primary btn-block" href="{{ route('admin.courses.curriculum', $course) }}">Kelola course</a>
+                <span class="site-state-tag">Mode pratinjau</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}">Pratinjau video</a>@endif<a class="btn btn-outline-primary btn-block" href="{{ route('admin.courses.curriculum', $course) }}">Kelola course</a>
             @elseif($accessState === 'guest')
                 <a class="btn btn-primary btn-block" href="{{ route('register') }}">Buat akun</a><a class="site-card-secondary" href="{{ route('login') }}">Sudah punya akun? Masuk</a><p class="site-card-note">Pembelian online sedang disiapkan.</p>
             @elseif($accessState === 'active')
-                <span class="site-state-tag">Akses Anda aktif</span><p class="site-card-note">Halaman belajar dan pemutar video sedang disiapkan.</p>
+                <span class="site-state-tag">Akses Anda aktif</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}">Mulai belajar</a>@else<p class="site-card-note">Video course belum siap diputar.</p>@endif
             @elseif($accessState === 'pending_order')
                 <span class="site-state-tag">Pembayaran menunggu konfirmasi</span><p class="site-card-note">Halaman instruksi pembayaran akan tersedia saat fitur pembelian diluncurkan.</p>
             @elseif($accessState === 'expired')

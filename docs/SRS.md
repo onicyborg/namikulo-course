@@ -16,7 +16,7 @@ Kata "harus" = wajib; "sebaiknya" = dianjurkan; "boleh" = opsional.
 - MVP cPanel tanpa queue worker: service sinkron, QUEUE_CONNECTION=sync; cache/session database. cron-job.org memicu batch langsung lewat HTTPS (5.10), tanpa Laravel Scheduler/crontab aplikasi.
 - Penyimpanan:
   - Disk `public` (`storage/app/public`): thumbnail course, avatar.
-  - Disk `video_private` (`storage/app/private/videos`): hasil HLS dan unggahan sementara; sumber asli tetap di komputer admin. Kunci persisten hanya DB terenkripsi. **Tidak pernah** dapat diakses langsung lewat web server.
+- Disk `video_private` (`storage/app/video-private`): hasil HLS dan unggahan sementara; sumber asli tetap di komputer admin. Kunci persisten hanya DB terenkripsi. **Tidak pernah** dapat diakses langsung lewat web server.
 - Integrasi eksternal: Midtrans Core API (HTTP), SMTP, ffmpeg.wasm di browser admin (asset lokal), tanpa FFmpeg/ffprobe di server.
 - Pemisahan lapisan: Controller (tipis) → Service (logika bisnis) → Model. Kode Blade tidak berisi logika bisnis.
 
@@ -135,7 +135,7 @@ Index: `(status, is_featured, featured_order)` bernama eksplisit.
 
 **video_uploads** (staging impor, dibuat Phase 4)
 
-Kolom UUID v7 `id`, `user_id`/`lesson_id` foreignUuid, `status` string(30) (preparing/uploading/validating/ready/failed/cancelled), `encryption_key` text null (cast encrypted), `manifest` json null, `expected_bytes` unsignedBigInteger null, `received_bytes` unsignedBigInteger default 0, `validation_cursor` unsignedInteger default 0, `last_activity_at`/`expires_at` timestamp nullable, `error_message` text null, timestamps. Index `(lesson_id,status)` bernama eksplisit. Manifest menyimpan daftar segmen, ukuran/hash/durasi yang divalidasi batasnya; jangan menyimpan payload biner. FK restrict pada lesson/user selama sesi berlangsung. Record terminal dibersihkan sesuai retensi; jangan menghapus aset aktif melalui cascade sesi. Model fillable eksplisit dan enum UploadStatus. Publikasi atomik pada finalisasi memperbarui video_assets; aset lama tetap valid sampai penggantinya siap.
+Kolom UUID v7 `id`, `user_id`/`lesson_id` foreignUuid, `status` string(20) (preparing/uploading/validating/ready/replaced/failed/cancelled/expired), `encryption_key` text (cast encrypted), `iv_hex` string(32), `duration_seconds` unsignedInteger, `manifest` json null, `expected_bytes` unsignedBigInteger null, `received_bytes` unsignedBigInteger default 0, `validation_cursor` unsignedInteger default 0, `storage_path` string, `last_activity_at`/`expires_at` timestamp, `cleaned_at` timestamp null, `error_message` string null, timestamps. Index `(user_id,status,expires_at)` bernama eksplisit. Manifest menyimpan playlist dan daftar segmen beserta ukuran/hash; jangan menyimpan payload biner. FK restrict pada lesson/user selama sesi berlangsung. Record terminal dibersihkan sesuai retensi; jangan menghapus aset aktif melalui cascade sesi. Model fillable eksplisit dan enum UploadStatus. Publikasi atomik pada finalisasi memperbarui video_assets; aset lama tetap valid sampai penggantinya siap.
 
 **orders**
 
@@ -260,7 +260,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | Kategori | resource `categories` `->except(['show','create','edit'])` |
 | Course | resource `courses` `->except(['show','create','edit'])`; `POST courses/{course}/featured` toggle unggulan; `POST courses/{course}/publish` dan `/unpublish` |
 | Kurikulum | `GET courses/{course}/curriculum` → `admin.courses.curriculum`; `POST/PUT/DELETE courses/{course}/sections[/{section}]`; `POST courses/{course}/sections/reorder`; `POST/PUT/DELETE sections/{section}/lessons[/{lesson}]`; `POST sections/{section}/lessons/reorder` |
-| Video | `GET lessons/{lesson}/video/prepare` → `admin.lessons.video.prepare`; `POST lessons/{lesson}/video/uploads` (inisiasi); `PUT video/uploads/{upload}/manifest`; `POST video/uploads/{upload}/chunks`; `POST video/uploads/{upload}/finalize`; `GET video/uploads/{upload}` (status); `DELETE video/uploads/{upload}` (batal); `DELETE lessons/{lesson}/video` (hapus aset). Prefix admin, nama `admin.video-uploads.*`, policy admin + ownership/lesson scope, CSRF dan throttle. Retry via sesi yang sama bila valid atau sesi baru setelah gagal; tidak menjalankan encoding server. |
+| Video | `GET lessons/{lesson}/video/prepare` → `admin.lessons.video.prepare`; `POST lessons/{lesson}/video/uploads` (inisiasi); `POST video/uploads/{upload}/manifest`; `POST video/uploads/{upload}/chunks/{name}/{index}`; `POST video/uploads/{upload}/finalize`; `GET video/uploads/{upload}/status`; `POST video/uploads/{upload}/cancel`; `DELETE lessons/{lesson}/video` (hapus aset). Prefix admin, nama `admin.video-uploads.*`, policy admin + ownership/lesson scope, CSRF dan throttle. Retry potongan pada sesi yang sama bila valid atau sesi baru setelah gagal; tidak menjalankan encoding server. |
 | User | resource `users` `->except(['show','create','edit'])`; `POST users/{user}/reset-password`; `POST users/{user}/toggle-active` |
 | Anggota course | `GET courses/{course}/members` → `admin.courses.members`; `POST courses/{course}/members`; `PUT members/{enrollment}` (ubah tanggal/perpanjang); `POST members/{enrollment}/revoke` |
 | Pesanan | `GET orders` → `admin.orders.index`; `GET orders/{order}` → `admin.orders.show`; `POST orders/{order}/sync` |
@@ -458,7 +458,7 @@ Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak be
 **Keamanan**
 
 - NFR-S1: Seluruh akses data di-scope di server (cegah IDOR): member hanya dapat melihat order/enrollment/progres miliknya.
-- NFR-S2: Header keamanan lewat `SecurityHeaders`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal. `Content-Security-Policy` didefinisikan di Phase 4 setelah daftar sumber script (host asset Otika, cdnjs/hls.js, Google Fonts bila dipakai) diketahui, dengan `media-src 'self' blob:`.
+- NFR-S2: Header keamanan lewat `SecurityHeaders`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` minimal. CSP halaman video mengizinkan origin asset Otika yang dihitung dari `asset()` pada `script-src`, `style-src`, `font-src`, dan `connect-src` (termasuk permintaan source map CSS oleh DevTools); `worker-src 'self' blob:` dan `media-src 'self' blob:`. Origin lain tidak diizinkan tanpa kebutuhan yang tercatat.
 - NFR-S3: Rate limiting: login, register, forgot/reset, checkout, polling status, stream, webhook.
 - NFR-S4: Kunci Midtrans dan kunci konten tidak muncul di log/Blade atau respons umum. Pengecualian kunci konten hanya input HTTPS impor admin dan respons endpoint playback key terotorisasi; key browser dibuat lokal sesuai V5. `APP_KEY` dijaga; mengganti `APP_KEY` membuat `encryption_key` video tidak terbaca, jadi dokumentasikan dan sediakan prosedur backup.
 - NFR-S5: Upload divalidasi MIME, ekstensi, ukuran, dan diberi nama acak. HTML dari editor disanitasi.

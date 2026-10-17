@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Section;
 use App\Services\ActivityLogger;
 use App\Services\ContentOrder;
+use App\Services\VideoContentDeletion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -45,20 +46,21 @@ class SectionController extends Controller
         return back()->with('success', 'Bab berhasil diperbarui.');
     }
 
-    public function destroy(Request $request, Course $course, Section $section, ActivityLogger $logger): RedirectResponse
+    public function destroy(Request $request, Course $course, Section $section, ActivityLogger $logger, VideoContentDeletion $deletion): RedirectResponse
     {
         $this->authorizeScope($course, $section);
-        DB::transaction(function () use ($section, $request, $logger): void {
+        $ids = DB::transaction(function () use ($section, $request, $logger, $deletion): array {
+            $ids = [];
             foreach ($section->lessons()->get() as $lesson) {
-                $oldLesson = $lesson->getAttributes();
-                $lesson->delete();
-                $logger->log('deleted', $request->user(), 'lessons', $lesson->id, $oldLesson);
+                $ids = array_merge($ids, $deletion->archiveLesson($lesson, $request->user()));
             }
             $old = $section->getAttributes();
             $section->delete();
             $logger->log('deleted', $request->user(), 'sections', $section->id, $old);
+            return $ids;
         });
-        return back()->with('success', 'Bab dan metadata materi di dalamnya dihapus.');
+        $removed = $deletion->removeFiles($ids);
+        return back()->with('success', $removed ? 'Bab, materi, dan berkas video privatnya dihapus.' : 'Bab dan materi dihapus. Berkas privat yang tersisa akan dibersihkan oleh pemicu berkala.');
     }
 
     public function reorder(Request $request, Course $course, ContentOrder $order): RedirectResponse

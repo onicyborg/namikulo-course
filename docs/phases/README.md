@@ -1,6 +1,6 @@
 # Roadmap pengembangan
 
-Status: Phase 0 **menunggu UAT user**; Phase 1, 2, dan 3 **lulus UAT user**. Phase 0 belum dinyatakan lulus oleh user.
+Status: Phase 0 **menunggu UAT user**; Phase 1–4 **lulus UAT user**; Phase 5 **aktif**. Phase 0 belum dinyatakan lulus oleh user.
 
 Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen tidak mengaktifkan phase atau menyatakan implementasi selesai. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
@@ -12,8 +12,8 @@ Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen 
 | [1](PHASE-1.md) | Kategori, course, bab, metadata video | F-201–206, F-208–209; prasyarat F-207 | Lulus UAT user |
 | [2](PHASE-2.md) | User, enrollment manual, expiry, pemicu cron-job.org | F-301–305, BR-09/12 | Lulus UAT user |
 | [3](PHASE-3.md) | Landing, katalog, detail | F-401–404 | Lulus UAT user |
-| [4](PHASE-4.md) | Upload, HLS browser, impor, stream, player terlindungi | F-207–208, F-602–603, F-701–706 | Direncanakan |
-| [5](PHASE-5.md) | Checkout, pembayaran, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-605; BR-02/04–07 | Direncanakan |
+| [4](PHASE-4.md) | Upload, HLS browser, impor, stream, player terlindungi | F-207–208, F-602–603, F-701–706 | Lulus UAT user |
+| [5](PHASE-5.md) | Checkout, pembayaran, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-605; BR-02/04–07 | Aktif |
 | [6](PHASE-6.md) | Dashboard member, course saya, progres, pesanan, profil | F-105, F-601, F-604, F-507 | Direncanakan |
 | [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis | F-509 (opsional), NFR, dashboard MVP | Direncanakan |
 
@@ -57,4 +57,4 @@ Seluruh kebutuhan M dan UAT integrasi lulus oleh user; keputusan S/C dicatat; st
 
 ## Perintah untuk user sekarang
 
-Phase 3 telah dinyatakan lulus oleh user. Phase 4 dimulai setelah instruksi berikutnya; UAT Phase 0 masih menunggu konfirmasi bila diperlukan. Agent tidak menjalankan migration, seed, aplikasi, atau test.
+Phase 4 lulus UAT pada perangkat user. Phase 5 dimulai sesuai instruksi user. UAT Phase 0 masih menunggu konfirmasi bila diperlukan. Agent tidak menjalankan migration, seed, aplikasi, atau test.

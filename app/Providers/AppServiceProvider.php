@@ -11,6 +11,8 @@ use App\Models\User;
 use App\Policies\ContentPolicy;
 use App\Policies\EnrollmentPolicy;
 use App\Policies\UserPolicy;
+use App\Services\HlsVideoDelivery;
+use App\Services\VideoDelivery;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -25,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(VideoDelivery::class, HlsVideoDelivery::class);
     }
 
     /**

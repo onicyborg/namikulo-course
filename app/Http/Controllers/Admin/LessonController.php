@@ -7,6 +7,7 @@ use App\Models\Lesson;
 use App\Models\Section;
 use App\Services\ActivityLogger;
 use App\Services\ContentOrder;
+use App\Services\VideoContentDeletion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -38,15 +39,12 @@ class LessonController extends Controller
         return back()->with('success', 'Materi berhasil diperbarui.');
     }
 
-    public function destroy(Request $request, Section $section, Lesson $lesson, ActivityLogger $logger): RedirectResponse
+    public function destroy(Request $request, Section $section, Lesson $lesson, VideoContentDeletion $deletion): RedirectResponse
     {
         $this->authorizeScope($section, $lesson);
-        DB::transaction(function () use ($lesson, $request, $logger): void {
-            $old = $lesson->getAttributes();
-            $lesson->delete();
-            $logger->log('deleted', $request->user(), 'lessons', $lesson->id, $old);
-        });
-        return back()->with('success', 'Materi dihapus dari kurikulum.');
+        $ids = DB::transaction(fn () => $deletion->archiveLesson($lesson, $request->user()));
+        $removed = $deletion->removeFiles($ids);
+        return back()->with('success', $removed ? 'Materi dan berkas video privatnya dihapus.' : 'Materi dihapus. Berkas privat yang tersisa akan dibersihkan oleh pemicu berkala.');
     }
 
     public function reorder(Request $request, Section $section, ContentOrder $order): RedirectResponse

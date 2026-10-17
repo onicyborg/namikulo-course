@@ -93,7 +93,8 @@ class CoursePageController extends Controller
     private function detail(Request $request, Course $course, EnrollmentService $enrollments, DescriptionSanitizer $sanitizer, bool $preview): View
     {
         $course->load(['category', 'sections' => fn ($sections) => $sections->with([
-            'lessons' => fn ($lessons) => $lessons->select('id', 'section_id', 'title', 'duration_seconds', 'sort_order'),
+            'lessons' => fn ($lessons) => $lessons->select('id', 'section_id', 'title', 'duration_seconds', 'sort_order')
+                ->with('videoAsset:id,lesson_id,status'),
         ])])->loadCount(['sections', 'lessons'])->loadSum('lessons as lessons_duration_seconds', 'duration_seconds');
 
         return view('site.courses.show', [
@@ -101,6 +102,8 @@ class CoursePageController extends Controller
             'preview' => $preview,
             'accessState' => $enrollments->stateFor($request->user(), $course),
             'safeDescription' => $sanitizer->clean($course->description),
+            'firstReadyLesson' => $course->sections->flatMap->lessons
+                ->first(fn ($lesson) => $lesson->videoAsset?->status === VideoStatus::Ready),
         ]);
     }
 
