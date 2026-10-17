@@ -4,11 +4,13 @@ namespace App\Services;
 
 use App\Enums\OrderStatus;
 use App\Enums\UserNotificationType;
+use App\Enums\DiscussionPostStatus;
 use App\Enums\UserRole;
 use App\Models\Enrollment;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\UserNotification;
+use App\Models\LessonDiscussionPost;
 
 class NotificationService
 {
@@ -64,9 +66,36 @@ class NotificationService
             courseId: $enrollment->course_id, enrollmentId: $enrollment->id);
     }
 
+    public function discussionQuestion(LessonDiscussionPost $post, string $recipientId, string $actorId): void
+    {
+        $this->create($recipientId, UserNotificationType::DiscussionQuestion, 'discussion:question:'.$post->id,
+            'Pertanyaan baru pada materi', 'Ada pertanyaan baru yang dapat Anda tanggapi.',
+            actorId: $actorId, courseId: $post->lesson->course_id, lessonId: $post->lesson_id, discussionPostId: $post->id);
+    }
+
+    public function discussionReply(LessonDiscussionPost $post, string $recipientId, string $actorId): void
+    {
+        $this->create($recipientId, UserNotificationType::DiscussionReply, 'discussion:reply:'.$post->id,
+            'Balasan pada diskusi materi', 'Ada balasan baru pada percakapan yang Anda ikuti.',
+            actorId: $actorId, courseId: $post->lesson->course_id, lessonId: $post->lesson_id, discussionPostId: $post->id);
+    }
+
     public function target(UserNotification $notification, User $viewer, ?array $activeCourseIds = null): ?string
     {
         if ($notification->user_id !== $viewer->id) return null;
+        if (in_array($notification->type, [UserNotificationType::DiscussionQuestion, UserNotificationType::DiscussionReply], true)) {
+            $post = $notification->discussionPost;
+            if (! $post || ! $post->lesson || ! $post->lesson->course || $post->lesson->course->trashed()) return null;
+            $root = $post->parent_id ? $post->root : $post;
+            if (! $root) return null;
+            if ($post->status !== DiscussionPostStatus::Visible || $root->status !== DiscussionPostStatus::Visible) {
+                return $viewer->isAdmin() ? route('admin.discussions.index') : null;
+            }
+            if (! $viewer->isAdmin() && ! ($activeCourseIds !== null
+                ? in_array($post->lesson->course_id, $activeCourseIds, true)
+                : (bool) app(EnrollmentService::class)->activeFor($viewer, $post->lesson->course))) return null;
+            return route('learn.discussion.thread', [$post->lesson, $root]).'?focus='.$post->id.'#discussion-post-'.$post->id;
+        }
         if ($viewer->isAdmin()) {
             return $notification->order ? route('admin.orders.show', $notification->order) : null;
         }
@@ -89,11 +118,13 @@ class NotificationService
     }
 
     private function create(string $userId, UserNotificationType $type, string $key, string $title, string $summary,
-        ?string $actorId = null, ?string $courseId = null, ?string $orderId = null, ?string $enrollmentId = null): void
+        ?string $actorId = null, ?string $courseId = null, ?string $orderId = null, ?string $enrollmentId = null,
+        ?string $lessonId = null, ?string $discussionPostId = null): void
     {
         UserNotification::query()->firstOrCreate(['user_id' => $userId, 'dedupe_key' => $key], [
             'actor_id' => $actorId, 'type' => $type, 'title' => $title, 'summary' => $summary,
             'course_id' => $courseId, 'order_id' => $orderId, 'enrollment_id' => $enrollmentId,
+            'lesson_id' => $lessonId, 'discussion_post_id' => $discussionPostId,
         ]);
     }
 }

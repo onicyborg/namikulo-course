@@ -259,6 +259,7 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | POST | `/learn/playback/{session}/heartbeat` | `learn.heartbeat` |
 | POST | `/learn/lessons/{lesson}/progress` | `learn.progress` |
 | GET | `/learn/{lesson}/discussion` | `learn.discussion.index` (Phase 9; halaman/fragmen berhalaman) |
+| GET | `/learn/{lesson}/discussion/{post}` | `learn.discussion.thread` (Phase 9; balasan berhalaman) |
 | POST | `/learn/{lesson}/discussion` | `learn.discussion.store` (Phase 9; pertanyaan/balasan) |
 | DELETE | `/learn/{lesson}/discussion/{post}` | `learn.discussion.destroy` (Phase 9; penulis/admin) |
 | GET | `/stream/{token}/master.m3u8` | `stream.master` |

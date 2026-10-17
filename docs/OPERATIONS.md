@@ -32,6 +32,8 @@ Respons `completed` berarti kandidat saat itu habis; `partial` berarti pemicu be
 
 ## Gangguan umum
 
+Diskusi Phase 9 tersedia pada setiap materi bagi member berakses aktif. Admin meninjau kiriman pada **Admin → Diskusi materi**: sembunyikan pertanyaan untuk menutup seluruh thread bagi member, atau sembunyikan satu balasan. Pemulihan mengembalikan visibilitas sesuai status induknya. Kiriman yang dihapus penulis tetap tercatat sebagai soft delete dan tampil sebagai status audit admin; isi kiriman tidak disalin ke `system_logs`. Tidak ada task cron atau worker baru untuk moderasi.
+
 | Kejadian | Langkah operator |
 |---|---|
 | Cron berhenti/401 | Periksa jadwal, HTTPS, header Bearer dan token yang cocok. Rotasi token dilakukan dengan mengganti `.env`, membangun ulang config cache, lalu memperbarui seluruh job cron-job.org. Token lama tidak dipakai lagi. |

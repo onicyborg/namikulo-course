@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\OperationController;
 use App\Http\Controllers\Operations\ScheduledJobController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\Member\LessonDiscussionController;
+use App\Http\Controllers\Admin\DiscussionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -66,6 +68,12 @@ Route::post('/account/timezone', [UserTimezoneController::class, 'update'])
 
 Route::middleware(['auth', 'active'])->group(function (): void {
     Route::get('/learn/{lesson}', [LearnController::class, 'show'])->name('learn.show');
+    Route::get('/learn/{lesson}/discussion', [LearnController::class, 'show'])->name('learn.discussion.index');
+    Route::get('/learn/{lesson}/discussion/{post}', [LessonDiscussionController::class, 'thread'])->whereUuid('post')->name('learn.discussion.thread');
+    Route::post('/learn/{lesson}/discussion', [LessonDiscussionController::class, 'store'])
+        ->middleware('throttle:5,1,discussion-post:')->name('learn.discussion.store');
+    Route::delete('/learn/{lesson}/discussion/{post}', [LessonDiscussionController::class, 'destroy'])
+        ->whereUuid('post')->middleware('throttle:10,1,discussion-delete:')->name('learn.discussion.destroy');
     Route::post('/learn/{lesson}/playback', [LearnController::class, 'playback'])->middleware('throttle:60,1,playback:')->name('learn.playback');
     Route::post('/learn/heartbeat/{token}', [LearnController::class, 'heartbeat'])->middleware('throttle:90,1,heartbeat:')->name('learn.heartbeat');
     Route::prefix('stream/{token}')->name('stream.')->middleware('throttle:600,1,stream:')->group(function (): void {
@@ -99,6 +107,9 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('discussions', [DiscussionController::class, 'index'])->name('discussions.index');
+        Route::post('discussions/{post}/hide', [DiscussionController::class, 'hide'])->whereUuid('post')->name('discussions.hide');
+        Route::post('discussions/{post}/restore', [DiscussionController::class, 'restore'])->whereUuid('post')->name('discussions.restore');
         Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
         Route::get('operations', [OperationController::class, 'index'])->name('operations.index');

@@ -63,7 +63,7 @@ Item ini dapat ditambahkan setelah MVP dengan PRD revisi.
 
 ### 4.3 Perluasan terencana setelah MVP
 
-Phase 8 menambah pusat notifikasi dalam aplikasi, ringkasan email harian, dan pengingat akses; implementasinya menunggu UAT user. Phase 9 masih direncanakan untuk tanya jawab per materi video. Kedua phase tidak mengubah syarat kelulusan Phase 7 atau keputusan rilis MVP. Diskusi hanya berada pada halaman materi, bukan forum umum. Role tetap `admin` dan `member`.
+Phase 8 menambah pusat notifikasi dalam aplikasi, ringkasan email harian, dan pengingat akses. Phase 9 menambah tanya jawab per materi video. Keduanya telah diimplementasikan dan menunggu UAT user; tidak mengubah syarat kelulusan Phase 7 atau keputusan rilis MVP. Diskusi hanya berada pada halaman materi, bukan forum umum. Role tetap `admin` dan `member`.
 
 ## 5. Kebutuhan fungsional
 
@@ -246,7 +246,7 @@ Ringkasan; rincian ada di `phases/README.md`.
 | 8 | Pusat notifikasi, peristiwa pembayaran/akses, pengingat H-7, rekap email 07.00 WIB |
 | 9 | Tanya jawab per materi, moderasi admin, notifikasi pertanyaan/balasan |
 
-Phase 8 telah diaktifkan atas instruksi user dan menunggu UAT; Phase 9 tetap rencana setelah MVP. Satu phase selesai setelah user meninjau hasil pengujian dan menyatakan lulus.
+Phase 8–9 telah diaktifkan atas instruksi user dan menunggu UAT. Satu phase selesai setelah user meninjau hasil pengujian dan menyatakan lulus.
 
 ## 10. Risiko
 

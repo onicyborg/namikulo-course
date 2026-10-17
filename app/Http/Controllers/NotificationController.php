@@ -15,7 +15,7 @@ class NotificationController extends Controller
     public function index(Request $request, NotificationService $service): View
     {
         $user = $request->user();
-        $items = $user->userNotifications()->with(['course', 'order:id,user_id,status'])
+        $items = $user->userNotifications()->with(['course', 'order:id,user_id,status', 'discussionPost.lesson.course', 'discussionPost.root'])
             ->latest('created_at')->paginate(15);
         $courseIds = $items->getCollection()->pluck('course_id')->filter()->unique()->all();
         $activeCourseIds = $user->isMember() ? Enrollment::query()->where('user_id', $user->id)

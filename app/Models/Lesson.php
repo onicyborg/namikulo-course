@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Lesson extends Model
@@ -27,5 +28,10 @@ class Lesson extends Model
     public function videoAsset(): HasOne
     {
         return $this->hasOne(VideoAsset::class);
+    }
+
+    public function discussionPosts(): HasMany
+    {
+        return $this->hasMany(LessonDiscussionPost::class);
     }
 }

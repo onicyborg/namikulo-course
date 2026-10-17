@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Member;
 use App\Enums\VideoStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
-use App\Services\EnrollmentService;
 use App\Services\LessonProgressService;
+use App\Services\LessonDiscussionService;
+use App\Enums\DiscussionPostStatus;
 use App\Services\VideoDelivery;
 use App\Models\LessonProgress;
 use Illuminate\Http\JsonResponse;
@@ -15,11 +16,19 @@ use Illuminate\View\View;
 
 class LearnController extends Controller
 {
-    public function show(Request $request, Lesson $lesson, EnrollmentService $enrollments): View
+    public function show(Request $request, Lesson $lesson, LessonDiscussionService $discussion): View
     {
         $lesson->load(['course', 'section', 'videoAsset']);
-        abort_unless($request->user()->isAdmin() || $enrollments->activeFor($request->user(), $lesson->course), 403, 'Akses course tidak aktif.');
+        $discussion->authorizeLesson($request->user(), $lesson);
         abort_unless($lesson->videoAsset?->status === VideoStatus::Ready, 404, 'Video belum siap.');
+
+        $discussionThreads = $lesson->discussionPosts()->whereNull('parent_id')
+            ->where('status', DiscussionPostStatus::Visible->value)
+            ->with(['user:id,name,role', 'replies' => fn ($query) => $query
+                ->where('status', DiscussionPostStatus::Visible->value)->with(['user:id,name,role', 'replyTo.user:id,name'])
+                ->oldest('created_at')->limit(3)])
+            ->withCount(['replies as visible_replies_count' => fn ($query) => $query->where('status', DiscussionPostStatus::Visible->value)])
+            ->latest('created_at')->paginate(10, ['*'], 'discussion_page');
 
         $sections = $lesson->course->sections()->with(['lessons' => fn ($query) => $query->with('videoAsset')])->get();
         $ready = $sections->flatMap->lessons->filter(fn ($item) => $item->videoAsset?->status === VideoStatus::Ready)->values();
@@ -31,6 +40,7 @@ class LearnController extends Controller
 
         return view('member.learn.show', [
             'lesson' => $lesson, 'sections' => $sections, 'progress' => $progress,
+            'discussionThreads' => $discussionThreads,
             'previous' => $position > 0 ? $ready[$position - 1] : null,
             'next' => $position !== false ? $ready->get($position + 1) : null,
             'preview' => $request->user()->isAdmin(),

@@ -17,7 +17,7 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-        if ($request->routeIs('admin.lessons.video.prepare', 'learn.show')) {
+        if ($request->routeIs('admin.lessons.video.prepare', 'learn.show', 'learn.discussion.*')) {
             $asset = parse_url(asset('css/app.min.css'));
             $assetOrigin = isset($asset['scheme'], $asset['host'])
                 ? $asset['scheme'].'://'.$asset['host'].(isset($asset['port']) ? ':'.$asset['port'] : '') : '';

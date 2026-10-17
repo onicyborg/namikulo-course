@@ -714,7 +714,7 @@ Loading, empty, success, error, permission (403), tidak ditemukan (404), kedaluw
 - Player memakai tautan kecil ke pusat notifikasi pada header atau bagian bawah halaman, jauh dari kontrol video. Jangan mengubah area video hanya demi badge notifikasi.
 - Email rekap HTML + teks polos memakai identitas email yang sudah ada, judul spesifik, jumlah belum dibaca, maksimal 20 ringkasan, tautan aman ke pusat notifikasi, dan catatan bahwa waktu pengiriman dimulai 07.00 WIB. Tidak perlu tombol promosi atau visual baru.
 
-### 19.12 Diskusi materi (rencana Phase 9)
+### 19.12 Diskusi materi (Phase 9)
 
 - Letakkan **Diskusi materi** di bawah deskripsi dan navigasi video pada `layouts/player`. Desktop mengikuti lebar kolom konten video; mobile menumpuk setelah player, sebelum/atau setelah kurikulum sesuai pembacaan yang paling jelas. Diskusi tidak menjadi overlay video dan tidak memindahkan kontrol pemutar.
 - Tampilkan pertanyaan sebagai thread dengan nama penulis, waktu lokal, isi teks biasa, jumlah jawaban, dan aksi **Balas**. Jawaban satu tingkat dengan penanda **Admin** yang mudah dibedakan tanpa bergantung pada warna saja. Bila membalas komentar tertentu, tampilkan konteks `Membalas [nama]` tanpa indentasi bertingkat tak terbatas.

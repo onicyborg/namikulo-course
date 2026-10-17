@@ -2,7 +2,7 @@
 
 Status: Phase 0 **menunggu UAT user**; Phase 1–6 **lulus UAT user**; Phase 7 **diimplementasikan, menunggu UAT user dan staging MySQL**. Proyek belum siap rilis.
 
-Dokumen Phase 0–7 disiapkan untuk MVP; Phase 8 telah diaktifkan atas instruksi user dan implementasinya menunggu UAT. Phase 9 tetap rencana. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
+Dokumen Phase 0–7 disiapkan untuk MVP; Phase 8–9 telah diaktifkan atas instruksi user dan implementasinya menunggu UAT. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
 ## Urutan kerja
 
@@ -17,7 +17,7 @@ Dokumen Phase 0–7 disiapkan untuk MVP; Phase 8 telah diaktifkan atas instruksi
 | [6](PHASE-6.md) | Dashboard member, course saya, progres, profil | F-105, F-601, F-604 | Lulus UAT user |
 | [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis MVP | F-509 ditunda saat Phase 7; NFR, dashboard MVP | Menunggu UAT |
 | [8](PHASE-8.md) | Pusat notifikasi, pembayaran/akses, pengingat H-7, rekap 07.00 WIB | F-509, F-801–804 | Diimplementasikan; menunggu UAT user |
-| [9](PHASE-9.md) | Diskusi per materi, moderasi admin, notifikasi pertanyaan/balasan | F-805–807 | Rencana; belum aktif |
+| [9](PHASE-9.md) | Diskusi per materi, moderasi admin, notifikasi pertanyaan/balasan | F-805–807 | Diimplementasikan; menunggu UAT user |
 
 Prioritas M pada Phase 0–7 adalah syarat rilis MVP; M pada Phase 8–9 adalah syarat kelulusan perluasan **setelah phase tersebut diaktifkan**, bukan syarat tambahan rilis MVP yang sedang berjalan. F-509 semula C dan ditunda di Phase 7; user kini memilihnya sebagai notifikasi aplikasi + rekap Phase 8. Forum umum tetap di luar scope.
 
@@ -61,4 +61,4 @@ Untuk rilis **MVP Phase 0–7**, seluruh kebutuhan M pada phase tersebut dan UAT
 
 ## Perintah untuk user sekarang
 
-Phase 7 dan Phase 8 sudah diimplementasikan dan menunggu UAT user. Untuk Phase 8, user perlu backup DB lalu menjalankan migration sebelum memakai aplikasi; dua jadwal cron baru diaktifkan setelah UAT. Phase 9 masih rencana. Ikuti [panduan UAT Phase 8](PHASE-8.md#panduan-uji-manual-uat) dan [checklist rilis](../RELEASE-CHECKLIST.md). Agent tidak menjalankan migration atau seed pada database user.
+Phase 7–9 sudah diimplementasikan dan menunggu UAT user. Untuk Phase 8–9, user perlu backup DB lalu menjalankan migration sebelum memakai aplikasi; dua jadwal cron Phase 8 diaktifkan setelah UAT. Ikuti [panduan UAT Phase 8](PHASE-8.md#panduan-uji-manual-uat), [panduan UAT Phase 9](PHASE-9.md#panduan-uji-manual-uat), dan [checklist rilis](../RELEASE-CHECKLIST.md). Agent tidak menjalankan migration atau seed pada database user.

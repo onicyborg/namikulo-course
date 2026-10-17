@@ -18,6 +18,7 @@
             <li class="menu-header">KONTEN</li>
             <li class="dropdown {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"><a href="{{ route('admin.categories.index') }}" class="nav-link"><i data-feather="grid" aria-hidden="true"></i><span>Kategori</span></a></li>
             <li class="dropdown {{ request()->routeIs('admin.courses.*') || request()->routeIs('admin.sections.*') ? 'active' : '' }}"><a href="{{ route('admin.courses.index') }}" class="nav-link"><i data-feather="book-open" aria-hidden="true"></i><span>Course</span></a></li>
+            <li class="dropdown {{ request()->routeIs('admin.discussions.*') ? 'active' : '' }}"><a href="{{ route('admin.discussions.index') }}" class="nav-link"><i data-feather="message-circle" aria-hidden="true"></i><span>Diskusi materi</span></a></li>
             <li class="menu-header">TRANSAKSI</li>
             <li class="dropdown {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}"><a href="{{ route('admin.notifications.index') }}" class="nav-link"><i data-feather="bell" aria-hidden="true"></i><span>Notifikasi</span></a></li>
             <li class="dropdown {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"><a href="{{ route('admin.orders.index') }}" class="nav-link"><i data-feather="credit-card" aria-hidden="true"></i><span>Pesanan</span></a></li>

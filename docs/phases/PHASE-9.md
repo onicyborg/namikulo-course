@@ -1,6 +1,6 @@
 # Phase 9: Diskusi pada setiap materi
 
-Status: **Rencana; belum aktif dan belum diimplementasikan.** Mulai hanya setelah Phase 8 lulus menurut user dan ada instruksi eksplisit untuk Phase 9. Phase ini tidak mengubah role: penjawab resmi sementara adalah admin.
+Status: **Aktif; implementasi menunggu UAT user.** User menginstruksikan pengembangan Phase 9 sambil menunda pengujian end to end. Phase ini tidak mengubah role: penjawab resmi sementara adalah admin. Kelulusan tetap menunggu feedback UAT user.
 
 Acuan: [PRD F-805–F-807 dan BR-13–BR-15](../PRD.md), [SRS 3.1 dan 5.12](../SRS.md), [design.md 19.12](../../design.md), [AGENTS.md](../../AGENTS.md).
 
@@ -8,7 +8,7 @@ Acuan: [PRD F-805–F-807 dan BR-13–BR-15](../PRD.md), [SRS 3.1 dan 5.12](../S
 
 Di bawah setiap video, member yang masih mempunyai akses dapat mengajukan pertanyaan, menanggapi pertanyaan atau komentar, dan membaca jawaban member/admin lain. Balasan memanfaatkan notifikasi Phase 8; pertanyaan baru mengundang admin untuk menjawab. Diskusi diikat pada `lesson`, bukan forum umum/course global.
 
-Prasyarat: pusat notifikasi dan digest Phase 8 berjalan; `EnrollmentService::activeFor` tetap menjadi sumber kebenaran akses; lesson/course soft delete dan mode admin preview dipahami dari implementasi aktual.
+Prasyarat implementasi: pusat notifikasi dan digest Phase 8 tersedia di kode; UAT keduanya dapat dilakukan bersama sesuai keputusan user. `EnrollmentService::activeFor` tetap menjadi sumber kebenaran akses; lesson/course soft delete dan mode admin preview mengikuti implementasi aktual.
 
 ## Urutan implementasi
 
@@ -19,9 +19,9 @@ Prasyarat: pusat notifikasi dan digest Phase 8 berjalan; `EnrollmentService::act
 5. Tambahkan halaman moderasi admin berhalaman dan aksi sembunyikan/pulihkan. Penulis dapat soft delete miliknya; admin dapat melihat log moderasi tanpa mengekspos body ke `system_logs`. Konten hilang tetap dapat diaudit sesuai kebijakan data yang berlaku.
 6. Perbarui dokumentasi UI dan operasi dengan batas moderasi, pemulihan, dan dampak course/lesson arsip. Jangan menambah role trainer, live chat, lampiran, WebSocket, atau forum umum.
 
-## Perintah untuk user (saat Phase 9 diaktifkan dan kode selesai)
+## Perintah untuk user
 
-Belum ada perintah yang perlu dijalankan sekarang. Saat serah terima implementasi, user membackup database lalu menjalankan `php artisan migrate` dan `php artisan optimize:clear` pada lingkungan yang dituju. Tidak ada worker atau cron tambahan; notifikasi balasan memakai digest Phase 8 yang sudah aktif.
+Setelah backup database, user menjalankan `php artisan migrate` lalu `php artisan optimize:clear` saat siap melakukan UAT. Tidak ada worker atau cron tambahan; notifikasi balasan memakai digest Phase 8 setelah task itu diaktifkan.
 
 ## Variabel lingkungan terencana
 

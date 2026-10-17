@@ -69,6 +69,7 @@ class OperationController extends Controller
             'operation_failed' => 'Operasi gagal', 'login' => 'Login', 'logout' => 'Logout'];
         $tableLabels = ['users' => 'User', 'courses' => 'Course', 'orders' => 'Pesanan',
             'payments' => 'Pembayaran', 'enrollments' => 'Akses course', 'video_uploads' => 'Unggahan video',
+            'lesson_discussion_posts' => 'Diskusi materi',
             'playback_sessions' => 'Sesi pemutaran', 'lesson_progress' => 'Progres belajar',
             'operation_states' => 'Tugas berkala'];
         $logs = SystemLog::query()->with('user:id,name,email');
