@@ -11,6 +11,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Services\ActivityLogger;
 use App\Services\EnrollmentService;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,6 +24,7 @@ class OrderService
         private readonly MidtransClient $client,
         private readonly PaymentService $payments,
         private readonly ActivityLogger $logger,
+        private readonly NotificationService $notifications,
     ) {}
 
     public function start(User $user, Course $course, string $channel): Order
@@ -62,7 +64,13 @@ class OrderService
                             throw ValidationException::withMessages(['course' => 'Status pembayaran lama sedang dikonfirmasi. Coba lagi setelah beberapa saat.']);
                         }
                     } else {
-                        $order->update(['status' => OrderStatus::Expired]);
+                        DB::transaction(function () use ($order): void {
+                            $locked = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+                            if ($locked->status !== OrderStatus::Pending || ! $locked->expires_at?->isPast()) return;
+                            $locked->update(['status' => OrderStatus::Expired]);
+                            $this->notifications->paymentExpired($locked);
+                        });
+                        $order->refresh();
                     }
                     if ($order->status === OrderStatus::Paid) {
                         throw ValidationException::withMessages(['course' => 'Pembayaran sebelumnya sudah lunas.']);

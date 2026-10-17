@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Services\ActivityLogger;
 use App\Services\EnrollmentService;
+use App\Services\NotificationService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -20,6 +21,7 @@ class PaymentService
         private readonly PaymentEmailService $email,
         private readonly PaymentInstructionEmailService $instructionsEmail,
         private readonly ActivityLogger $logger,
+        private readonly NotificationService $notifications,
     ) {}
 
     public function sync(Payment $payment): string
@@ -84,6 +86,7 @@ class PaymentService
                 'deeplink_url' => $deeplink,
                 'raw_response' => $this->safeResponse($response),
             ]);
+            $this->notifications->paymentPending($order);
         });
     }
 
@@ -148,13 +151,18 @@ class PaymentService
             if ($mapped->isPaid()) {
                 $order->update(['status' => OrderStatus::Paid, 'paid_at' => $paidAt]);
                 $this->enrollments->createFromOrder($order);
+                $this->notifications->paymentPaid($order);
                 $becamePaid = true;
             } elseif ($mapped === PaymentStatus::Refund) {
                 $order->update(['status' => OrderStatus::Refunded]);
             } elseif ($order->status === OrderStatus::Pending && $mapped === PaymentStatus::Expire && $order->expires_at?->isPast()) {
                 $order->update(['status' => OrderStatus::Expired]);
+                $this->notifications->paymentExpired($order);
             } elseif ($order->status === OrderStatus::Pending && in_array($mapped, [PaymentStatus::Deny, PaymentStatus::Failure], true)) {
                 $order->update(['status' => OrderStatus::Failed]);
+            }
+            if ($mapped === PaymentStatus::Pending && $order->status === OrderStatus::Pending) {
+                $this->notifications->paymentPending($order);
             }
             $this->logger->log('updated', null, 'payments', $payment->id, null,
                 ['status' => $mapped->value, 'order_id' => $order->id]);

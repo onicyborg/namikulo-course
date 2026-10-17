@@ -6,13 +6,15 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Models\OperationState;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 use App\Services\Checkout\PaymentService;
 
 class ExpirePendingOrders
 {
     public const TASK = 'expire-pending-orders';
 
-    public function __construct(private readonly PaymentService $payments, private readonly ActivityLogger $logger) {}
+    public function __construct(private readonly PaymentService $payments, private readonly ActivityLogger $logger,
+        private readonly NotificationService $notifications) {}
 
     public function run(int $batchSize, int $maxSeconds): array
     {
@@ -41,8 +43,13 @@ class ExpirePendingOrders
                 }
                 if ($order->status === OrderStatus::Pending
                     && (! $payment || ! in_array($payment->fresh()->status, [PaymentStatus::Pending, PaymentStatus::Unknown, PaymentStatus::Initiating], true))) {
-                    $order->update(['status' => OrderStatus::Expired]);
-                    $this->logger->log('updated', null, 'orders', $order->id, ['status' => 'pending'], ['status' => 'expired']);
+                    DB::transaction(function () use ($order): void {
+                        $locked = Order::query()->whereKey($order->id)->lockForUpdate()->firstOrFail();
+                        if ($locked->status !== OrderStatus::Pending) return;
+                        $locked->update(['status' => OrderStatus::Expired]);
+                        $this->notifications->paymentExpired($locked);
+                        $this->logger->log('updated', null, 'orders', $locked->id, ['status' => 'pending'], ['status' => 'expired']);
+                    });
                 }
                 $afterId = $order->id;
                 $state->update(['cursor' => ['after_id' => $afterId], 'last_error' => null, 'next_attempt_at' => null]);

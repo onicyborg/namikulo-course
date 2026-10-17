@@ -705,3 +705,19 @@ Atas permintaan user, menu **Transaksi** dan invoice PDF diselesaikan lebih awal
 ### 19.10 State wajib di seluruh halaman baru
 
 Loading, empty, success, error, permission (403), tidak ditemukan (404), kedaluwarsa (akses habis), dan batas laju (429). Halaman error `403/404/419/429/500/503` tersedia di `resources/views/errors`.
+
+### 19.11 Pusat notifikasi (Phase 8)
+
+- Navbar Admin dan Member mendapat satu tombol notifikasi berlabel jelas dengan angka belum dibaca (`99+` untuk jumlah besar). Indikator diperbarui saat halaman dibuka; jangan memberi kesan real-time bila tidak ada WebSocket/polling.
+- Halaman daftar memakai layout Admin/Member masing-masing, urutan terbaru, pemisahan visual terbaca/belum dibaca, waktu menurut zona browser, ringkasan satu sampai dua baris, dan tujuan tindakan yang jelas. Tidak menampilkan nomor VA, QR, email orang lain, atau teks sensitif di preview.
+- Tindakan **Tandai dibaca** dan **Tandai semua dibaca** berupa tombol dengan state loading/hasil. Bila target hilang atau hak akses berakhir, item tetap dapat dibaca sebagai riwayat tanpa tautan yang membuka materi.
+- Player memakai tautan kecil ke pusat notifikasi pada header atau bagian bawah halaman, jauh dari kontrol video. Jangan mengubah area video hanya demi badge notifikasi.
+- Email rekap HTML + teks polos memakai identitas email yang sudah ada, judul spesifik, jumlah belum dibaca, maksimal 20 ringkasan, tautan aman ke pusat notifikasi, dan catatan bahwa waktu pengiriman dimulai 07.00 WIB. Tidak perlu tombol promosi atau visual baru.
+
+### 19.12 Diskusi materi (rencana Phase 9)
+
+- Letakkan **Diskusi materi** di bawah deskripsi dan navigasi video pada `layouts/player`. Desktop mengikuti lebar kolom konten video; mobile menumpuk setelah player, sebelum/atau setelah kurikulum sesuai pembacaan yang paling jelas. Diskusi tidak menjadi overlay video dan tidak memindahkan kontrol pemutar.
+- Tampilkan pertanyaan sebagai thread dengan nama penulis, waktu lokal, isi teks biasa, jumlah jawaban, dan aksi **Balas**. Jawaban satu tingkat dengan penanda **Admin** yang mudah dibedakan tanpa bergantung pada warna saja. Bila membalas komentar tertentu, tampilkan konteks `Membalas [nama]` tanpa indentasi bertingkat tak terbatas.
+- Form **Ajukan pertanyaan** dan **Tulis balasan** memakai textarea berlabel, petunjuk singkat panjang teks, tombol kirim jelas, pesan validasi di field, dan fokus kembali ke thread setelah submit. Pakai submit normal/Blade + Bootstrap 4; tidak perlu editor kaya, lampiran, live chat, atau library baru.
+- Admin memiliki daftar moderasi berhalaman dengan konteks course/materi, tombol sembunyikan/pulihkan, dan alasan status. Pada thread yang disembunyikan, member melihat state netral; isi bermasalah tidak ditampilkan di daftar atau preview notifikasi.
+- Sediakan state belum ada pertanyaan, akses sudah berakhir, kiriman dihapus, batas kirim tercapai, dan halaman jawaban berikutnya. Semua tombol dapat dicapai keyboard; teks panjang harus membungkus tanpa overflow pada 375/768/1024 px.

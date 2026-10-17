@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class EnrollmentService
 {
-    public function __construct(private readonly ActivityLogger $logger) {}
+    public function __construct(private readonly ActivityLogger $logger, private readonly NotificationService $notifications) {}
 
     public function activeFor(User $user, Course $course): ?Enrollment
     {
@@ -93,6 +93,7 @@ class EnrollmentService
                 'starts_at' => $startsAt, 'expires_at' => $expiresAt, 'granted_by' => $actor->id, 'note' => $note,
             ]);
             $this->logger->log('assigned', $actor, 'enrollments', $enrollment->id, null, $enrollment->getAttributes());
+            $this->notifications->accessGranted($enrollment, $actor);
             return $enrollment;
         });
     }
@@ -133,6 +134,7 @@ class EnrollmentService
             $enrollment->update(['status' => EnrollmentStatus::Revoked, 'revoked_at' => now(), 'revoked_by' => $actor->id, 'note' => $note]);
             $this->revokePlayback($enrollment);
             $this->logger->log('unassigned', $actor, 'enrollments', $enrollment->id, $old, $enrollment->getAttributes(), 'Akses dicabut');
+            $this->notifications->accessRevoked($enrollment, $actor);
             return $enrollment;
         });
     }

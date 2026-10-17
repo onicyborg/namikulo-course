@@ -74,6 +74,16 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function userNotifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    public function notificationDigests(): HasMany
+    {
+        return $this->hasMany(NotificationDigest::class);
+    }
+
     public function isMember(): bool
     {
         return $this->role === UserRole::Member;

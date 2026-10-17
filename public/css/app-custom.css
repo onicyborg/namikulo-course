@@ -309,3 +309,5 @@ textarea:focus-visible {
         animation-iteration-count: 1 !important;
     }
 }
+.notification-navbar-link{position:relative}
+.notification-navbar-count{position:absolute;top:6px;right:2px;font-size:10px;line-height:1;padding:3px 5px}

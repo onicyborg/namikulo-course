@@ -52,7 +52,7 @@ Seeder tidak boleh berisi kredensial hardcode. Ambil dari `.env` (mis. `SEED_ADM
 - Sebuah phase dianggap **selesai hanya setelah user meninjau hasil pengujian dan menyatakan lulus**. Agent tidak boleh menandai phase selesai atas inisiatif sendiri.
 - Jika user melaporkan bug pada phase aktif, perbaiki di phase tersebut sampai user menyatakan lulus.
 - Jangan berpindah phase tanpa instruksi eksplisit user, misalnya "Phase 1 lulus, lanjut Phase 2".
-- Atas permintaan user, seluruh dokumen Phase 0–7 disiapkan di muka berdasarkan PRD/SRS. Dokumen adalah rencana, bukan izin implementasi atau kelulusan. Cocokkan dengan revisi terbaru dan hasil UAT sebelum memulai setiap phase.
+- Atas permintaan user, dokumen Phase 0–7 disiapkan untuk MVP dan Phase 8–9 sebagai rencana perluasan berdasarkan PRD/SRS. Dokumen adalah rencana, bukan izin implementasi atau kelulusan. Cocokkan dengan revisi terbaru dan hasil UAT sebelum memulai setiap phase.
 
 ### 0.4 Skill yang tersedia
 

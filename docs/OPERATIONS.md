@@ -13,8 +13,10 @@ Setiap task adalah **POST HTTPS** ke `https://DOMAIN/operations/jobs/{task}` den
 | `cleanup-video-uploads` | Tiap 15 menit | Unggahan lama yang tidak lagi dirujuk aset/sesi aktif |
 | `expire-pending-orders` | Tiap 10 menit | Pesanan pending lewat batas, setelah status gateway diperiksa bila perlu |
 | `reconcile-payments` | Tiap 15 menit | Pembayaran pending/unknown/initiating yang perlu Get Status |
+| `create-access-expiry-notifications` | Tiap jam | Pengingat H-7 akses aktif menurut zona member |
+| `send-notification-digests` | Mulai 07.00 WIB, ulangi tiap 5 menit sampai hari berakhir | Satu rekap maksimal per akun/tanggal WIB untuk item belum dibaca sebelum 07.00 |
 
-F-509, pengingat akses H-7, **ditunda** sesuai default roadmap dan belum memiliki task aktif. Jangan menjadwalkan `send-access-expiry-reminders` sampai user memilih fitur itu dan implementasi berikutnya lulus UAT.
+Aktifkan dua task Phase 8 hanya setelah migration Phase 8 dijalankan dan UAT lulus. `send-notification-digests` menolak kiriman sebelum 07.00 WIB, termasuk jika zona cron-job.org salah. Atur `MAIL_TIMEOUT=5`, `OPERATIONS_MAX_SECONDS=10`, dan `NOTIFICATION_DIGEST_BATCH_SIZE=3` sebagai nilai awal; batch berhenti sebelum anggaran SMTP tidak mencukupi. Email instruksi pembayaran dan konfirmasi lunas tetap dikirim segera, terpisah dari rekap.
 
 Respons `completed` berarti kandidat saat itu habis; `partial` berarti pemicu berikutnya perlu melanjutkan; `busy` berarti lock task masih dipakai request lain. Respons 503 menandakan kegagalan/ketergantungan tidak tersedia, bukan keberhasilan. Satu request membatasi batch dan waktu menurut `OPERATIONS_BATCH_SIZE`/`OPERATIONS_MAX_SECONDS`. cron-job.org tidak mengikuti cursor otomatis; interval jadwal harus tetap aktif untuk melanjutkan partial.
 
@@ -26,6 +28,7 @@ Respons `completed` berarti kandidat saat itu habis; `partial` berarti pemicu be
 4. Periksa webhook Midtrans dan notifikasi cron-job.org. Pembayaran tidak boleh dinyatakan lunas dari redirect/polling browser. Gunakan sinkronisasi admin bila webhook tertunda, lalu periksa satu enrollment per order.
    Snapshot notifikasi baru hanya menyimpan field status yang diperlukan. Untuk snapshot lama, operator menjalankan `php artisan payments:redact-notifications` lalu `--apply` setelah backup; perintah tidak mencetak payload.
 5. Jika backlog naik, periksa `last_error`, `next_attempt_at`, durasi request, dan batas hosting. Biarkan retry/backoff berjalan; jangan menjalankan task berulang paralel atau menambah worker diam-diam.
+6. Untuk rekap, lihat jumlah dicatat terkirim, tidak pasti, gagal, dan akun yang menunggu di **Admin → Tugas & log**. Status tidak pasti tidak dicoba ulang otomatis pada tanggal WIB yang sama; notifikasi yang tetap belum dibaca dapat ikut rekap hari berikutnya. Jika backlog belum selesai sampai akhir hari, evaluasi frekuensi dan kapasitas SMTP/hosting.
 
 ## Gangguan umum
 

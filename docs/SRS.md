@@ -1,6 +1,6 @@
 # SRS — Platform Course Berbayar
 
-Versi 1.2 · Status: Draf; pemrosesan browser dan operasi tanpa worker · Tanggal: 16 Oktober 2026
+Versi 1.3 · Status: Draf; MVP tanpa worker dan rencana Phase 8–9 · Tanggal: 17 Oktober 2026
 
 Dokumen ini adalah spesifikasi teknis yang menjadi acuan agent. Kebutuhan produk ada di [PRD.md](PRD.md); aturan kerja agent ada di [../AGENTS.md](../AGENTS.md). Bila ada konflik, urutan prioritas: AGENTS.md > SRS.md > PRD.md > design.md.
 
@@ -18,6 +18,7 @@ Kata "harus" = wajib; "sebaiknya" = dianjurkan; "boleh" = opsional.
   - Disk `public` (`storage/app/public`): thumbnail course, avatar.
 - Disk `video_private` (`storage/app/video-private`): hasil HLS dan unggahan sementara; sumber asli tetap di komputer admin. Kunci persisten hanya DB terenkripsi. **Tidak pernah** dapat diakses langsung lewat web server.
 - Integrasi eksternal: Midtrans Core API (HTTP), SMTP, ffmpeg.wasm di browser admin (asset lokal), tanpa FFmpeg/ffprobe di server.
+- Perluasan Phase 8–9: notifikasi aplikasi tersimpan di DB, rekap email memakai task cron-job.org, dan diskusi teks per materi; tanpa WebSocket, push browser, queue worker, atau role pengajar.
 - Pemisahan lapisan: Controller (tipis) → Service (logika bisnis) → Model. Kode Blade tidak berisi logika bisnis.
 
 ```text
@@ -49,7 +50,9 @@ app/
     Video/HlsVideoDelivery.php
   Services/Operations/ ExpireEnrollments, ExpirePendingOrders, ReconcilePayments,
                        PrunePlaybackSessions, CleanupVideoUploads
-                       SendAccessExpiryReminders (opsional F-509)
+                       CreateAccessExpiryNotifications, SendNotificationDigests (Phase 8)
+  Services/Discussion/ LessonDiscussionService (Phase 9)
+  Services/Notification/ NotificationService, NotificationDigestService (Phase 8)
 config/              course.php  midtrans.php  video.php  operations.php
 resources/views/
   layouts/ (admin, member, auth, public, player)
@@ -201,7 +204,13 @@ Index `(user_id, course_id, status)` bernama eksplisit.
 
 **system_logs** — `user_id` foreignUuid null (nullOnDelete), `action` string(40), `table_name` string(80) null, `record_id` string(36) null, `method` string(10) null, `url` string(500) null, `ip_address` string(45) null, `user_agent` string(255) null, `old_values` json null, `new_values` json null, `description` string null. Hanya `created_at`. Index `(table_name, record_id)` dan `action`.
 
-**Tabel framework** (`sessions`, `cache`, `jobs`, `failed_jobs`, `password_reset_tokens`): bawaan Laravel, dengan `sessions.user_id` diubah menjadi `foreignUuid` nullable index.
+**user_notifications** (migration baru Phase 8) — `id` UUID v7; `user_id` foreignUuid penerima (restrict), `actor_id` foreignUuid null (nullOnDelete), `type` string(30), `title` string(160), `summary` string(300), `dedupe_key` string(191), `course_id`/`lesson_id`/`order_id`/`enrollment_id` foreignUuid nullable sesuai tipe (nullOnDelete agar riwayat aman), `read_at` timestamp null, timestamps UTC. Unique `(user_id, dedupe_key)` bernama pendek; index `(user_id, read_at, created_at)` dan `(user_id, created_at)`. Jangan simpan URL bebas, detail VA/QR, token, atau isi email di tabel ini. Tipe di PHP Backed Enum: `payment_pending`, `payment_paid`, `payment_expired`, `access_granted`, `access_revoked`, `access_expiring`, `discussion_question`, `discussion_reply`. Referensi target yang hilang ditampilkan sebagai item historis tanpa tautan berbahaya. Kolom `discussion_post_id` nullable dengan FK nullOnDelete ditambahkan lewat migration Phase 9 setelah tabel post ada; tidak mengubah migration Phase 8 yang telah dijalankan.
+
+**notification_digests** (migration baru Phase 8) — `id` UUID v7, `user_id` foreignUuid (restrict), `digest_date` date **Asia/Jakarta**, `cutoff_at` timestamp UTC, `status` string(20) (`attempted`/`sent`/`failed`/`uncertain`/`skipped`), `item_count` unsignedInteger, `attempted_at`/`sent_at` timestamp null, `error_class` string(120) null, timestamps UTC. Unique `(user_id, digest_date)` bernama pendek; index `(digest_date, status)`. Satu baris adalah klaim maksimal satu percobaan SMTP otomatis per user/hari WIB, bukan bukti pasti email diterima. Tidak menyimpan body atau daftar notifikasi dalam JSON.
+
+**lesson_discussion_posts** (migration baru Phase 9) — `id` UUID v7, `lesson_id` foreignUuid (restrict; lesson soft delete), `user_id` foreignUuid (restrict), `parent_id` foreignUuid null (FK ke pertanyaan akar, restrict), `reply_to_id` foreignUuid null (FK ke post yang ditanggapi, restrict), `body` text, `status` string(20) (`visible`/`hidden`), `deleted_at` timestamp null (soft delete), timestamps UTC. Index `(lesson_id, parent_id, created_at)` dan `(parent_id, created_at)` dengan nama pendek. Root `parent_id=null`; semua jawaban berinduk langsung ke root meski ditujukan kepada komentar lain. Validasi memastikan parent/reply_to pada lesson dan thread yang sama, bukan hanya FK. Isi post dirender sebagai teks biasa dengan newline yang di-escape.
+
+**Tabel framework** (`sessions`, `cache`, `jobs`, `failed_jobs`, `password_reset_tokens`): bawaan Laravel, dengan `sessions.user_id` diubah menjadi `foreignUuid` nullable index. Perluasan memakai `user_notifications` khusus, bukan tabel `notifications` bawaan Laravel.
 
 ### 3.2 Relasi utama
 
@@ -231,12 +240,15 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | GET | `/my/courses/{course:slug}` | `member.courses.show` |
 | GET | `/my/orders` | `member.orders.index` |
 | GET | `/my/orders/{order}/invoice` | `member.orders.invoice` |
+| GET | `/my/notifications` | `member.notifications.index` (Phase 8) |
 | GET/PUT | `/my/profile` | `member.profile.edit` / `.update` |
 | GET | `/checkout/{course:slug}` | `checkout.show` |
 | POST | `/checkout/{course:slug}` | `checkout.store` |
 | GET | `/orders/{order}/pay` | `orders.pay` |
 | GET | `/orders/{order}/status` | `orders.status` (JSON) |
 | POST | `/orders/{order}/cancel` | `orders.cancel` |
+| POST | `/my/notifications/{notification}/read` | `member.notifications.read` (Phase 8) |
+| POST | `/my/notifications/read-all` | `member.notifications.read-all` (Phase 8) |
 
 ### 4.3 Belajar dan stream (`auth`, dapat diakses member dan admin, akses diperiksa di service)
 
@@ -246,6 +258,9 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | POST | `/learn/lessons/{lesson}/playback` | `learn.playback` |
 | POST | `/learn/playback/{session}/heartbeat` | `learn.heartbeat` |
 | POST | `/learn/lessons/{lesson}/progress` | `learn.progress` |
+| GET | `/learn/{lesson}/discussion` | `learn.discussion.index` (Phase 9; halaman/fragmen berhalaman) |
+| POST | `/learn/{lesson}/discussion` | `learn.discussion.store` (Phase 9; pertanyaan/balasan) |
+| DELETE | `/learn/{lesson}/discussion/{post}` | `learn.discussion.destroy` (Phase 9; penulis/admin) |
 | GET | `/stream/{token}/master.m3u8` | `stream.master` |
 | GET | `/stream/{token}/{rendition}/index.m3u8` | `stream.playlist` |
 | GET | `/stream/{token}/{rendition}/key` | `stream.key` |
@@ -269,6 +284,8 @@ Prefix, nama, dan middleware. Controller mengikuti folder di bagian 2. `{course}
 | User | resource `users` `->except(['show','create','edit'])`; `POST users/{user}/reset-password`; `POST users/{user}/toggle-active` |
 | Anggota course | `GET courses/{course}/members` → `admin.courses.members`; `POST courses/{course}/members`; `PUT members/{enrollment}` (ubah tanggal/perpanjang); `POST members/{enrollment}/revoke` |
 | Pesanan | `GET orders` → `admin.orders.index`; `GET orders/{order}` → `admin.orders.show`; `POST orders/{order}/sync` |
+| Notifikasi | `GET notifications` → `admin.notifications.index`; `POST notifications/{notification}/read` dan `POST notifications/read-all` (Phase 8) |
+| Moderasi | `GET discussions` → `admin.discussions.index`; `POST discussions/{post}/hide` dan `/restore` (Phase 9) |
 | Log | `GET logs` → `admin.logs.index` (S) |
 
 ### 4.6 Pemicu operasi
@@ -452,13 +469,35 @@ cron-job.org memanggil endpoint HTTPS yang menjalankan batch service sinkron. Ti
 | cleanup-video-uploads | Tiap 15 menit | CleanupVideoUploads | 4 |
 | expire-pending-orders | Tiap 10 menit | ExpirePendingOrders | 5 |
 | reconcile-payments | Tiap 15 menit | ReconcilePayments | 5 (S) |
-| send-access-expiry-reminders | Tiap 15 menit, mulai setelah 08:00 | SendAccessExpiryReminders | 7, hanya jika F-509 dipilih |
+| create-access-expiry-notifications | Tiap jam | CreateAccessExpiryNotifications | 8, aktif hanya setelah Phase 8 dirilis |
+| send-notification-digests | Pukul 07.00 WIB lalu tiap 5 menit untuk mengejar backlog hari itu | SendNotificationDigests | 8, aktif hanya setelah Phase 8 dirilis |
 
-Pemicu cleanup lebih sering dari rancangan lama agar batch kecil dapat mengejar backlog. Retensi sesi berakhir/dicabut 30 hari; unggahan tidak aktif >24 jam. Jangan menghapus sesi impor aktif, folder aset yang dirujuk, atau hasil penggantian sebelum swap atomik. Reminder hanya eligible satu kali per enrollment/tanggal akhir pada hari H-7 menurut zona member yang tersimpan (UTC bila tidak diketahui); timestamp/penanda persisten dan lock diperlukan, termasuk keterbatasan hasil SMTP tidak pasti. Aktifkan jadwal hanya saat fiturnya tersedia.
+Pemicu cleanup lebih sering dari rancangan lama agar batch kecil dapat mengejar backlog. Retensi sesi berakhir/dicabut 30 hari; unggahan tidak aktif >24 jam. Jangan menghapus sesi impor aktif, folder aset yang dirujuk, atau hasil penggantian sebelum swap atomik. Pengingat F-509 yang ditunda pada Phase 7 diganti dengan notifikasi aplikasi Phase 8; **tidak** ada task email pengingat tersendiri. Aktifkan dua jadwal baru hanya saat fiturnya tersedia.
 
 User mengatur URL aktual, POST, header rahasia, zona waktu dan notifikasi gagal melalui dashboard cron-job.org; tidak memerlukan API key layanan di aplikasi. Staging HTTPS/tunnel disediakan user untuk UAT. User memeriksa pemicu berulang, partial continuation, timeout, recovery checkpoint, rotasi token dan backlog. Jika batch tertinggal, sesuaikan frekuensi dalam batas hosting atau rencanakan VPS; jangan diam-diam menambah worker.
 
 Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak berarti lunas/kedaluwarsa. Rekonsiliasi/admin sync menggunakan verifikasi server dan service idempoten yang sama dengan webhook. Polling browser tetap hanya membaca DB. Akses expired tetap ditolak langsung meskipun maintenance terlambat. Backup dikelola user/provider, bukan endpoint perintah bebas.
+
+### 5.11 Notifikasi aplikasi dan rekap email (Phase 8)
+
+- **SRS-N1:** `NotificationService` membuat item di `user_notifications` dalam transaksi yang sama dengan perubahan bisnis: tagihan valid `pending`, pembayaran terverifikasi `paid`, pesanan benar-benar `expired`, akses manual diberikan/dicabut. Member mendapat satu item `payment_pending` per order meski metode diganti; tautan selalu membuka status/instruksi terbaru. Member dan admin aktif mendapat `payment_paid` sekali per order sesuai perannya; jangan membuat `access_granted` kedua untuk pembelian yang sama. Admin manual memberi `access_granted`/`access_revoked` kepada member terkait. Event duplikat memakai unique `(user_id,dedupe_key)` dan operasi idempoten. Notifikasi dibuat setelah status otoritatif, bukan berdasarkan polling browser atau redirect.
+- **SRS-N2:** Item berisi judul/ringkasan pendek yang di-escape dan referensi internal. Untuk diskusi, ringkasan hanya menyebut ada pertanyaan/balasan pada materi; **jangan menyalin isi post** agar moderasi tidak meninggalkan kutipan bermasalah di notifikasi/email. Target tautan dipilih server menurut tipe; tidak menerima URL dari payload atau DB yang tidak tervalidasi. `payment_pending` membuka `orders.pay`, `payment_paid` membuka course/member atau detail order admin, `payment_expired` membuka riwayat transaksi, akses membuka course, diskusi membuka materi bila akses masih sah dan post/thread terlihat. Bila target tidak tersedia, disembunyikan, atau akses berakhir, tampilkan konteks aman di daftar tanpa membuka materi/IDOR.
+- **SRS-N3:** Navbar Admin/Member menampilkan hitungan belum dibaca terbatasi (`99+`) dan tautan ke daftar berhalaman (10–20 item). Player menampilkan tautan ringkas ke notifikasi di luar area kontrol video. Indikator diperbarui saat membuka halaman; tidak ada WebSocket atau polling terus-menerus. GET daftar hanya milik penerima, status dibaca diubah lewat POST dengan CSRF, route model binding di-scope `user_id`, dan admin tidak melihat notifikasi pribadi member. Pengguna nonaktif tidak dapat mengakses atau menerima rekap.
+- **SRS-N4:** `CreateAccessExpiryNotifications` memilih kandidat enrollment aktif dengan `expires_at > now()` dan jendela maksimum sekitar delapan hari ke depan, lalu memeriksa tanggal lokal pada `users.timezone` (fallback UTC) untuk H-7 terhadap tanggal akhir. Jendela kandidat diberi margin satu hari agar perbedaan zona tidak melewatkan H-7. Bila pemicu terlambat, boleh membuat pengingat sekali sampai sebelum `expires_at`; jangan mengirim setelah berakhir. Dedupe key memuat enrollment ID dan nilai `expires_at` UTC, sehingga perubahan tanggal akhir yang nyata dapat menghasilkan pengingat baru. Course yang diarsipkan tetap relevan bila enrollment aktif. Tugas memakai lock/batch/checkpoint 5.10.
+- **SRS-N5:** `SendNotificationDigests` memakai tanggal `Asia/Jakarta`. Untuk tanggal D, `cutoff_at` adalah 07.00 WIB D dalam UTC. Task menolak mengirim sebelum cutoff, meski cron-job.org salah zona. Pilih akun aktif dengan notifikasi `read_at IS NULL` dan `created_at < cutoff_at`; klaim unique `(user_id,digest_date)` **sebelum** SMTP, lalu baca ulang item belum dibaca dan kirim satu email HTML + teks polos bila masih ada. Notifikasi setelah cutoff menunggu kesempatan D+1. Tanggal/cutoff tidak memakai zona perangkat penerima; waktu per item dalam email dapat ditampilkan menurut `users.timezone` tersimpan (fallback UTC).
+- **SRS-N6:** Rekap berisi jumlah dan daftar ringkas (maksimal 20 item terbaru, sisanya diringkas sebagai jumlah) serta tautan ke pusat notifikasi. Jangan memuat nomor VA, QR, token, isi komentar lengkap, alamat email pihak lain, atau rahasia. Item yang belum dibaca dapat muncul lagi esok hari; satu user mendapat maksimal satu percobaan rekap otomatis per tanggal WIB. Bila SMTP gagal atau timeout setelah mungkin terkirim, catat `failed`/`uncertain`, jangan mengulang otomatis pada tanggal yang sama; item tetap belum dibaca dan bisa masuk rekap hari berikutnya. Kegagalan email tidak memutar balik pembayaran/enrollment. Pantau jumlah gagal dan backlog di Admin → Tugas & log. **Email instruksi pembayaran dan konfirmasi lunas tetap dikirim segera** melalui alur transaksi yang sudah ada. Status pembayaran yang belum dibaca tetap ikut rekap; batas satu email per hari hanya berlaku untuk rekap, bukan email transaksional tersebut.
+- **SRS-N7:** Endpoint cron memakai allow-list, token, throttle, batch, lock, dan durasi 5.10. Ukuran batch rekap terpisah `NOTIFICATION_DIGEST_BATCH_SIZE` (awal 3) serta `MAIL_TIMEOUT` pendek agar total < `OPERATIONS_MAX_SECONDS`. Status `partial` berarti user eligible hari D masih ada; pemicu setiap 5 menit sesudah 07.00 WIB mengejar backlog tanpa mengirim item D+1 lebih awal. Monitor waktu selesai aktual; pukul 07.00 WIB adalah waktu mulai, bukan jaminan semua email tiba tepat menit itu.
+- **SRS-N7a:** Sebelum setiap kiriman SMTP, hitung sisa waktu request dan sisakan setidaknya `MAIL_TIMEOUT` ditambah margin; hentikan batch sebagai `partial` bila tidak cukup. Ukuran 3 adalah batas atas, bukan janji tiga email per pemicu. Jika backlog tidak tuntas sebelum pergantian hari WIB, tampilkan keterlambatan dan evaluasi frekuensi/kapasitas hosting; jangan menyisipkan worker tersembunyi.
+- **SRS-N8:** Indeks DB dan query hanya mengambil jumlah/notifikasi yang dibutuhkan; tidak memuat seluruh riwayat per request. Tidak menyimpan data sensitif atau isi email di `system_logs`; log hanya tipe, ID internal, hasil batch, dan jumlah. Retensi notifikasi dan digest ditetapkan setelah kebijakan data disetujui; jangan menghapus riwayat otomatis pada Phase 8.
+
+### 5.12 Diskusi per materi (Phase 9)
+
+- **SRS-D1:** Diskusi berada di bawah deskripsi/navigasi video pada `learn.show`, tetap di luar overlay dan kontrol pemutar. Pertanyaan akar diurutkan terbaru, 10 per halaman; jawaban diurutkan tertua, berhalaman/batasi muatan per thread. Tampilkan penulis, waktu lokal, penanda Admin, dan status kiriman. Form pertanyaan dan balasan memakai label jelas, CSRF, validasi server, `old()` dan error field; pesan dikirim dengan submit normal + redirect ke anchor agar video tidak diproses ulang tanpa alasan.
+- **SRS-D2:** Hanya member dengan `EnrollmentService::activeFor` pada course lesson yang dapat membaca/mengirim. Admin aktif boleh membaca, menjawab, dan moderasi tanpa enrollment. Setiap GET/POST/DELETE memvalidasi lesson–course–post–parent/reply_to berada dalam scope sama dan tidak soft deleted; route parameter ID tidak boleh meloloskan IDOR lintas lesson. Course arsip tetap boleh dibahas oleh enrollment aktif, sesuai BR-10. Course/lesson yang soft deleted tidak menerima kiriman baru.
+- **SRS-D3:** Pertanyaan dan balasan berupa teks biasa, 10–2000 karakter setelah trim; tanpa HTML, unggahan, atau embed. Root `parent_id=null`; balasan menunjuk root pada `parent_id`; `reply_to_id` dapat menunjuk root atau komentar yang masih terlihat dalam thread sama. Tidak ada kedalaman visual lebih dari satu tingkat. Render dengan escape dan newline aman; tidak membuat HTML dengan `innerHTML` dari isi user.
+- **SRS-D4:** Rate limit kirim per user (awal 5/menit dan 50/hari), validasi larangan kiriman kosong/duplikat cepat, dan pagination melindungi cPanel. Penulis boleh soft delete miliknya; admin boleh menyembunyikan/mengembalikan semua post. Root tersembunyi/terhapus menutup seluruh thread bagi member; balasan tersembunyi/terhapus tidak ditampilkan. Admin melihat status dan audit. Hapus tidak menghilangkan jejak log moderasi; edit kiriman belum termasuk Phase 9.
+- **SRS-D5:** Pembuatan post dan notifikasi dilakukan dalam satu transaksi. Pertanyaan baru memberi item `discussion_question` untuk admin aktif selain pengirim. Balasan memberi `discussion_reply` kepada penulis root dan, bila berbeda, penulis `reply_to_id`; penerima dideduplikasi, pengirim tidak diberi notifikasi. Member penerima harus masih aktif dan memiliki akses course saat notifikasi dibuat; admin aktif dikecualikan dari syarat enrollment. Jangan memberi notifikasi untuk thread/post yang tersembunyi. Klik item tetap memeriksa akses terkini. Admin baru di masa depan menerima pertanyaan berikutnya saja; tidak backfill otomatis.
+- **SRS-D6:** `system_logs` merekam pembuatan, penghapusan, penyembunyian/pemulihan post dengan ID/aktor/lesson, tanpa menyalin body penuh ke log. UI menyediakan state kosong, validasi gagal, akses berakhir, post disembunyikan, dan batas kirim. UAT mencakup dua member dan admin pada lesson berbeda, tautan notifikasi setelah akses berakhir, serta balasan bersamaan.
 
 ## 6. Kebutuhan non-fungsional
 
@@ -470,12 +509,14 @@ Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak be
 - NFR-S4: Kunci Midtrans dan kunci konten tidak muncul di log/Blade atau respons umum. Pengecualian kunci konten hanya input HTTPS impor admin dan respons endpoint playback key terotorisasi; key browser dibuat lokal sesuai V5. `APP_KEY` dijaga; mengganti `APP_KEY` membuat `encryption_key` video tidak terbaca, jadi dokumentasikan dan sediakan prosedur backup.
 - NFR-S5: Upload divalidasi MIME, ekstensi, ukuran, dan diberi nama acak. HTML dari editor disanitasi.
 - NFR-S6: Password di-hash bawaan Laravel (bcrypt/argon). Sesi di-regenerate saat login.
+- NFR-S7 (Phase 8–9): Semua item notifikasi dan post diskusi di-scope menurut penerima/lesson/akses aktif; isi diskusi di-escape sebagai teks biasa. Rate limit tulis dan moderasi mencegah penyalahgunaan; tautan notifikasi tidak melewati pemeriksaan akses server.
 
 **Kinerja**
 
 - NFR-P1: Halaman publik < 2 detik pada koneksi umum; gunakan `loading="lazy"`, ukuran thumbnail wajar, eager loading, dan indeks sesuai bagian 3.
 - NFR-P2: Streaming segmen harus mendukung `Range`/`stream` tanpa memuat seluruh file ke memori.
 - NFR-P3: Query daftar admin memakai pagination atau DataTables dengan batas data wajar.
+- NFR-P4 (Phase 8–9): Daftar notifikasi dan diskusi berhalaman dengan indeks sesuai 3.1. Navbar hanya menghitung unread; jangan menarik body seluruh post/notifikasi pada setiap halaman. Batch rekap memakai batas khusus kecil karena SMTP berjalan sinkron di cPanel.
 
 **Keandalan dan operasional**
 
@@ -483,6 +524,7 @@ Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak be
 - NFR-R2: Impor video dan batch operasi memiliki lock, batas waktu, checkpoint, retry terbatas serta status kegagalan persisten; tidak bergantung failed_jobs atau worker. Email sinkron dengan timeout, gagal kirim tidak membatalkan transaksi bisnis.
 - NFR-R3: Cadangan database dan folder `storage/app/private/videos` harus dijadwalkan oleh user/server (di luar kode); dokumentasikan.
 - NFR-R4: Pemicu cron-job.org sesuai 5.10 aktif di production; pantau hasil batch dan backlog. Tidak memakai Laravel Scheduler/crontab aplikasi atau worker server.
+- NFR-R5 (Phase 8): Unique key notifikasi/digest, klaim sebelum kirim, lock task, dan status hasil SMTP mencegah percobaan otomatis ganda pada hari WIB yang sama. Ketepatan menit pengiriman dan keberhasilan SMTP tidak dijamin; pemberitahuan dalam aplikasi tetap tersedia.
 
 **Kompatibilitas**
 
@@ -496,6 +538,7 @@ Get Status Midtrans diizinkan dalam batch dengan timeout; kegagalan API tidak be
 **Logging dan audit**
 
 - NFR-L1: `system_logs` mencatat aksi admin (CRUD, beri/ubah/cabut akses), login/logout, perubahan status order, dan hasil notifikasi pembayaran. Data sensitif dibersihkan.
+- NFR-L2 (Phase 8–9): Log peristiwa notifikasi/diskusi dan kegagalan digest tanpa body pesan, isi email, nomor pembayaran, token, atau alamat email penerima lain. Admin memantau batch digest dan moderasi tanpa membuka data pribadi yang tidak diperlukan.
 
 ## 7. Konfigurasi
 
@@ -541,13 +584,14 @@ OPERATIONS_PLAYBACK_RETENTION_DAYS=30
 OPERATIONS_UPLOAD_STALE_HOURS=24
 OPERATIONS_BATCH_SIZE=20
 OPERATIONS_MAX_SECONDS=10
+NOTIFICATION_DIGEST_BATCH_SIZE=3   # Phase 8; batasi menurut MAIL_TIMEOUT dan batas request hosting
 
 SEED_ADMIN_NAME=
 SEED_ADMIN_EMAIL=
 SEED_ADMIN_PASSWORD=
 ```
 
-Konfigurasi aplikasi dibaca lewat `config('course.*')`, `config('midtrans.*')`, `config('video.*')`, `config('operations.*')`. Jangan memanggil `env()` di luar file config.
+Konfigurasi aplikasi dibaca lewat `config('course.*')`, `config('midtrans.*')`, `config('video.*')`, `config('operations.*')`. `NOTIFICATION_DIGEST_BATCH_SIZE` dibaca melalui `config('operations.*')` setelah Phase 8 diimplementasikan. Zona rekap `Asia/Jakarta` adalah aturan produk tetap; jangan mengubah `APP_TIMEZONE=UTC`. Jangan memanggil `env()` di luar file config.
 
 ## 8. Catatan deployment (production MySQL)
 
@@ -573,7 +617,9 @@ Detail urutan dan dependensi ada di [roadmap](phases/README.md). Publikasi posit
 | 4 | F-207–F-208, F-602, F-603, F-701–F-706 | 5.7, 5.10 |
 | 5 | F-306–F-307, F-501–F-508, F-605, BR-02, BR-04–BR-07 | 5.5, 5.6, 5.10 |
 | 6 | F-601, F-604, F-507, F-105 | 5.8 |
-| 7 | F-509 (opsional), dashboard, audit dan kesiapan rilis | 5.9, 5.10, 6, 8 |
+| 7 | Dashboard, audit dan kesiapan rilis; F-509 ditunda pada phase ini | 5.9, 5.10, 6, 8 |
+| 8 | F-509 yang kini dipilih, F-801–F-804, BR-15–BR-18 | 3.1, 4.2, 4.5, 5.10–5.11, 6–8 |
+| 9 | F-805–F-807, BR-13–BR-15 | 3.1, 4.3, 4.5, 5.12, 6 |
 
 ## 10. Jalur peningkatan setelah MVP
 

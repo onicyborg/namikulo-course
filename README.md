@@ -2,7 +2,7 @@
 
 Platform course video berbayar dengan area admin dan member, pembayaran Midtrans Core API melalui UI custom, serta akses belajar enam bulan. Nama tampilan aplikasi mengikuti `APP_NAME`.
 
-**Status:** Phase 0 menunggu UAT user; Phase 1–6 lulus UAT user; Phase 7 diimplementasikan dan menunggu UAT. Belum siap rilis.
+**Status:** Phase 0 menunggu UAT user; Phase 1–6 lulus UAT user; Phase 7 diimplementasikan dan menunggu UAT. Phase 8 diimplementasikan dan menunggu UAT user; Phase 9 masih rencana. Belum siap rilis.
 
 ## Pedoman proyek
 
@@ -41,7 +41,7 @@ Asset Otika memakai `asset()` dan `ASSET_URL`; asset aplikasi memakai `url()`/`S
 
 Proyek tidak memakai npm, Vite, atau build frontend. Asset Otika dimuat dari `ASSET_URL`; CSS dan JavaScript aplikasi berada di `public/`.
 
-Untuk persiapan staging/production, baca [deployment](docs/DEPLOYMENT.md), [operasi](docs/OPERATIONS.md), dan [checklist rilis](docs/RELEASE-CHECKLIST.md). F-509 pengingat akses H-7 tetap ditunda; tidak ada jadwal cron untuk fitur itu.
+Untuk persiapan staging/production, baca [deployment](docs/DEPLOYMENT.md), [operasi](docs/OPERATIONS.md), dan [checklist rilis](docs/RELEASE-CHECKLIST.md). Pengingat akses H-7, pusat notifikasi, dan rekap email ada di [Phase 8](docs/phases/PHASE-8.md), menunggu UAT user; aktifkan dua task cron barunya setelah migration dan UAT lulus. Diskusi materi masih direncanakan pada [Phase 9](docs/phases/PHASE-9.md).
 
 ## Operasi dan rilis
 

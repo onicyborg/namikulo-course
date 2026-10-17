@@ -1,6 +1,6 @@
 # PRD — Platform Course Berbayar
 
-Versi 1.2 · Status: Draf; MVP cPanel dengan pemrosesan browser sesuai arahan user · Tanggal: 16 Oktober 2026
+Versi 1.3 · Status: Draf; MVP cPanel dan rencana perluasan pasca-MVP · Tanggal: 17 Oktober 2026
 
 Dokumen ini menjelaskan **apa** yang dibangun dan **mengapa**. Detail teknis ada di [SRS.md](SRS.md). Urutan pengerjaan ada di [phases/README.md](phases/README.md).
 
@@ -23,8 +23,12 @@ Referensi tampilan: portal course dengan hero, langkah belajar, statistik, dan g
 | G3 | Peserta hanya dapat mengakses course yang dibeli dan hanya selama masa aktif 6 bulan. |
 | G4 | Konten video terlindungi semaksimal yang realistis untuk platform web (lihat bagian 7). |
 | G5 | Pembayaran berjalan di UI milik sendiri, status bayar andal dan tanpa pemberian akses ganda atau salah. |
+| G6 | Member dapat bertanya dan saling menanggapi pada materi yang sedang dipelajari; admin dapat menjawab tanpa role pengajar baru. |
+| G7 | Peristiwa belajar, pembayaran, dan akses mudah ditindaklanjuti lewat notifikasi dalam aplikasi dan satu rekap email harian untuk notifikasi yang belum dibaca. |
 
 Ukuran keberhasilan (diukur setelah rilis, bukan syarat tiap phase): konversi dari halaman detail ke pesanan, rasio pesanan yang berstatus lunas, jumlah laporan akses salah (target nol), dan jumlah tiket "sudah bayar tapi tidak bisa akses" (target nol).
+
+Untuk perluasan Phase 8–9, amati jumlah pertanyaan yang belum mendapat respons admin/member, waktu respons pertama, jumlah notifikasi belum dibaca, dan persentase rekap harian yang berhasil dicatat terkirim. Metrik SMTP tidak ditafsirkan sebagai bukti email benar-benar dibaca.
 
 ## 3. Pengguna dan role
 
@@ -53,13 +57,17 @@ Hanya dua role yang disimpan di database: `admin` dan `member`. Pengunjung adala
 
 ### 4.2 Di luar scope (belum dikerjakan)
 
-Keranjang belanja multi-course, kupon/voucher, afiliasi, sertifikat, kuis/ujian, forum/komentar, live class, aplikasi mobile native, pembayaran kartu kredit, langganan berulang otomatis, refund otomatis dari panel, multi-bahasa selain Indonesia, instruktur sebagai role terpisah, lampiran dokumen (PDF/slide) pada materi.
+Keranjang belanja multi-course, kupon/voucher, afiliasi, sertifikat, kuis/ujian, forum umum lintas course, live class, aplikasi mobile native, pembayaran kartu kredit, langganan berulang otomatis, refund otomatis dari panel, multi-bahasa selain Indonesia, instruktur sebagai role terpisah, lampiran dokumen (PDF/slide) pada materi.
 
 Item ini dapat ditambahkan setelah MVP dengan PRD revisi.
 
+### 4.3 Perluasan terencana setelah MVP
+
+Phase 8 menambah pusat notifikasi dalam aplikasi, ringkasan email harian, dan pengingat akses; implementasinya menunggu UAT user. Phase 9 masih direncanakan untuk tanya jawab per materi video. Kedua phase tidak mengubah syarat kelulusan Phase 7 atau keputusan rilis MVP. Diskusi hanya berada pada halaman materi, bukan forum umum. Role tetap `admin` dan `member`.
+
 ## 5. Kebutuhan fungsional
 
-Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
+Prioritas: **M** = wajib dalam scope rilis/phase yang ditandai, **S** = sebaiknya ada, **C** = bisa ditunda. Penanda `M (Phase 8/9)` tidak menjadi syarat rilis MVP Phase 0–7.
 
 ### 5.1 Autentikasi dan akun
 
@@ -118,7 +126,7 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | F-506 | Pesanan kedaluwarsa otomatis bila lewat batas bayar; pesanan dapat dibatalkan atau metode diganti. | M |
 | F-507 | Member dapat melihat riwayat pesanan dan membuka kembali instruksi bayar yang masih berlaku. | M |
 | F-508 | Email instruksi dikirim setelah tagihan berhasil dibuat (nominal, batas bayar, VA/QRIS atau tautan pembayaran) dan email konfirmasi dikirim setelah pembayaran berhasil. | S |
-| F-509 | Pengingat email saat akses tersisa 7 hari. | C |
+| F-509 | Pengingat saat akses tersisa sekitar 7 hari melalui notifikasi dalam aplikasi, yang ikut rekap email harian bila belum dibaca; tidak ada email pengingat tersendiri. Diimplementasikan pada Phase 8, menunggu UAT. | M (Phase 8) |
 | F-510 | Member dapat mengunduh invoice PDF untuk pesanan lunas; invoice memiliki nomor tetap, identitas penjual dan pembeli, rincian course, nominal, metode, serta tanggal pembayaran. | M |
 
 ### 5.6 Belajar
@@ -142,6 +150,20 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | F-705 | Satu sesi pemutaran aktif per user. | M |
 | F-706 | Log sesi pemutaran untuk penelusuran penyalahgunaan. | S |
 
+### 5.8 Diskusi materi dan notifikasi (perluasan Phase 8–9)
+
+Prioritas **M (Phase 8/9)** berlaku untuk perluasan ini setelah user mengaktifkan phasenya; tidak mengubah daftar wajib rilis MVP Phase 0–7.
+
+| ID | Kebutuhan | Prioritas |
+|---|---|---|
+| F-801 | Admin dan member mempunyai pusat notifikasi dalam aplikasi, indikator jumlah belum dibaca, daftar berhalaman, serta tindakan tandai dibaca. Hanya penerima yang dapat melihat notifikasinya. | M (Phase 8) |
+| F-802 | Setelah tagihan berhasil dibuat, member menerima notifikasi menunggu pembayaran yang menuju instruksi pesanan. Pembayaran lunas, pesanan kedaluwarsa, dan perubahan akses manual yang relevan juga membuat notifikasi; admin menerima pemberitahuan pembelian lunas. Perubahan metode pada pesanan yang sama tidak membanjiri notifikasi. | M (Phase 8) |
+| F-803 | Member menerima satu pengingat dalam aplikasi untuk setiap masa akses yang mendekati akhir (sekitar H-7); perpanjangan masa akses dapat menghasilkan pengingat baru pada tanggal akhir yang baru. | M (Phase 8) |
+| F-804 | Mulai pukul 07.00 WIB setiap hari, sistem mengirim **maksimal satu** email rekap per akun yang memiliki notifikasi belum dibaca sebelum batas waktu tersebut. Tidak ada email rekap bila semuanya sudah dibaca. Isi memuat jumlah, jenis, dan tautan ke pusat notifikasi tanpa data pembayaran sensitif. | M (Phase 8) |
+| F-805 | Pada tiap materi video, member dengan akses course aktif dapat membaca dan membuat pertanyaan serta menanggapi pertanyaan/komentar. Admin dapat membaca dan menjawab tanpa role trainer. Diskusi tetap tersedia bagi member yang masih aktif pada course arsip. | M (Phase 9) |
+| F-806 | Balasan memberi notifikasi dalam aplikasi kepada penulis pertanyaan dan penulis komentar yang ditanggapi, tanpa notifikasi untuk diri sendiri atau duplikasi penerima. Pertanyaan baru memberi notifikasi kepada admin aktif. Notifikasi yang belum dibaca ikut rekap harian. | M (Phase 9) |
+| F-807 | Admin dapat menyembunyikan/mengembalikan konten diskusi bermasalah; penulis dapat menghapus kirimannya sendiri. Konten tersembunyi tidak terlihat oleh member. | M (Phase 9) |
+
 ## 6. Aturan bisnis
 
 | ID | Aturan |
@@ -158,6 +180,12 @@ Prioritas: **M** = wajib MVP, **S** = sebaiknya ada, **C** = bisa ditunda.
 | BR-10 | Course berstatus draft atau arsip tidak tampil di publik dan tidak dapat dibeli. Pengarsipan hanya dapat dilakukan pada course yang sudah terbit. Anggota lama pada course yang diarsipkan tetap dapat belajar sampai akses berakhir. |
 | BR-11 | Harga disimpan dalam Rupiah bulat. Harga diskon, bila ada, harus lebih kecil dari harga normal. |
 | BR-12 | Perubahan akses (beri, perpanjang, cabut) dan perubahan status pesanan dicatat di log sistem. |
+| BR-13 | Membaca/menulis diskusi materi memerlukan login aktif dan akses course yang masih berlaku; admin dapat mengakses untuk moderasi/pratinjau. Akses yang berakhir tidak membuka kembali materi melalui tautan notifikasi. |
+| BR-14 | Pertanyaan dan balasan berupa teks biasa tanpa HTML, gambar, tautan otomatis, atau lampiran. Balasan dapat ditujukan ke komentar tertentu tetapi ditampilkan dalam satu tingkat di bawah pertanyaan agar percakapan mudah diikuti. |
+| BR-15 | Notifikasi dibuat sekali untuk setiap peristiwa bisnis yang sah dan hanya untuk penerima terkait. Pembuatan ulang webhook/pemicu tidak menggandakan notifikasi. Notifikasi pembayaran tidak menentukan status bayar atau hak akses. |
+| BR-16 | Rekap email memakai tanggal **Asia/Jakarta**, sedangkan semua timestamp database tetap UTC. Batas rekap hari D adalah notifikasi belum dibaca yang dibuat sebelum 07.00 WIB hari D; notifikasi setelahnya masuk kesempatan hari berikutnya. Jika masih belum dibaca, item dapat muncul kembali pada rekap hari berikutnya. |
+| BR-17 | Rekap tidak dikirim untuk akun nonaktif. Kegagalan/ketidakpastian SMTP tidak menghapus notifikasi dan tidak memicu pengiriman otomatis berulang pada tanggal rekap yang sama. |
+| BR-18 | Email instruksi pembayaran dan konfirmasi lunas tetap dikirim segera sebagai pesan transaksional. Rekap pukul 07.00 WIB adalah email tambahan, maksimal satu per akun per hari, yang merangkum semua notifikasi aplikasi yang belum dibaca sebelum batas waktu, termasuk status pembayaran. |
 
 ## 7. Perlindungan konten: yang bisa dan tidak bisa dijanjikan
 
@@ -197,6 +225,7 @@ Agent memakai asumsi di kolom "Default" sampai user menyatakan lain.
 | Q8 | Pengiriman email (SMTP) tersedia untuk reset password dan notifikasi? | Diasumsikan SMTP diisi lewat `.env`. |
 | Q9 | Perkiraan jumlah user, course, dan ukuran video? Menentukan ruang disk dan beban streaming. | Ratusan user, puluhan course. Batas awal usulan video sumber 200 MiB, durasi 15 menit, maksimum 720p, MP4 H.264/AAC; bukan jaminan kapasitas browser. Tetapkan ulang setelah UAT perangkat admin. Batas 2 GB sebelumnya dibatalkan. |
 | Q10 | Materi selain video (PDF/slide)? | Di luar scope MVP. |
+| Q11 | Apakah email pembayaran yang sensitif waktu tetap dikirim segera di samping rekap 07.00 WIB? | **Diputuskan user: ya.** Email instruksi dan konfirmasi lunas tetap dikirim segera; rekap harian memuat status pembayaran bila notifikasinya belum dibaca. |
 
 Penjadwalan operasional memakai **cron-job.org** untuk memicu endpoint HTTPS yang diamankan, lalu pekerjaan dieksekusi langsung dalam batch kecil dengan batas waktu dan checkpoint. Keterlambatan pemicu tidak boleh membuka akses yang sudah kedaluwarsa. Detail: SRS bagian 5.10.
 
@@ -213,9 +242,11 @@ Ringkasan; rincian ada di `phases/README.md`.
 | 4 | Video terlindungi: unggah, enkripsi HLS, pemutar, watermark |
 | 5 | Pembayaran Midtrans dengan UI custom dan enrollment otomatis |
 | 6 | Area member: course saya, progres, pesanan, profil |
-| 7 | Penguatan: dashboard admin, pengingat, audit keamanan, panduan deployment MySQL |
+| 7 | Penguatan: dashboard admin, audit keamanan, operasi, panduan deployment MySQL; pengingat lama ditunda ke Phase 8 |
+| 8 | Pusat notifikasi, peristiwa pembayaran/akses, pengingat H-7, rekap email 07.00 WIB |
+| 9 | Tanya jawab per materi, moderasi admin, notifikasi pertanyaan/balasan |
 
-Aturan: satu phase selesai setelah feedback uji langsung dari user menyatakan lulus. Agent tidak melakukan testing.
+Phase 8 telah diaktifkan atas instruksi user dan menunggu UAT; Phase 9 tetap rencana setelah MVP. Satu phase selesai setelah user meninjau hasil pengujian dan menyatakan lulus.
 
 ## 10. Risiko
 
@@ -226,7 +257,10 @@ Aturan: satu phase selesai setelah feedback uji langsung dari user menyatakan lu
 | Webhook Midtrans terlambat/gagal | User sudah bayar tetapi belum dapat akses | Sinkron status manual oleh admin, pengecekan status terjadwal, log notifikasi. |
 | Perbedaan PostgreSQL (dev) vs MySQL (prod) | Migration gagal di production | Aturan migration portabel di AGENTS.md; user mencoba migrate di MySQL staging sebelum rilis. |
 | Streaming melalui PHP membebani server | Lambat saat banyak penonton | Dukungan `X-Accel-Redirect`/Nginx internal location; cache segmen privat. |
-| Tanpa testing oleh agent | Bug lolos antar phase | UAT tertulis tiap phase, user menguji sebelum phase berikutnya. |
+| Volume kiriman diskusi/notifikasi menyulitkan moderasi atau membebani cPanel | Spam dan respons lambat | Batas kirim, pagination, teks biasa, moderasi admin, proses email dalam batch kecil tanpa worker. |
+| SMTP timeout setelah pesan sebenarnya terkirim | Rekap ganda bila dicoba ulang tanpa batas | Maksimal satu percobaan otomatis per akun/tanggal WIB; hasil tidak pasti dicatat, notifikasi tetap tersedia dalam aplikasi. |
+| Perbedaan waktu lokal member dan jam rekap WIB | Pengingat atau batas hari salah | Akses dihitung terhadap UTC/zona member sesuai aturan lama; hanya jadwal dan batas rekap memakai Asia/Jakarta. |
+| Pengujian terbatas pada lingkungan lokal | Integrasi produksi belum terbukti | Agent menguji di lingkungan terisolasi; user menilai UAT dan staging sebelum rilis. |
 
 ## 11. Keputusan MVP cPanel (16 Oktober 2026)
 

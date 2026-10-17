@@ -24,6 +24,10 @@
             @endforeach
         </tbody></table></div>
         <p class="admin-operations-note">“Calon tertunda” menghitung data yang memenuhi syarat awal. Sebagian unggahan video dapat tetap dilindungi karena masih dipakai sesi atau aset aktif.</p>
+        <p class="admin-operations-note">Rekap {{ $digestDate }} WIB: {{ (int) ($digestStats[\App\Enums\NotificationDigestStatus::Sent->value] ?? 0) }} dicatat terkirim,
+            {{ (int) ($digestStats[\App\Enums\NotificationDigestStatus::Uncertain->value] ?? 0) }} hasil tidak pasti,
+            {{ (int) ($digestStats[\App\Enums\NotificationDigestStatus::Failed->value] ?? 0) }} gagal,
+            {{ $tasks[\App\Services\SendNotificationDigests::TASK]['remaining'] }} akun menunggu giliran. Hasil tidak pasti tidak dicoba ulang otomatis hari ini.</p>
     </div></section>
 
     <section class="card" aria-labelledby="system-log-title"><div class="card-header"><h2 id="system-log-title">Log aktivitas</h2></div><div class="card-body">

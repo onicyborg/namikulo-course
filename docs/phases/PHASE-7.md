@@ -13,7 +13,7 @@ Phase 6 lulus dan user menginstruksikan lanjut. Kumpulkan hasil UAT semua phase 
 1. Dashboard admin: total user, course terbit, enrollment aktif, pendapatan bulan berjalan dari paid, pending, pesanan terbaru dan video gagal. Query agregat/eager loading, state kosong tanpa angka buatan.
 2. Review seluruh route/policy/ownership/CSRF/rate limit, sanitasi HTML/upload, secret/log, keamanan file/stream, idempotensi pembayaran, lock task, checkpoint dan retry batch. Perbaiki temuan dalam scope MVP.
 3. Lengkapi halaman log admin bila F-706/observabilitas memerlukannya (S); akses admin, filter/pagination, sanitasi. Pastikan operator dapat memantau trigger diterima, job selesai/gagal dan backlog tanpa membuat dashboard operasional baru yang tidak diminta.
-4. F-509 hanya jika dipilih user: email akses tersisa tujuh hari, service batch berkala dan penanda persisten per enrollment/tanggal akhir agar retry tidak menggandakan email. Pada implementasi ini F-509 ditunda sesuai default roadmap; endpoint/jadwal tersebut tidak diaktifkan.
+4. F-509 ditunda pada implementasi Phase 7; endpoint/jadwal email pengingat tersendiri tidak diaktifkan. User kemudian memilih pengingat dalam aplikasi yang masuk rekap harian sebagai [rencana Phase 8](PHASE-8.md); perubahan itu tidak berlaku surut untuk Phase 7.
 5. Tulis docs/DEPLOYMENT.md, docs/OPERATIONS.md, docs/RELEASE-CHECKLIST.md pada phase ini: setup MySQL, PHP/webserver/OpenSSL, asset WASM/worker browser, disk, timeout dan checkpoint batch, SMTP, Midtrans, cron-job.org, backup/restore APP_KEY/DB/video, rotasi token, pemulihan impor terputus dan batch gagal dan gangguan gateway.
 6. Dokumentasikan deploy/rollback yang menjaga DB dan file: backup sebelum migrate, migration baru non-destruktif, rollback kode hanya bila skema kompatibel, pemulihan backup dilakukan user jika dibutuhkan. Jangan menggunakan migrate:fresh di production.
 7. User melakukan UAT staging MySQL, browser/responsif, gangguan browser/pemicu/gateway, dan restore di lingkungan terisolasi. Catat bukti dan blocker. Tetapkan siap rilis hanya setelah persetujuan eksplisit user.
@@ -77,6 +77,6 @@ Dilakukan user. Tambahkan pemeriksaan umum [roadmap](README.md#prosedur-tiap-pha
 
 ## Kriteria kelulusan, asumsi dan keterbatasan
 
-Rilis ditahan bila kebutuhan M, keamanan akses/pembayaran, backup, pemrosesan browser, atau integrasi wajib belum lulus. User memberi persetujuan production; agent tidak melakukan deploy atau transaksi production. F-509 boleh ditunda secara eksplisit karena kategori C.
+Rilis ditahan bila kebutuhan M pada MVP, keamanan akses/pembayaran, backup, pemrosesan browser, atau integrasi wajib belum lulus. User memberi persetujuan production; agent tidak melakukan deploy atau transaksi production. F-509 ditunda saat Phase 7 masih berkategori C; revisi sesudahnya menempatkan pengingat aplikasi sebagai syarat Phase 8, bukan syarat rilis MVP yang sedang diperiksa.
 
 Phase hanya berubah menjadi lulus setelah user mengonfirmasi hasil UAT. Perbaiki temuan pada phase ini sebelum meminta lanjut. Laporan akhir memuat ringkasan/file, perintah user, .env, hasil pengujian agent, UAT, dan asumsi/keterbatasan. Kesiapan rilis memerlukan keputusan terpisah pada [checklist rilis](../RELEASE-CHECKLIST.md).

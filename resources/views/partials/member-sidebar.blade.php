@@ -25,6 +25,7 @@
                     <i data-feather="file-text" aria-hidden="true"></i><span>Transaksi</span>
                 </a>
             </li>
+            <li class="dropdown {{ request()->routeIs('member.notifications.*') ? 'active' : '' }}"><a href="{{ route('member.notifications.index') }}" class="nav-link"><i data-feather="bell" aria-hidden="true"></i><span>Notifikasi</span></a></li>
             <li class="dropdown {{ request()->routeIs('member.profile.*') ? 'active' : '' }}">
                 <a href="{{ route('member.profile.edit') }}" class="nav-link">
                     <i data-feather="user" aria-hidden="true"></i><span>Profil</span>

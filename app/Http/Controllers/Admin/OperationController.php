@@ -14,11 +14,17 @@ use App\Models\Payment;
 use App\Models\PlaybackSession;
 use App\Models\SystemLog;
 use App\Models\VideoUpload;
+use App\Models\NotificationDigest;
+use App\Models\User;
+use App\Enums\NotificationDigestStatus;
 use App\Services\CleanupVideoUploads;
 use App\Services\ExpireEnrollments;
 use App\Services\ExpirePendingOrders;
 use App\Services\PrunePlaybackSessions;
 use App\Services\ReconcilePayments;
+use App\Services\CreateAccessExpiryNotifications;
+use App\Services\SendNotificationDigests;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -31,6 +37,11 @@ class OperationController extends Controller
             'table' => ['nullable', 'string', 'max:80'],
             'q' => ['nullable', 'string', 'max:100'],
         ]);
+        $digestDate = now()->setTimezone('Asia/Jakarta')->toDateString();
+        $digestCutoff = Carbon::parse($digestDate.' 07:00:00', 'Asia/Jakarta')->utc();
+        $digestBacklog = now()->gte($digestCutoff) ? User::query()->where('is_active', true)
+            ->whereHas('userNotifications', fn ($query) => $query->whereNull('read_at')->where('created_at', '<', $digestCutoff))
+            ->whereDoesntHave('notificationDigests', fn ($query) => $query->where('digest_date', $digestDate))->count() : 0;
         $tasks = [
             ExpireEnrollments::TASK => ['name' => 'Kedaluwarsa akses', 'minutes' => 60,
                 'remaining' => Enrollment::query()->where('status', EnrollmentStatus::Active->value)->where('expires_at', '<=', now())->count()],
@@ -46,6 +57,10 @@ class OperationController extends Controller
             ReconcilePayments::TASK => ['name' => 'Sinkron pembayaran', 'minutes' => 15,
                 'remaining' => Payment::query()->whereIn('status', [PaymentStatus::Initiating->value, PaymentStatus::Unknown->value, PaymentStatus::Pending->value])
                     ->where('created_at', '<=', now()->subMinutes(10))->count()],
+            CreateAccessExpiryNotifications::TASK => ['name' => 'Pengingat akses', 'minutes' => 60,
+                'remaining' => Enrollment::query()->where('status', EnrollmentStatus::Active->value)
+                    ->where('expires_at', '>', now())->where('expires_at', '<=', now()->addDays(9))->count()],
+            SendNotificationDigests::TASK => ['name' => 'Rekap notifikasi', 'minutes' => 5, 'remaining' => $digestBacklog],
         ];
         $states = OperationState::query()->whereIn('task', array_keys($tasks))->get()->keyBy('task');
         $actionLabels = ['created' => 'Dibuat', 'updated' => 'Diubah', 'deleted' => 'Dihapus',
@@ -67,6 +82,9 @@ class OperationController extends Controller
 
         return view('admin.operations.index', [
             'tasks' => $tasks, 'states' => $states, 'filters' => $filters,
+            'digestStats' => NotificationDigest::query()->where('digest_date', $digestDate)
+                ->selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status'),
+            'digestDate' => $digestDate,
             'actionLabels' => $actionLabels, 'tableLabels' => $tableLabels,
             'logs' => $logs->latest()->paginate(25)->withQueryString(),
         ]);

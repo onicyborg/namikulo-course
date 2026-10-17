@@ -35,7 +35,7 @@ Panduan ini untuk instalasi **setelah UAT staging MySQL lulus dan user menyetuju
 | Email | `MAIL_MAILER=smtp`, host/port/skema/akun/sandi/from, `MAIL_TIMEOUT=5`; hindari mailer `log` di production |
 | Pembayaran | `MIDTRANS_IS_PRODUCTION=true` hanya setelah sandbox/merchant siap, Merchant ID, Server Key, daftar kanal aktif; `MIDTRANS_CLIENT_KEY` tidak dipakai oleh UI Core API MVP |
 | Invoice | `INVOICE_SELLER_NAME`, alamat, email, nomor pajak hanya jika benar-benar berlaku; isi sebelum invoice pertama dibuat karena snapshot bersifat tetap |
-| Operasi | `OPERATIONS_CRON_TOKEN` acak minimal 32 byte dan berbeda dari staging, `OPERATIONS_BATCH_SIZE=20`, `OPERATIONS_MAX_SECONDS=10` |
+| Operasi | `OPERATIONS_CRON_TOKEN` acak minimal 32 byte dan berbeda dari staging, `OPERATIONS_BATCH_SIZE=20`, `OPERATIONS_MAX_SECONDS=10`, `NOTIFICATION_DIGEST_BATCH_SIZE=3` untuk Phase 8 |
 | Video | Nilai `VIDEO_*` mengikuti [operasi video](video-operations.md); `VIDEO_ACCEL_REDIRECT=false` pada cPanel saat ini |
 
 `APP_DEBUG=false` mencegah stack trace mentah di respons publik. Gunakan `SESSION_SECURE_COOKIE=true` bila HTTPS sudah benar pada seluruh jalur. Pastikan `ASSET_URL` mengarah ke host Otika HTTPS yang disetujui.

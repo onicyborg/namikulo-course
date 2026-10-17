@@ -16,7 +16,7 @@ Isi bukti, tanggal, dan penanggung jawab setelah UAT user. **Dokumen ini belum m
 | Backup/restore | Dump DB, `APP_KEY`, HLS privat, file publik; restore berhasil di lingkungan terisolasi | Belum diverifikasi |
 | Konfigurasi production | HTTPS, `APP_DEBUG=false`, MySQL, SMTP, Midtrans production, URL webhook, token cron berbeda | Belum diaktifkan |
 | Operasi dan rollback | [Deployment](DEPLOYMENT.md) dan [operasi](OPERATIONS.md) dipahami operator; kompatibilitas skema rollback ditinjau | Menunggu review |
-| Fitur opsional | F-509 pengingat H-7 ditunda; tidak ada endpoint/jadwal aktif | Keputusan roadmap saat ini |
+| Perluasan Phase 8 | Pusat notifikasi, H-7, dan rekap email diuji terpisah; dua task baru hanya diaktifkan setelah migration dan UAT | Menunggu UAT Phase 8 |
 | Lisensi aset | Kewajiban distribusi ffmpeg.wasm GPL-2.0-or-later dan aset pihak ketiga ditinjau sebelum rilis | Belum diverifikasi |
 
 ## Keputusan rilis

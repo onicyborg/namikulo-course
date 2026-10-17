@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\OperationController;
 use App\Http\Controllers\Operations\ScheduledJobController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -97,6 +98,9 @@ Route::prefix('admin')
     ->middleware(['auth', 'active', 'role:'.UserRole::Admin->value])
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
         Route::get('operations', [OperationController::class, 'index'])->name('operations.index');
         Route::get('courses/{course}/preview', [CoursePageController::class, 'preview'])->name('courses.preview');
         Route::get('lessons/{lesson}/video/prepare', [VideoUploadController::class, 'prepare'])->name('lessons.video.prepare');
@@ -142,6 +146,9 @@ Route::prefix('my')
     ->middleware(['auth', 'active', 'role:'.UserRole::Member->value])
     ->group(function (): void {
         Route::get('/dashboard', MemberDashboardController::class)->name('dashboard');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+        Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
         Route::get('/courses', [MemberCourseController::class, 'index'])->name('courses.index');
         Route::get('/courses/{course:slug}', [MemberCourseController::class, 'show'])->withTrashed()->name('courses.show');
         Route::get('/profile', [MemberProfileController::class, 'edit'])->name('profile.edit');

@@ -2,7 +2,7 @@
 
 Status: Phase 0 **menunggu UAT user**; Phase 1–6 **lulus UAT user**; Phase 7 **diimplementasikan, menunggu UAT user dan staging MySQL**. Proyek belum siap rilis.
 
-Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen tidak mengaktifkan phase atau menyatakan implementasi selesai. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
+Dokumen Phase 0–7 disiapkan untuk MVP; Phase 8 telah diaktifkan atas instruksi user dan implementasinya menunggu UAT. Phase 9 tetap rencana. Prioritas: [AGENTS.md](../../AGENTS.md) > [SRS](../SRS.md) > [PRD](../PRD.md) > [design](../../design.md).
 
 ## Urutan kerja
 
@@ -15,9 +15,11 @@ Dokumen Phase 0–7 disiapkan sekaligus atas permintaan user. Persiapan dokumen 
 | [4](PHASE-4.md) | Upload, HLS browser, impor, stream, player terlindungi | F-207–208, F-602–603, F-701–706 | Lulus UAT user |
 | [5](PHASE-5.md) | Checkout, pembayaran, transaksi member, invoice PDF, pesanan admin, enrollment pembelian | F-306–307, F-501–508, F-510, F-605; BR-02/04–07 | Lulus UAT user |
 | [6](PHASE-6.md) | Dashboard member, course saya, progres, profil | F-105, F-601, F-604 | Lulus UAT user |
-| [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis | F-509 (opsional), NFR, dashboard MVP | Menunggu UAT |
+| [7](PHASE-7.md) | Dashboard admin, penguatan, operasi dan kesiapan rilis MVP | F-509 ditunda saat Phase 7; NFR, dashboard MVP | Menunggu UAT |
+| [8](PHASE-8.md) | Pusat notifikasi, pembayaran/akses, pengingat H-7, rekap 07.00 WIB | F-509, F-801–804 | Diimplementasikan; menunggu UAT user |
+| [9](PHASE-9.md) | Diskusi per materi, moderasi admin, notifikasi pertanyaan/balasan | F-805–807 | Rencana; belum aktif |
 
-Prioritas M wajib rilis; S direncanakan pada phase terkait dan setiap penundaan membutuhkan keputusan user yang dicatat. F-509 berkategori C: default ditunda, implementasi hanya jika user memilih. Fitur di luar MVP PRD 4.2 tidak masuk roadmap ini.
+Prioritas M pada Phase 0–7 adalah syarat rilis MVP; M pada Phase 8–9 adalah syarat kelulusan perluasan **setelah phase tersebut diaktifkan**, bukan syarat tambahan rilis MVP yang sedang berjalan. F-509 semula C dan ditunda di Phase 7; user kini memilihnya sebagai notifikasi aplikasi + rekap Phase 8. Forum umum tetap di luar scope.
 
 ## Penyelesaian dependensi
 
@@ -29,6 +31,7 @@ Prioritas M wajib rilis; S direncanakan pada phase terkait dan setiap penundaan 
 - Phase 4 menyiapkan kontrol/proses playback. Penyimpanan progres dan perhitungan persentase dibuat Phase 6. Jangan menampilkan progres fiktif atau memanggil endpoint yang belum ada.
 - Phase 5 menyediakan halaman pembayaran, akses langsung ke player, daftar transaksi member, dan invoice PDF sesuai permintaan user. Dashboard member lengkap dan progres diselesaikan Phase 6.
 - SRS awal menempatkan F-306/F-307 sebagian dan F-105 di Phase 2. Roadmap ini memusatkan pesanan/sinkron pada Phase 5 dan profil member pada Phase 6 agar tidak mendahului dependensi; Phase 2 fokus administrasi user/anggota. Tabel keterlacakan SRS diselaraskan.
+- Phase 8 memakai status pembayaran dan enrollment yang sudah otoritatif; notifikasi tidak memberi akses. Phase 9 memakai pusat notifikasi Phase 8 untuk pertanyaan dan balasan. Jangan mengaktifkan task digest atau tautan diskusi sebelum migration, route, dan kontrol aksesnya siap.
 
 ## Prosedur tiap phase
 
@@ -50,11 +53,12 @@ UAT semua halaman: role benar/salah, validasi dan CSRF, `old()`, flash/loading/e
 - Akses enam bulan kalender tanpa overflow; default dari config, disimpan pada course menurut SRS. Jangan menambah UI masa akses course yang dapat diubah tanpa keputusan produk.
 - Pengarsipan course menjaga akses anggota lama sesuai BR-10. Dampak penghapusan lesson/file pada anggota dibahas di Phase 4; jangan menghapus berkas saat sekadar mengarsipkan course.
 - Hari/jam pembersihan dan retensi baru di SRS 5.10 adalah default operasional, bukan aturan produk baru.
+- Rekap notifikasi Phase 8 dimulai pukul 07.00 WIB untuk seluruh akun; tampilan tanggal tetap mengikuti zona browser/member sesuai aturan lama. Sesuai keputusan Q11 di PRD, email instruksi pembayaran dan konfirmasi lunas tetap dikirim segera; batas satu email harian hanya untuk rekap notifikasi.
 
 ## Gerbang siap rilis
 
-Seluruh kebutuhan M dan UAT integrasi lulus oleh user; keputusan S/C dicatat; staging MySQL berhasil; batch cron-job.org, SMTP dan Midtrans terkonfigurasi; file privat dan akses terverifikasi; backup/pemulihan serta rollback tersedia; tidak ada blocker terbuka. User menyetujui rilis secara eksplisit. Penyusunan roadmap atau selesainya coding bukan tanda proyek siap production.
+Untuk rilis **MVP Phase 0–7**, seluruh kebutuhan M pada phase tersebut dan UAT integrasi lulus oleh user; keputusan S/C dicatat; staging MySQL berhasil; batch cron-job.org, SMTP dan Midtrans terkonfigurasi; file privat dan akses terverifikasi; backup/pemulihan serta rollback tersedia; tidak ada blocker terbuka. Phase 8–9 memiliki gerbang UAT tersendiri setelah diaktifkan. User menyetujui setiap rilis secara eksplisit. Penyusunan roadmap atau selesainya coding bukan tanda proyek siap production.
 
 ## Perintah untuk user sekarang
 
-Phase 7 sudah diimplementasikan dan menunggu UAT user. Jalankan migration indeks baru pada staging MySQL dan ikuti [panduan UAT Phase 7](PHASE-7.md#panduan-uji-manual-uat). UAT Phase 0 masih menunggu konfirmasi. Production dan status siap rilis mengikuti [checklist rilis](../RELEASE-CHECKLIST.md), bukan penyelesaian coding. Agent tidak menjalankan migration atau seed pada database user.
+Phase 7 dan Phase 8 sudah diimplementasikan dan menunggu UAT user. Untuk Phase 8, user perlu backup DB lalu menjalankan migration sebelum memakai aplikasi; dua jadwal cron baru diaktifkan setelah UAT. Phase 9 masih rencana. Ikuti [panduan UAT Phase 8](PHASE-8.md#panduan-uji-manual-uat) dan [checklist rilis](../RELEASE-CHECKLIST.md). Agent tidak menjalankan migration atau seed pada database user.

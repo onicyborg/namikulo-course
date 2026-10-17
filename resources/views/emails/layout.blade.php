@@ -16,7 +16,7 @@
                 </td></tr>
                 <tr><td style="padding:30px 32px 34px;font-size:15px;line-height:1.6;">@yield('content')</td></tr>
                 <tr><td style="padding:20px 32px;border-top:1px solid #e6e9f2;color:#6b7690;font-size:12px;line-height:1.6;">
-                    Email otomatis dari Namikulo Course terkait pesanan Anda. Jika Anda tidak mengenali pesanan ini, hubungi admin melalui situs.
+                    @hasSection('footer')@yield('footer')@else Email otomatis dari Namikulo Course terkait pesanan Anda. Jika Anda tidak mengenali pesanan ini, hubungi admin melalui situs. @endif
                 </td></tr>
             </table>
         </td></tr>

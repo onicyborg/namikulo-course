@@ -15,6 +15,14 @@
         </ul>
     </div>
     <ul class="navbar-nav navbar-right">
+        @php($unreadNotifications = auth()->user()->userNotifications()->whereNull('read_at')->count())
+        <li>
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : route('member.notifications.index') }}"
+                class="nav-link nav-link-lg notification-navbar-link" aria-label="Notifikasi{{ $unreadNotifications ? ', '.$unreadNotifications.' belum dibaca' : '' }}">
+                <i data-feather="bell" aria-hidden="true"></i>
+                @if($unreadNotifications)<span class="badge badge-primary notification-navbar-count">{{ $unreadNotifications > 99 ? '99+' : $unreadNotifications }}</span>@endif
+            </a>
+        </li>
         <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user" aria-haspopup="true" aria-expanded="false">
                 @if(auth()->user()->avatar_path)

@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="learn-shell" id="learn-player" data-start-url="{{ route('learn.playback', $lesson) }}" data-resume-seconds="{{ $progress->get($lesson->id)?->completed_at ? 0 : ($progress->get($lesson->id)?->last_position_seconds ?? 0) }}">
-    <header class="learn-header"><a href="{{ $backUrl }}" aria-label="Kembali ke course">← <span>Course</span></a><div><small>{{ $lesson->course->title }}</small><strong>{{ $lesson->title }}</strong></div>@if($preview)<span class="learn-preview">Pratinjau admin</span>@endif</header>
+    <header class="learn-header"><a href="{{ $backUrl }}" aria-label="Kembali ke course">← <span>Course</span></a><div><small>{{ $lesson->course->title }}</small><strong>{{ $lesson->title }}</strong></div><a href="{{ auth()->user()->isAdmin() ? route('admin.notifications.index') : route('member.notifications.index') }}">Notifikasi</a>@if($preview)<span class="learn-preview">Pratinjau admin</span>@endif</header>
     <div class="learn-layout"><div class="learn-main">
         <div class="learn-stage" data-video-stage>
             <video id="course-video" preload="none" playsinline controlsList="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback aria-label="Video {{ $lesson->title }}"></video>

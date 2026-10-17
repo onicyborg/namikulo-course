@@ -1,0 +1,15 @@
+.notification-card-header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.notification-card-header h2{font-size:18px;margin:0 0 4px}
+.notification-card .notification-list{padding:0}
+.notification-item{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:20px 24px;border-bottom:1px solid #edf0f5}
+.notification-item:last-child{border-bottom:0}
+.notification-item-unread{background:#f7f8ff;border-left:3px solid #6777ef;padding-left:21px}
+.notification-item-content{min-width:0}
+.notification-item-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.notification-item h3{font-size:16px;font-weight:700;margin:0}
+.notification-item p{margin:8px 0;color:#505b70}
+.notification-item time{font-size:12px;color:#67748b}
+.notification-item-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex-shrink:0}
+.notification-item-actions form{margin:0}
+.notification-item-actions .btn{min-height:38px}
+@media(max-width:767px){.notification-item{align-items:flex-start;flex-direction:column;gap:12px}.notification-item-actions{width:100%}.notification-item-actions .btn{min-height:44px}}
