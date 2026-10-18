@@ -1,14 +1,13 @@
-@extends('layouts.auth')
+@extends('layouts.login')
 
 @section('title', 'Masuk')
 
 @section('content')
-<div class="card auth-card">
-    <div class="card-body">
-        <div class="auth-heading">
-            <p class="auth-eyebrow">Selamat datang kembali</p>
-            <h1>Masuk ke akun Anda</h1>
-            <p>Kelola course atau lanjutkan pembelajaran dari dashboard.</p>
+<div class="nl-form-content">
+        <div class="nl-form-heading">
+            <p class="nl-eyebrow">SELAMAT DATANG KEMBALI</p>
+            <h1 id="login-title">Masuk ke akun Anda</h1>
+            <p>Lanjutkan belajar atau kelola course Anda.</p>
         </div>
 
         <x-flash-message />
@@ -27,9 +26,9 @@
             </div>
 
             <div class="form-group">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="nl-password-label">
                     <label for="password">Password</label>
-                    <a href="{{ route('password.request') }}" class="auth-inline-link">Lupa password?</a>
+                    <a href="{{ route('password.request') }}">Lupa password?</a>
                 </div>
                 <div class="password-field">
                     <input id="password" type="password" name="password"
@@ -41,15 +40,14 @@
                 @error('password')<div id="password-error" class="invalid-feedback d-block" role="alert">{{ $message }}</div>@enderror
             </div>
 
-            <div class="form-group custom-control custom-checkbox">
-                <input type="checkbox" name="remember" class="custom-control-input" id="remember" value="1" @checked(old('remember'))>
-                <label class="custom-control-label" for="remember">Ingat saya di perangkat ini</label>
+            <div class="nl-remember">
+                <input type="checkbox" name="remember" id="remember" value="1" @checked(old('remember'))>
+                <label for="remember">Ingat saya di perangkat ini</label>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg btn-block" data-loading-text="Memproses...">Masuk</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block nl-submit" data-loading-text="Memproses...">Masuk<x-dashboard.icon name="arrow-right" /></button>
         </form>
-    </div>
-    <div class="card-footer auth-card-footer">
+    <div class="nl-account-switch">
         Belum memiliki akun? <a href="{{ route('register') }}">Daftar sebagai member</a>
     </div>
 </div>

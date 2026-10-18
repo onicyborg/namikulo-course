@@ -1,0 +1,2 @@
+Lexical 0.52.0 (core and @lexical packages)
+Static browser bundle built with esbuild 0.28.2

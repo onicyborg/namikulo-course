@@ -132,7 +132,7 @@
             var height = Number(videos[0].height);
             var landscape = width <= Number(root.dataset.width) && height <= Number(root.dataset.height);
             var portrait = width <= Number(root.dataset.height) && height <= Number(root.dataset.width);
-            if (!landscape && !portrait) throw new Error('Resolusi terlalu besar. Ekspor ulang maksimal 1280×720 atau 720×1280.');
+            if (!landscape && !portrait) throw new Error('Resolusi terlalu besar. Ekspor ulang maksimal ' + root.dataset.width + '×' + root.dataset.height + ' atau ' + root.dataset.height + '×' + root.dataset.width + '.');
             var duration = Number(result.format && result.format.duration);
             if (!Number.isFinite(duration) || duration <= 0 || duration > Number(root.dataset.durationSeconds)) {
                 throw new Error('Durasi video tidak valid atau melewati batas ' + root.dataset.durationSeconds + ' detik.');
@@ -165,8 +165,9 @@
                 '-f', 'hls', '-hls_time', '6', '-hls_playlist_type', 'vod',
                 '-hls_segment_type', 'mpegts', '-hls_key_info_file', 'keyinfo.txt',
                 '-hls_segment_filename', 'out/seg_%05d.ts', 'out/index.m3u8'
-            ], 20 * 60 * 1000);
+            ], Number(root.dataset.processTimeoutMs));
             if (code !== 0) throw new Error('Engine gagal membuat HLS AES-128. Periksa profil MP4 dan jarak keyframe sumber.');
+            await ffmpeg.deleteFile('input.mp4');
             processingStep = 'segments';
             var manifest = await ffmpeg.readFile('out/index.m3u8', 'utf8');
             var files = (await ffmpeg.listDir('out')).filter(function (entry) { return /^seg_\d{5}\.ts$/.test(entry.name); })
@@ -176,9 +177,9 @@
             var total = 0;
             for (var i = 0; i < files.length; i++) {
                 var bytes = await ffmpeg.readFile('out/' + files[i].name);
-                if (!bytes.length || bytes.length > Number(root.dataset.segmentBytes)) throw new Error('Ada segmen terlalu besar. Ekspor sumber dengan keyframe maksimal tiap 6 detik.');
+                if (!bytes.length || bytes.length > Number(root.dataset.segmentBytes)) throw new Error('Ada segmen melebihi batas ' + Math.round(Number(root.dataset.segmentBytes) / 1024 / 1024) + ' MiB. Ekspor sumber dengan keyframe maksimal tiap 6 detik.');
                 total += bytes.length;
-                if (total > Number(root.dataset.uploadBytes)) throw new Error('Hasil video melewati batas unggahan.');
+                if (total > Number(root.dataset.uploadBytes)) throw new Error('Hasil HLS melewati batas ' + Math.round(Number(root.dataset.uploadBytes) / 1024 / 1024) + ' MiB. Gunakan bitrate sumber yang lebih rendah.');
                 segments.push({ name: files[i].name, size: bytes.length, sha256: await sha256(bytes) });
                 bytes = null;
             }
@@ -295,7 +296,7 @@
                 if (!Number.isFinite(info.duration) || info.duration <= 0 || info.duration > Number(root.dataset.durationSeconds)) throw new Error('Durasi sumber tidak sesuai batas.');
                 var landscape = info.width <= Number(root.dataset.width) && info.height <= Number(root.dataset.height);
                 var portrait = info.width <= Number(root.dataset.height) && info.height <= Number(root.dataset.width);
-                if (!landscape && !portrait) throw new Error('Resolusi sumber terlalu besar.');
+                if (!landscape && !portrait) throw new Error('Resolusi sumber melewati batas ' + root.dataset.width + '×' + root.dataset.height + ' atau ' + root.dataset.height + '×' + root.dataset.width + '.');
                 var result = await process(file);
                 if (cancelled) throw new Error('Persiapan dibatalkan.');
                 await upload(result);

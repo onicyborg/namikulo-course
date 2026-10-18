@@ -1,38 +1,48 @@
 @extends('layouts.admin')
 
 @section('title', 'Moderasi diskusi')
+@push('styles')
+<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">
+<link rel="stylesheet" href="{{ url('css/admin-discussions.css') }}">
+@endpush
 
 @section('content')
 <x-page-header title="Moderasi diskusi" parent="Dashboard" :parentUrl="route('admin.dashboard')" />
-<div class="section-body">
+<div class="section-body nc-discussions">
     <x-flash-message />
     <div class="card">
-        <div class="card-header"><h2>Kiriman materi</h2><div class="card-header-action"><form method="GET" action="{{ route('admin.discussions.index') }}" class="form-inline"><label for="discussion-status" class="mr-2">Status</label><select id="discussion-status" name="status" class="form-control mr-2"><option value="">Semua</option><option value="visible" @selected(($filters['status'] ?? '') === 'visible')>Tampil</option><option value="hidden" @selected(($filters['status'] ?? '') === 'hidden')>Disembunyikan</option><option value="deleted" @selected(($filters['status'] ?? '') === 'deleted')>Dihapus penulis</option></select><button class="btn btn-primary" type="submit">Terapkan</button></form></div></div>
+        <div class="card-header"><h2>Kiriman materi</h2></div>
         <div class="card-body">
-            <p class="text-muted">Kiriman tersembunyi tidak terlihat oleh member. Menyembunyikan pertanyaan juga menutup seluruh balasannya.</p>
-            @if($posts->isEmpty())
-                <x-empty-state title="Belum ada kiriman" description="Diskusi yang dibuat pada materi akan muncul di sini." icon="message-circle" />
-            @else
-                <div class="table-responsive"><table class="table table-striped"><thead><tr><th>Materi</th><th>Penulis &amp; waktu</th><th>Kiriman</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-                    @foreach($posts as $post)
-                        <tr>
-                            <td><strong>{{ $post->lesson?->title ?? 'Materi tidak tersedia' }}</strong><small class="d-block text-muted">{{ $post->lesson?->course?->title ?? 'Course tidak tersedia' }} · {{ $post->parent_id ? 'Balasan' : 'Pertanyaan' }}</small></td>
-                            <td>{{ $post->user?->name ?? 'Pengguna' }}<small class="d-block text-muted"><time datetime="{{ $post->created_at->copy()->utc()->toIso8601String() }}" data-local-datetime>{{ $post->created_at->copy()->utc()->format('d M Y H:i') }} UTC</time></small></td>
-                            <td style="min-width:220px;max-width:400px;overflow-wrap:anywhere">{{ \Illuminate\Support\Str::limit($post->body, 180) }}</td>
-                            <td>@if($post->trashed())<span class="badge badge-secondary">Dihapus</span>@elseif($post->status === \App\Enums\DiscussionPostStatus::Hidden)<span class="badge badge-warning">Disembunyikan</span>@else<span class="badge badge-success">Tampil</span>@endif</td>
-                            <td>
-                                @if(! $post->trashed())
-                                    @if($post->lesson && (! $post->parent_id || $post->root))<a class="btn btn-sm btn-outline-primary mb-1" href="{{ route('learn.discussion.thread', [$post->lesson, $post->root ?? $post]) }}?focus={{ $post->id }}#discussion-post-{{ $post->id }}">Lihat</a>@endif
-                                    <form method="POST" action="{{ $post->status === \App\Enums\DiscussionPostStatus::Visible ? route('admin.discussions.hide', $post) : route('admin.discussions.restore', $post) }}" class="d-inline" @if($post->status === \App\Enums\DiscussionPostStatus::Visible && ! $post->parent_id) data-confirm="Sembunyikan pertanyaan ini dan seluruh balasannya dari member?" @endif>@csrf<button type="submit" class="btn btn-sm {{ $post->status === \App\Enums\DiscussionPostStatus::Visible ? 'btn-outline-warning' : 'btn-outline-success' }} mb-1">{{ $post->status === \App\Enums\DiscussionPostStatus::Visible ? 'Sembunyikan' : 'Pulihkan' }}</button></form>
-                                @else<span class="text-muted">—</span>@endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody></table></div>
-                <div class="mt-3">{{ $posts->links('pagination::bootstrap-4') }}</div>
-            @endif
+            <p class="nc-discussions-note">Kiriman tersembunyi tidak terlihat oleh member. Menyembunyikan pertanyaan juga menutup seluruh balasannya.</p>
+            <form method="GET" action="{{ route('admin.discussions.index') }}" class="nc-discussion-filters" data-discussion-filters>
+                <div><label for="discussion-page-size">Tampilkan data</label><select id="discussion-page-size" name="per_page" class="form-control">@foreach([10, 25, 50, 100] as $size)<option value="{{ $size }}" @selected((int) ($filters['per_page'] ?? 10) === $size)>{{ $size }} data</option>@endforeach</select></div>
+                <div><label for="discussion-search">Cari diskusi</label><input id="discussion-search" name="q" type="search" maxlength="120" value="{{ $filters['q'] ?? '' }}" placeholder="Materi, penulis, atau isi kiriman…" class="form-control"></div>
+                <div><label for="discussion-status">Status</label><select id="discussion-status" name="status" class="form-control"><option value="">Semua status</option><option value="visible" @selected(($filters['status'] ?? '') === 'visible')>Tampil</option><option value="hidden" @selected(($filters['status'] ?? '') === 'hidden')>Disembunyikan</option><option value="deleted" @selected(($filters['status'] ?? '') === 'deleted')>Dihapus penulis</option></select></div>
+                <a class="nc-discussion-action nc-discussion-reset" href="{{ route('admin.discussions.index') }}" aria-label="Reset filter" data-action-tooltip="Reset filter"><x-dashboard.icon name="x" /></a>
+                <noscript><button class="btn btn-primary" type="submit">Cari diskusi</button></noscript>
+            </form>
+            @if($posts->isEmpty())<p class="nc-discussion-fallback-empty">{{ ($filters['status'] ?? null) || ($filters['q'] ?? null) ? 'Tidak ada kiriman yang sesuai filter.' : 'Belum ada kiriman diskusi.' }}</p>@endif
+            <p class="nc-discussion-feedback" role="status" data-discussion-feedback hidden></p>
+            <div class="table-responsive"><table class="table nc-discussion-table" id="discussion-table" data-source-url="{{ route('admin.discussions.index') }}"><thead><tr><th>Materi</th><th>Penulis &amp; waktu</th><th>Kiriman</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+                @foreach($posts as $post)
+                    <tr>
+                        <td>@include('admin.discussions.cells.lesson')</td>
+                        <td>@include('admin.discussions.cells.author')</td>
+                        <td>@include('admin.discussions.cells.body')</td>
+                        <td>@include('admin.discussions.cells.status')</td>
+                        <td>@include('admin.discussions.cells.actions')</td>
+                    </tr>
+                @endforeach
+            </tbody></table></div>
+            <div class="nc-discussion-fallback-pagination">{{ $posts->links('pagination::bootstrap-4') }}</div>
         </div>
     </div>
 </div>
 @endsection
-@push('scripts')<script src="{{ url('js/pages/discussion.js') }}"></script>@endpush
+@push('plugin-scripts')<script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script>@endpush
+@push('scripts')
+<script src="{{ url('js/admin-action-tooltip.js') }}"></script>
+<script src="{{ url('js/pages/discussion.js') }}?v=5"></script>
+<script src="{{ url('js/pages/admin-discussions.js') }}"></script>
+@endpush

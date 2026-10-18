@@ -1,0 +1,1 @@
+<a class="nc-data-table-action" href="{{ route('admin.orders.show', $order) }}" aria-label="Lihat detail pesanan {{ $order->order_number }}" data-action-tooltip="Lihat detail pesanan"><x-dashboard.icon name="eye" /></a>

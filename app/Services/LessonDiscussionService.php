@@ -30,13 +30,15 @@ class LessonDiscussionService
         return $post;
     }
 
-    public function create(User $author, Lesson $lesson, string $body, ?string $parentId, ?string $replyToId): LessonDiscussionPost
+    public function create(User $author, Lesson $lesson, string $body, ?string $parentId, ?string $replyToId, string $format = 'plain'): LessonDiscussionPost
     {
         $this->authorizeLesson($author, $lesson);
-        $body = trim($body);
-        if (mb_strlen($body) < 10 || mb_strlen($body) > 2000) {
+        $content = app(DiscussionContent::class);
+        $text = $content->text($body, $format);
+        if (mb_strlen($text) < 10 || mb_strlen($text) > 2000 || strlen($body) > 20000) {
             throw ValidationException::withMessages(['body' => 'Tulis 10 sampai 2.000 karakter.']);
         }
+        $body = $content->html($body, $format);
         if (! $parentId && $replyToId) {
             throw ValidationException::withMessages(['reply_to_id' => 'Pilih pertanyaan sebelum membalas.']);
         }
@@ -71,7 +73,7 @@ class LessonDiscussionService
 
             $post = LessonDiscussionPost::query()->create([
                 'lesson_id' => $lesson->id, 'user_id' => $author->id, 'parent_id' => $root?->id,
-                'reply_to_id' => $replyTo?->id, 'body' => $body, 'status' => DiscussionPostStatus::Visible,
+                'reply_to_id' => $replyTo?->id, 'body' => $body, 'body_format' => 'html', 'status' => DiscussionPostStatus::Visible,
             ]);
             $this->logger->log('created', $author, 'lesson_discussion_posts', $post->id, null,
                 ['lesson_id' => $lesson->id, 'parent_id' => $root?->id]);

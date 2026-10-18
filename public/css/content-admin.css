@@ -1,12 +1,3 @@
-@font-face {
-    font-family: "summernote";
-    font-style: normal;
-    font-weight: normal;
-    font-display: block;
-    src: url("../fonts/summernote/summernote4c4d.woff") format("woff"),
-        url("../fonts/summernote/summernote4c4d.ttf") format("truetype");
-}
-
 .content-admin { width: 100%; min-width: 0; }
 .content-admin--curriculum { max-width: 1440px; }
 .content-admin .card { border: 1px solid #e7e9f2; box-shadow: 0 6px 22px rgba(32, 38, 58, .05); }

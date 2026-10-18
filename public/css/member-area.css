@@ -1,0 +1,136 @@
+.nm-app {
+    --app-primary-dark: var(--nd-link);
+    --c-primary: var(--nd-primary);
+    --c-primary-600: var(--nd-link);
+    --c-primary-50: var(--nd-active);
+    --c-ink: var(--nd-text);
+    --c-muted: var(--nd-muted);
+    --c-line: var(--nd-border);
+    --c-bg: var(--nd-bg);
+    --c-danger: var(--nd-bad-text);
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-card: var(--nd-shadow);
+}
+.nm-app .nd-main { width: 100%; }
+.nm-app .nd-notification-copy { overflow-wrap: anywhere; }
+.nm-app .nd-notification-popover { display: flex; flex-direction: column; max-height: calc(100dvh - 110px); }
+.nm-app .nd-notification-list { min-height: 0; flex: 1 1 auto; }
+.nm-app .nd-notification-heading, .nm-app .nd-notification-all { flex: 0 0 auto; }
+.nm-app .nm-profile-link { display: flex; align-items: center; gap: 10px; padding: 11px 10px; margin-bottom: 6px; border-radius: 8px; color: var(--nd-text); }
+.nm-app .nm-profile-link:hover { background: var(--nd-subtle); }
+.nm-app .card-header h2 { font-size: 16px; }
+.nm-app .card-header a:not(.btn), .nm-app .member-dashboard-small-row a, .nm-app .member-recommendation a { color: var(--nd-link); font-weight: 650; }
+.nm-app .btn { min-height: 44px; font-size: 13px; }
+.nm-app .btn .nd-icon { width: 17px; height: 17px; }
+.nm-app .nm-icon-action { width: 44px; padding: 0; flex: 0 0 44px; }
+.nm-app .form-group { margin-bottom: 20px; }
+.nm-app .form-group label { margin-bottom: 8px; font-size: 13px; font-weight: 600; }
+.nm-app .form-control { min-height: 44px; font-size: 14px; }
+.nm-app .form-text { margin-top: 7px; font-size: 12px; }
+.nm-app .alert-info { border-color: var(--nd-active-border); background: var(--nd-active); color: var(--nd-text); }
+.nm-app .alert-warning { border-color: var(--nd-warn-text); background: var(--nd-warn-bg); color: var(--nd-warn-text); }
+.nm-app .alert a { text-decoration: underline; }
+.nm-app .card-footer .pagination { margin: 0; flex-wrap: wrap; }
+.nm-app .app-empty-state { text-align: center; }
+.nm-app .app-empty-state h2 { margin-bottom: 10px; font-size: 20px; }
+.nm-app .app-empty-state .lead { margin-bottom: 22px; font-size: 14px; }
+.nm-app .badge { line-height: 1.4; white-space: normal; text-align: left; font-size: 11px; }
+
+.nm-app .member-dashboard-intro { border: 0 !important; background: linear-gradient(115deg, #0f766e, #134e4a); color: #fff; }
+.nm-app .member-dashboard-intro .card-body { padding: 30px; }
+.nm-app .member-dashboard-intro h2 { margin: 5px 0 10px; color: #fff; font-size: clamp(24px, 3vw, 32px); letter-spacing: -.03em; }
+.nm-app .member-dashboard-intro p:last-child, .nm-app .member-dashboard-count { color: #ccfbf1; }
+.nm-app .member-dashboard-eyebrow { color: #ccfbf1; font-size: 11px; letter-spacing: .12em; }
+.nm-app .member-dashboard-count { gap: 7px; padding-left: 26px; border-left: 1px solid rgb(255 255 255 / 24%); }
+.nm-app .member-dashboard-count strong { color: #fff; font-size: 42px; letter-spacing: -.04em; }
+.nm-app .member-dashboard-count span { font-size: 12px; }
+.nm-app .member-course-row { gap: 24px; padding: 24px 0; }
+.nm-app .member-course-image, .nm-app .member-learning-thumb { background: var(--nd-subtle); color: var(--nd-link); border-radius: 10px; }
+.nm-app .member-course-image { flex-basis: 230px; width: 230px; }
+.nm-app .member-course-image-placeholder { color: var(--nd-link); }
+.nm-app .member-course-category, .nm-app .member-learning-overline { color: var(--nd-link); font-size: 11px; }
+.nm-app .member-course-heading { flex-wrap: wrap; gap: 10px; }
+.nm-app .member-course-heading > div { flex: 1 1 200px; min-width: 0; }
+.nm-app .member-course-heading h3 { margin-top: 5px; font-size: 18px; line-height: 1.45; }
+.nm-app .member-course-summary { margin: 9px 0 0; font-size: 13px; line-height: 1.65; }
+.nm-app .member-course-expiry { margin: 12px 0 16px; font-size: 12px; }
+.nm-app .member-learning-progress-meta { flex-wrap: wrap; gap: 5px 12px; font-size: 12px; }
+.nm-app .member-course-content .progress { height: 6px; border-radius: 6px; }
+.nm-app .member-dashboard-small-row { align-items: flex-start; padding: 14px 0; }
+.nm-app .member-dashboard-small-row strong { font-size: 14px; }
+.nm-app .member-dashboard-small-row small { font-size: 12px; }
+.nm-app .member-dashboard-small-row a { padding: 8px 0; font-size: 12px; }
+.nm-app .member-recommendation { padding: 16px; border: 1px solid var(--nd-border); border-radius: 10px; background: var(--nd-bg); }
+.nm-app .member-recommendation h3 { margin: 0 0 10px; font-size: 16px; }
+.nm-app .member-recommendation p { margin-bottom: 16px; font-size: 13px; }
+.nm-app .member-dashboard-recommendations .row { row-gap: 16px; }
+
+.nm-app .member-learning-filters { padding-bottom: 20px; margin: 0; gap: 8px; }
+.nm-app .nm-course-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.nm-app .nm-course-grid > .app-empty-state { grid-column: 1 / -1; }
+.nm-app .nm-course-grid .member-learning-row { display: flex; flex-direction: column; gap: 0; padding: 0; border: 1px solid var(--nd-border); border-radius: 12px; overflow: hidden; }
+.nm-app .nm-course-grid .member-learning-thumb { width: 100%; max-width: none; flex: none; border-radius: 0; }
+.nm-app .nm-course-grid .member-learning-copy { display: flex; flex-direction: column; width: 100%; padding: 22px; }
+.nm-app .member-learning-title { flex-direction: column; gap: 10px; }
+.nm-app .member-learning-title h3 { font-size: 18px; }
+.nm-app .member-learning-copy > p { font-size: 13px; line-height: 1.6; }
+.nm-app .member-learning-copy > .btn { margin-top: auto; align-self: flex-start; }
+.nm-app .member-learning-detail .card-body { padding: 28px; }
+.nm-app .nm-course-title { margin: 8px 0 14px; font-size: clamp(24px, 2.5vw, 30px); font-weight: 750; line-height: 1.3; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.nm-app .member-learning-detail .card-body > p { margin-bottom: 22px; line-height: 1.7; }
+.nm-app .member-learning-section h3 { margin: 5px 0 12px; font-size: 17px; font-weight: 700; overflow-wrap: anywhere; }
+.nm-app .nm-chapter-label { color: var(--nd-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; }
+.nm-app .member-learning-section li { padding: 16px 0; }
+.nm-app .nm-lesson-icon { display: grid; place-items: center; flex: 0 0 36px; height: 36px; border-radius: 8px; background: var(--nd-active); color: var(--nd-link); }
+.nm-app .nm-lesson-copy { min-width: 0; flex: 1; }
+.nm-app .nm-lesson-copy strong { font-size: 14px; }
+.nm-app .nm-lesson-copy small { font-size: 12px; }
+.nm-app .member-learning-access p { line-height: 1.7; font-size: 13px; overflow-wrap: anywhere; }
+.nm-app .member-profile-avatar { padding-bottom: 24px; border-bottom: 1px solid var(--nd-border); }
+.nm-app .form-control-file { color: var(--nd-muted); font-size: 12px; }
+.nm-app .form-control-file::file-selector-button { margin-right: 10px; padding: 9px 12px; border: 1px solid var(--nd-border); border-radius: 7px; background: var(--nd-subtle); color: var(--nd-text); cursor: pointer; }
+
+.nm-app .member-orders-filter { gap: 12px; padding-bottom: 22px; border-bottom: 1px solid var(--nd-border); }
+.nm-app .nm-filter-field { width: min(100%, 280px); }
+.nm-app .nm-filter-field label { display: block; margin: 0 0 7px; font-size: 12px; color: var(--nd-muted); }
+.nm-app .nm-filter-field select { max-width: none; }
+.nm-app .member-orders-table th { font-size: 12px; }
+.nm-app .member-orders-table td { font-size: 13px; }
+.nm-app .member-order-title, .nm-app .member-order-amount { color: var(--nd-text); }
+.nm-app .member-order-title { overflow-wrap: anywhere; min-width: 160px; }
+.nm-app .member-order-number { color: var(--nd-muted); overflow-wrap: anywhere; }
+.nm-app .member-order-actions { min-width: 116px; white-space: nowrap; }
+.nm-app .notification-item { align-items: flex-start; gap: 20px; padding: 22px 24px; }
+.nm-app .notification-item-unread { padding-left: 21px; }
+.nm-app .notification-item-heading h3 { font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.nm-app .notification-item p { font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.nm-app .notification-item-actions { justify-content: flex-end; }
+
+.nm-app .checkout-page { width: 100%; max-width: none; padding: 0; }
+.nm-app .site-breadcrumb { display: flex; flex-wrap: wrap; gap: 9px; color: var(--nd-muted); font-size: 12px; }
+.nm-app .site-breadcrumb a { color: var(--nd-link); }
+.nm-app .checkout-heading h1 { font-size: clamp(26px, 3vw, 34px); font-weight: 750; letter-spacing: -.035em; }
+.nm-app .checkout-panel { background: var(--nd-surface); }
+.nm-app .checkout-panel h2 { color: var(--nd-text); }
+.nm-app .checkout-panel p { margin-bottom: 16px; line-height: 1.65; }
+.nm-app .checkout-state-success { color: var(--nd-good-text) !important; }
+.nm-app .checkout-qr { background: #fff; padding: 10px; border-radius: 8px; }
+.nm-app .checkout-summary-line > strong { min-width: 0; }
+
+@media (max-width: 1199px) {
+    .nm-app .notification-item { flex-direction: column; }
+    .nm-app .notification-item-actions { justify-content: flex-start; }
+    .nm-app .checkout-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 767px) {
+    .nm-app .nm-course-grid { grid-template-columns: minmax(0, 1fr); }
+    .nm-app .member-course-row { flex-direction: column; }
+    .nm-app .member-course-image { width: 100%; max-width: none; flex: none; }
+    .nm-app .member-dashboard-intro .card-body { padding: 24px; }
+    .nm-app .member-dashboard-count { border-left: 0; padding-left: 0; }
+    .nm-app .member-learning-section li { flex-wrap: wrap; }
+    .nm-app .member-learning-section li > .btn { margin-left: 48px; }
+    .nm-app .member-learning-detail .card-body { padding: 22px; }
+    .nm-app .member-orders-filter .btn { flex: 0 0 auto; }
+}

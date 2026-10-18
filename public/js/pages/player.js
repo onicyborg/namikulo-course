@@ -6,6 +6,7 @@
         if (!root) return;
         var video = document.getElementById('course-video');
         var stage = root.querySelector('[data-video-stage]');
+        var playerFrame = root.querySelector('[data-player-frame]') || stage;
         var screenMessage = root.querySelector('[data-screen-message]');
         var watermark = root.querySelector('[data-watermark]');
         var play = root.querySelector('[data-play]');
@@ -168,9 +169,15 @@
         seek.addEventListener('input', function () { if (Number.isFinite(video.duration)) video.currentTime = Number(seek.value) / 100 * video.duration; });
         volume.addEventListener('input', function () { video.volume = Number(volume.value) / 100; });
         speed.addEventListener('change', function () { video.playbackRate = Number(speed.value); });
+        fullscreen.hidden = !playerFrame.requestFullscreen;
         fullscreen.addEventListener('click', function () {
-            if (document.fullscreenElement) document.exitFullscreen();
-            else if (stage.requestFullscreen) stage.requestFullscreen();
+            var request = document.fullscreenElement ? document.exitFullscreen() : playerFrame.requestFullscreen();
+            if (request && request.catch) request.catch(function () { showMessage('Layar penuh belum tersedia. Anda tetap dapat menonton di halaman ini.'); });
+        });
+        document.addEventListener('fullscreenchange', function () {
+            var isFullscreen = document.fullscreenElement === playerFrame;
+            fullscreen.textContent = isFullscreen ? 'Keluar layar penuh' : 'Layar penuh';
+            fullscreen.setAttribute('aria-label', isFullscreen ? 'Keluar dari layar penuh' : 'Aktifkan layar penuh');
         });
         stage.addEventListener('contextmenu', function (event) { event.preventDefault(); });
         document.addEventListener('visibilitychange', function () {

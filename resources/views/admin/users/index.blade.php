@@ -1,22 +1,28 @@
 @extends('layouts.admin')
 @section('title', 'User')
-@push('styles')<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}"><link rel="stylesheet" href="{{ url('css/content-admin.css') }}">@endpush
+@push('styles')
+<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
+<link rel="stylesheet" href="{{ url('css/content-admin.css') }}">
+<link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">
+<link rel="stylesheet" href="{{ url('css/admin-data-table.css') }}?v=3">
+<link rel="stylesheet" href="{{ url('css/admin-users.css') }}?v=1">
+@endpush
 @section('content')
 <x-page-header title="User" parent="Dashboard" :parentUrl="route('admin.dashboard')" />
-<div class="section-body content-admin"><x-flash-message />
+<div class="section-body content-admin nc-users"><x-flash-message />
     @if($errors->any())<div class="alert alert-danger" role="alert" tabindex="-1" data-validation-summary>Perubahan belum disimpan: {{ $errors->first() }}</div>@endif
     <div class="card"><div class="card-header content-card-header"><div><h2>Daftar user</h2><p>Kelola akun, peran, dan akses login.</p></div><div class="card-header-action"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#user-create">Tambah user</button></div></div><div class="card-body">
-        <form method="GET" action="{{ route('admin.users.index') }}" class="row align-items-end mb-3">
-            <div class="col-12 col-md-5"><div class="form-group"><label for="filter-user-q">Cari nama atau email</label><input id="filter-user-q" name="q" class="form-control" value="{{ $filters['q'] ?? '' }}"></div></div>
-            <div class="col-6 col-md-2"><div class="form-group"><label for="filter-user-role">Peran</label><select id="filter-user-role" name="role" class="form-control"><option value="">Semua</option>@foreach(\App\Enums\UserRole::cases() as $role)<option value="{{ $role->value }}" @selected(($filters['role'] ?? '') === $role->value)>{{ $role->label() }}</option>@endforeach</select></div></div>
-            <div class="col-6 col-md-2"><div class="form-group"><label for="filter-user-status">Status</label><select id="filter-user-status" name="status" class="form-control"><option value="">Semua</option><option value="active" @selected(($filters['status'] ?? '') === 'active')>Aktif</option><option value="inactive" @selected(($filters['status'] ?? '') === 'inactive')>Nonaktif</option></select></div></div>
-            <div class="col-12 col-md-3"><div class="form-group"><button type="submit" class="btn btn-outline-primary">Terapkan filter</button><a class="btn btn-light" href="{{ route('admin.users.index') }}">Reset</a></div></div>
-        </form>
+        @include('admin.users._filters')
         @if($users->isEmpty())<x-empty-state title="Tidak ada user" description="Ubah filter atau tambahkan user baru." />@else
-        <div class="table-responsive"><table class="table table-striped" @unless($serverSide) id="user-table" @endunless><thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Status</th><th>Akses</th><th>Aksi</th></tr></thead><tbody>
-            @foreach($users as $user)<tr><td><strong>{{ $user->name }}</strong></td><td>{{ $user->email }}</td><td>{{ $user->role->label() }}</td><td><span class="badge badge-{{ $user->is_active ? 'success' : 'secondary' }}">{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span></td><td>{{ $user->enrollments_count }}</td><td class="content-actions"><button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#user-edit-{{ $user->id }}">Ubah</button><form method="POST" action="{{ route('admin.users.toggle-active', $user) }}" data-loading-form>@csrf<button type="submit" class="btn btn-sm btn-outline-{{ $user->is_active ? 'warning' : 'success' }}">{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button></form><form method="POST" action="{{ route('admin.users.reset-password', $user) }}" data-loading-form>@csrf<button type="submit" class="btn btn-sm btn-outline-secondary">Kirim reset</button></form></td></tr>@endforeach
+        <div class="table-responsive"><table class="table table-striped" @unless($serverSide) id="users-table" @endunless><thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Status</th><th>Akses</th><th>Aksi</th></tr></thead><tbody>
+            @foreach($users as $user)<tr><td><strong>{{ $user->name }}</strong></td><td>{{ $user->email }}</td><td>{{ $user->role->label() }}</td><td><span class="badge badge-{{ $user->is_active ? 'success' : 'secondary' }}">{{ $user->is_active ? 'Aktif' : 'Nonaktif' }}</span></td><td>{{ $user->enrollments_count }}</td><td><div class="nc-data-table-actions">
+                <button type="button" class="nc-data-table-action" data-toggle="modal" data-target="#user-edit-{{ $user->id }}" aria-label="Ubah user {{ $user->name }}" data-action-tooltip="Ubah user"><x-dashboard.icon name="pencil" /></button>
+                @if($user->id !== auth()->id())<form method="POST" action="{{ route('admin.users.toggle-active', $user) }}" data-loading-form>@csrf<button type="submit" class="nc-data-table-action {{ $user->is_active ? 'nc-data-table-action--danger' : 'nc-data-table-action--success' }}" aria-label="{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }} user {{ $user->name }}" data-action-tooltip="{{ $user->is_active ? 'Nonaktifkan user' : 'Aktifkan user' }}" data-loading-text="…"><x-dashboard.icon :name="$user->is_active ? 'x' : 'circle-check'" /></button></form>@endif
+                <form method="POST" action="{{ route('admin.users.reset-password', $user) }}" data-loading-form>@csrf<button type="submit" class="nc-data-table-action" aria-label="Kirim tautan reset password ke {{ $user->name }}" data-action-tooltip="Kirim tautan reset password" data-loading-text="…"><x-dashboard.icon name="rotate-ccw" /></button></form>
+            </div></td></tr>@endforeach
         </tbody></table></div>
-        @if($serverSide)<div class="mt-3">{{ $users->links('pagination::bootstrap-4') }}</div>@endif
+        @if($serverSide)@include('admin.partials.data-table-pagination', ['paginator' => $users])@endif
+        @unless($serverSide)<div class="nc-user-table-footer" data-user-table-footer></div>@endunless
         @endif
     </div></div>
 </div>
@@ -26,4 +32,4 @@
 @foreach($users as $user)<div class="modal fade" id="user-edit-{{ $user->id }}" tabindex="-1" role="dialog" aria-labelledby="user-edit-title-{{ $user->id }}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered" role="document"><div class="modal-content"><form method="POST" action="{{ route('admin.users.update', $user) }}" data-loading-form>@csrf @method('PUT')<div class="modal-header"><h2 class="modal-title h5" id="user-edit-title-{{ $user->id }}">Ubah user</h2><button type="button" class="close" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button></div><div class="modal-body">@include('admin.users._form', ['user' => $user])</div><div class="modal-footer"><button type="button" class="btn btn-light" data-dismiss="modal">Batal</button><button type="submit" class="btn btn-primary">Simpan perubahan</button></div></form></div></div></div>@endforeach
 @endpush
 @push('plugin-scripts')<script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script>@endpush
-@push('scripts')<script src="{{ url('js/pages/admin-content.js') }}"></script>@if($errors->any() && old('_form'))<script>window.contentModalToOpen = @json(old('_form') === 'create' ? 'user-create' : 'user-edit-'.old('_record'));</script>@endif @endpush
+@push('scripts')<script src="{{ url('js/admin-action-tooltip.js') }}"></script><script src="{{ url('js/pages/admin-content.js') }}"></script><script src="{{ url('js/pages/admin-users.js') }}?v=1"></script>@if($errors->any() && old('_form'))<script>window.contentModalToOpen = @json(old('_form') === 'create' ? 'user-create' : 'user-edit-'.old('_record'));</script>@endif @endpush

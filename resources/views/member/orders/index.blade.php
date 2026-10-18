@@ -19,7 +19,8 @@
             </div>
         </div>
         <div class="card-body">
-            <form method="GET" action="{{ route('member.orders.index') }}" class="member-orders-filter">
+            <form method="GET" action="{{ route('member.orders.index') }}" class="member-orders-filter" data-member-auto-filter>
+                <div class="nm-filter-field">
                 <label for="order-status">Status transaksi</label>
                 <select id="order-status" name="status" class="form-control">
                     <option value="">Semua status</option>
@@ -27,8 +28,9 @@
                         <option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>
                     @endforeach
                 </select>
-                <button type="submit" class="btn btn-primary">Terapkan</button>
-                @if($filters['status'] ?? null)<a href="{{ route('member.orders.index') }}" class="btn btn-outline-primary">Reset</a>@endif
+                </div>
+                <button type="submit" class="btn btn-primary" data-filter-submit>Terapkan</button>
+                <a href="{{ route('member.orders.index') }}" class="btn btn-light nm-icon-action" data-action-tooltip="Reset filter" aria-label="Reset filter"><x-dashboard.icon name="rotate-ccw" /></a>
             </form>
 
             @if($orders->count())
@@ -49,12 +51,12 @@
                                 <td><span class="badge badge-{{ $badge[$status] ?? 'light' }}">{{ $labels[$status] ?? ucfirst($status) }}</span></td>
                                 <td class="member-order-actions">
                                     @if($order->status === \App\Enums\OrderStatus::Pending && $order->expires_at?->isFuture())
-                                        <a href="{{ route('orders.pay', $order) }}" class="btn btn-primary btn-sm">Lanjutkan pembayaran</a>
+                                        <a href="{{ route('orders.pay', $order) }}" class="btn btn-primary nm-icon-action" data-action-tooltip="Lanjutkan pembayaran" aria-label="Lanjutkan pembayaran {{ $order->order_number }}"><x-dashboard.icon name="credit-card" /></a>
                                     @else
-                                        <a href="{{ route('orders.pay', $order) }}" class="btn btn-outline-primary btn-sm">Lihat detail</a>
+                                        <a href="{{ route('orders.pay', $order) }}" class="btn btn-outline-primary nm-icon-action" data-action-tooltip="Lihat detail transaksi" aria-label="Lihat detail {{ $order->order_number }}"><x-dashboard.icon name="eye" /></a>
                                     @endif
                                     @if($order->status === \App\Enums\OrderStatus::Paid)
-                                        <a href="{{ route('member.orders.invoice', $order) }}" class="btn btn-outline-primary btn-sm">Unduh invoice PDF</a>
+                                        <a href="{{ route('member.orders.invoice', $order) }}" class="btn btn-outline-primary nm-icon-action" data-action-tooltip="Unduh invoice PDF" aria-label="Unduh invoice PDF {{ $order->order_number }}"><x-dashboard.icon name="arrow-down" /></a>
                                     @endif
                                 </td>
                             </tr>

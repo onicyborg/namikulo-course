@@ -11,28 +11,64 @@ use App\Services\Checkout\PaymentEmailService;
 use App\Services\Checkout\PaymentInstructionEmailService;
 use App\Services\Checkout\PaymentService;
 use App\Services\ActivityLogger;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|JsonResponse
     {
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:120'],
             'status' => ['nullable', 'in:pending,paid,expired,cancelled,failed,refunded'],
+            'per_page' => ['nullable', 'integer', 'in:10,25,50,100'],
         ]);
-        $orders = Order::query()->with(['user', 'course'])->withCount('payments');
+        $orders = Order::query();
         if ($filters['q'] ?? null) {
             $term = '%'.mb_strtolower(trim($filters['q'])).'%';
-            $orders->where(fn ($query) => $query->whereRaw('LOWER(order_number) LIKE ?', [$term])
-                ->orWhereHas('user', fn ($user) => $user->whereRaw('LOWER(email) LIKE ?', [$term])));
+            $orders->where(fn ($query) => $query->whereRaw('LOWER(orders.order_number) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(orders.course_title) LIKE ?', [$term])
+                ->orWhereHas('user', fn ($user) => $user->whereRaw('LOWER(users.email) LIKE ?', [$term])));
         }
         if ($filters['status'] ?? null) $orders->where('status', $filters['status']);
 
+        if ($request->has('draw')) {
+            $page = $request->validate([
+                'draw' => ['required', 'integer', 'min:0'],
+                'start' => ['required', 'integer', 'min:0'],
+                'length' => ['required', 'integer', 'in:10,25,50,100'],
+            ]);
+            $columns = [0 => 'order_number', 2 => 'course_title', 3 => 'amount', 4 => 'status', 6 => 'created_at'];
+            $sort = $columns[(int) $request->input('order.0.column')] ?? 'created_at';
+            $direction = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
+            $filteredCount = (clone $orders)->count();
+            $rows = $orders->with(['user:id,name,email'])->withCount('payments')
+                ->orderBy('orders.'.$sort, $direction)->orderBy('orders.id')
+                ->skip((int) $page['start'])->take((int) $page['length'])->get();
+
+            return response()->json([
+                'draw' => (int) $page['draw'],
+                'recordsTotal' => Order::query()->count(),
+                'recordsFiltered' => $filteredCount,
+                'data' => $rows->map(fn ($order) => [
+                    'number' => view('admin.orders.cells.number', compact('order'))->render(),
+                    'member' => view('admin.orders.cells.member', compact('order'))->render(),
+                    'course' => view('admin.orders.cells.course', compact('order'))->render(),
+                    'amount' => view('admin.orders.cells.amount', compact('order'))->render(),
+                    'status' => view('admin.orders.cells.status', compact('order'))->render(),
+                    'attempts' => view('admin.orders.cells.attempts', compact('order'))->render(),
+                    'created' => view('admin.orders.cells.created', compact('order'))->render(),
+                    'actions' => view('admin.orders.cells.actions', compact('order'))->render(),
+                ]),
+            ]);
+        }
+
         return view('admin.orders.index', [
-            'orders' => $orders->latest()->paginate(20)->withQueryString(),
+            'orders' => $orders->with(['user:id,name,email'])->withCount('payments')
+                ->orderByDesc('orders.created_at')->orderBy('orders.id')
+                ->paginate((int) ($filters['per_page'] ?? 10))->withQueryString(),
             'filters' => $filters,
         ]);
     }

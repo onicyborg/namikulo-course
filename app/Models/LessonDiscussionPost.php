@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\DiscussionPostStatus;
+use App\Enums\DiscussionBodyFormat;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,11 +14,21 @@ class LessonDiscussionPost extends Model
 {
     use HasUuids, SoftDeletes;
 
-    protected $fillable = ['lesson_id', 'user_id', 'parent_id', 'reply_to_id', 'body', 'status'];
+    protected $fillable = ['lesson_id', 'user_id', 'parent_id', 'reply_to_id', 'body', 'body_format', 'status'];
+
+    public function plainBody(): string
+    {
+        return app(\App\Services\DiscussionContent::class)->text($this->body, $this->body_format?->value ?? 'plain');
+    }
+
+    public function formattedBody(): string
+    {
+        return app(\App\Services\DiscussionContent::class)->html($this->body, $this->body_format?->value ?? 'plain');
+    }
 
     protected function casts(): array
     {
-        return ['status' => DiscussionPostStatus::class];
+        return ['status' => DiscussionPostStatus::class, 'body_format' => DiscussionBodyFormat::class];
     }
 
     public function lesson(): BelongsTo { return $this->belongsTo(Lesson::class); }

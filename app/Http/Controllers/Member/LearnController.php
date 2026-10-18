@@ -41,6 +41,8 @@ class LearnController extends Controller
         return view('member.learn.show', [
             'lesson' => $lesson, 'sections' => $sections, 'progress' => $progress,
             'discussionThreads' => $discussionThreads,
+            'readyCount' => $ready->count(),
+            'lessonNumber' => $position !== false ? $position + 1 : null,
             'previous' => $position > 0 ? $ready[$position - 1] : null,
             'next' => $position !== false ? $ready->get($position + 1) : null,
             'preview' => $request->user()->isAdmin(),

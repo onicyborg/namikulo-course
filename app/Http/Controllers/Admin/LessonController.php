@@ -8,6 +8,7 @@ use App\Models\Section;
 use App\Services\ActivityLogger;
 use App\Services\ContentOrder;
 use App\Services\VideoContentDeletion;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,8 @@ class LessonController extends Controller
     public function store(Request $request, Section $section, ActivityLogger $logger): RedirectResponse
     {
         Gate::authorize('update', $section);
-        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:5000']]);
+        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:100000']]);
+        $data['description'] = app(\App\Services\DescriptionSanitizer::class)->clean($data['description'] ?? null);
         DB::transaction(function () use ($section, $data, $request, $logger): void {
             $order = ((int) $section->lessons()->max('sort_order')) + 1;
             $lesson = $section->lessons()->create($data + ['course_id' => $section->course_id, 'sort_order' => $order, 'duration_seconds' => 0]);
@@ -30,7 +32,8 @@ class LessonController extends Controller
     public function update(Request $request, Section $section, Lesson $lesson, ActivityLogger $logger): RedirectResponse
     {
         $this->authorizeScope($section, $lesson);
-        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:5000']]);
+        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:100000']]);
+        $data['description'] = app(\App\Services\DescriptionSanitizer::class)->clean($data['description'] ?? null);
         DB::transaction(function () use ($lesson, $data, $request, $logger): void {
             $old = $lesson->getAttributes();
             $lesson->update($data);
@@ -47,11 +50,14 @@ class LessonController extends Controller
         return back()->with('success', $removed ? 'Materi dan berkas video privatnya dihapus.' : 'Materi dihapus. Berkas privat yang tersisa akan dibersihkan oleh pemicu berkala.');
     }
 
-    public function reorder(Request $request, Section $section, ContentOrder $order): RedirectResponse
+    public function reorder(Request $request, Section $section, ContentOrder $order): JsonResponse|RedirectResponse
     {
         Gate::authorize('update', $section);
         $data = $request->validate(['order' => ['present', 'array'], 'order.*' => ['required', 'uuid']]);
         $order->save($section->lessons()->getQuery(), $data['order'], 'lessons', $request->user());
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Urutan materi disimpan.']);
+        }
         return back()->with('success', 'Urutan materi disimpan.');
     }
 

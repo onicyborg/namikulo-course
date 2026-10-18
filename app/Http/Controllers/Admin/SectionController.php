@@ -8,6 +8,7 @@ use App\Models\Section;
 use App\Services\ActivityLogger;
 use App\Services\ContentOrder;
 use App\Services\VideoContentDeletion;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +26,8 @@ class SectionController extends Controller
     public function store(Request $request, Course $course, ActivityLogger $logger): RedirectResponse
     {
         Gate::authorize('update', $course);
-        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:5000']]);
+        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:100000']]);
+        $data['description'] = app(\App\Services\DescriptionSanitizer::class)->clean($data['description'] ?? null);
         DB::transaction(function () use ($course, $data, $request, $logger): void {
             $order = ((int) $course->sections()->max('sort_order')) + 1;
             $section = $course->sections()->create($data + ['sort_order' => $order]);
@@ -37,7 +39,8 @@ class SectionController extends Controller
     public function update(Request $request, Course $course, Section $section, ActivityLogger $logger): RedirectResponse
     {
         $this->authorizeScope($course, $section);
-        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:5000']]);
+        $data = $request->validate(['title' => ['required', 'string', 'max:255'], 'description' => ['nullable', 'string', 'max:100000']]);
+        $data['description'] = app(\App\Services\DescriptionSanitizer::class)->clean($data['description'] ?? null);
         DB::transaction(function () use ($section, $data, $request, $logger): void {
             $old = $section->getAttributes();
             $section->update($data);
@@ -63,11 +66,14 @@ class SectionController extends Controller
         return back()->with('success', $removed ? 'Bab, materi, dan berkas video privatnya dihapus.' : 'Bab dan materi dihapus. Berkas privat yang tersisa akan dibersihkan oleh pemicu berkala.');
     }
 
-    public function reorder(Request $request, Course $course, ContentOrder $order): RedirectResponse
+    public function reorder(Request $request, Course $course, ContentOrder $order): JsonResponse|RedirectResponse
     {
         Gate::authorize('update', $course);
         $data = $request->validate(['order' => ['present', 'array'], 'order.*' => ['required', 'uuid']]);
         $order->save($course->sections()->getQuery(), $data['order'], 'sections', $request->user());
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Urutan bab disimpan.']);
+        }
         return back()->with('success', 'Urutan bab disimpan.');
     }
 

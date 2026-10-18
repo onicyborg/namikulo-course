@@ -1,0 +1,25 @@
+.nc-rich-description { line-height:1.8; overflow-wrap:anywhere; }
+.nc-rich-description p, .nd-app .nc-rich-description p { margin:0 0 12px; }
+.nc-rich-description ul, .nc-rich-description ol { padding-left:24px; margin:0 0 12px; }
+.nc-rich-description h2, .nd-app .nc-rich-description h2 { font-size:1.3em; font-weight:700; margin:18px 0 10px; }
+.nc-rich-description h3, .nc-rich-description h4, .nd-app .nc-rich-description h3, .nd-app .nc-rich-description h4 { font-size:1.1em; font-weight:600; margin:14px 0 8px; }
+.nc-rich-description blockquote { border-left:3px solid var(--nd-border,#cbd5e1); padding-left:16px; margin:12px 0; }
+.nc-rich-description a, .nd-app .nc-rich-description a { color:var(--nd-link,#0f766e); text-decoration:underline; }
+.nc-rich-description > :last-child, .nd-app .nc-rich-description > :last-child { margin-bottom:0; }
+.nd-app .nc-curriculum .nc-rich-description { white-space:normal; }
+.nc-rich-description { min-width: 0; max-width: 100%; overflow-x: auto; }
+.nc-rich-description pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 14px; border-radius: 8px; background: var(--nd-subtle, #f1f5f9); color: inherit; }
+.nc-rich-description code { color: inherit; }
+.nc-rich-description table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+.nc-rich-description th, .nc-rich-description td { padding: 10px; border: 1px solid var(--nd-border, #cbd5e1); overflow-wrap: anywhere; }
+.member-learning-section .nc-rich-description ul, .member-learning-section .nc-rich-description ol { margin: 0 0 12px; padding-left: 24px; list-style-position: outside; }
+.member-learning-section .nc-rich-description ul { list-style-type: disc; }
+.member-learning-section .nc-rich-description ol { list-style-type: decimal; }
+.member-learning-section .nc-rich-description li, .nm-app .member-learning-section .nc-rich-description li { display: list-item; padding: 2px 0; border: 0; }
+.member-learning-section .nc-rich-description li strong { display: inline; }
+.nc-rich-description.nc-authored-colors { --nd-text: #0f172a; --nd-muted: #475569; --nd-border: #cbd5e1; --nd-subtle: #f1f5f9; --nd-link: #0f766e; padding: 18px; border: 1px solid #e2e8f0; border-radius: 9px; background: #fff; color: #0f172a; }
+.nd-app .nc-rich-description.nc-authored-colors p, .nd-app .nc-rich-description.nc-authored-colors h2, .nd-app .nc-rich-description.nc-authored-colors h3, .nd-app .nc-rich-description.nc-authored-colors h4 { color: inherit; }
+.nc-description-details { margin-top: 16px; font-size: .9rem; }
+.nc-description-details summary { color: var(--nd-link, #0f766e); cursor: pointer; padding: 8px 0; font-weight: 600; }
+.nc-description-details[open] summary { margin-bottom: 10px; }
+.nc-description-details summary:focus-visible { outline: 2px solid var(--nd-link, #0f766e); outline-offset: 3px; }

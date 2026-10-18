@@ -1,0 +1,16 @@
+.nd-app .nc-confirm-dialog { width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; padding: 0; overflow: auto; border: 1px solid var(--nd-border); border-radius: 14px; background: var(--nd-surface); color: var(--nd-text); box-shadow: 0 28px 80px rgb(2 6 23 / 30%); }
+.nd-app .nc-confirm-dialog::backdrop { background: rgb(2 6 23 / 70%); }
+.nd-app .nc-confirm-dialog-body { padding: 26px 26px 20px; }
+.nd-app .nc-confirm-dialog-icon { display: inline-grid; place-items: center; width: 42px; height: 42px; margin-bottom: 18px; border-radius: 10px; background: var(--nd-bad-bg); color: var(--nd-bad-text); }
+.nd-app .nc-confirm-dialog-icon svg { width: 21px; height: 21px; }
+.nd-app .nc-confirm-dialog.is-warning .nc-confirm-dialog-icon { background: var(--nd-warn-bg); color: var(--nd-warn-text); }
+.nd-app .nc-confirm-dialog h2 { margin: 0 0 8px; color: var(--nd-text); font-size: 19px; font-weight: 700; line-height: 1.35; }
+.nd-app .nc-confirm-dialog p { margin: 0; color: var(--nd-muted); font-size: 14px; line-height: 1.65; overflow-wrap: anywhere; }
+.nd-app .nc-confirm-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; padding: 16px 26px 22px; border-top: 1px solid var(--nd-border); }
+.nd-app .nc-confirm-dialog-actions button { min-height: 40px; padding: 8px 15px; border: 1px solid var(--nd-border); border-radius: 8px; background: var(--nd-subtle); color: var(--nd-text); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
+.nd-app .nc-confirm-dialog-actions button:hover { background: var(--nd-active); }
+.nd-app .nc-confirm-dialog-actions .nc-confirm-dialog-submit { border-color: var(--nd-bad-text); background: var(--nd-bad-text); color: #fff; }
+.nd-app .nc-confirm-dialog-actions .nc-confirm-dialog-submit:hover { filter: brightness(.9); background: var(--nd-bad-text); }
+.nd-app .nc-confirm-dialog.is-warning .nc-confirm-dialog-submit { border-color: var(--nd-warn-text); background: var(--nd-warn-text); color: var(--nd-bg); }
+.nd-app .nc-confirm-dialog :focus-visible { outline: 2px solid var(--nd-link); outline-offset: 2px; }
+@media (max-width: 480px) { .nd-app .nc-confirm-dialog-body { padding: 22px 20px 18px; } .nd-app .nc-confirm-dialog-actions { padding: 15px 20px 20px; } .nd-app .nc-confirm-dialog-actions button { flex: 1; } }

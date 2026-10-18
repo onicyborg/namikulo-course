@@ -13,9 +13,9 @@ Sebelum fitur penuh, buat halaman minimum persiapan yang memakai build ffmpeg.wa
 ## Scope dan urutan implementasi
 
 1. Sediakan asset distribusi ffmpeg.wasm wrapper/core/Web Worker lokal lewat url(), tanpa Vite atau build frontend. Muat hanya halaman persiapan admin. Browser memeriksa HTTPS/WebAssembly/Web Worker/Web Crypto, tanpa pilihan OS wajib. Target awal Chrome/Edge desktop; Firefox/Safari mengikuti hasil UAT. Tidak menjanjikan semua perangkat/HP.
-2. Buat halaman kustom persiapan video sesuai design. Input MP4 H.264 yuv420p/AAC, maksimum 720p; batas usulan sumber 200 MiB/900 detik, satu kualitas mengikuti sumber. Validasi metadata; input tidak sesuai ditolak. Tidak ada encoding ulang otomatis atau dua resolusi. Admin menjaga tab terbuka.
+2. Buat halaman kustom persiapan video sesuai design. Input MP4 H.264 yuv420p/AAC, maksimum 1080p; batas percobaan sumber 500 MiB/1800 detik, satu kualitas mengikuti sumber. Validasi metadata; input tidak sesuai ditolak. Tidak ada encoding ulang otomatis atau dua resolusi. Admin menjaga tab terbuka.
 3. Browser mengemas HLS VOD stream copy dan AES-128 memakai kunci acak lokal, lalu mengunggah hanya manifest/segmen. Jangan upload video sumber; jangan menyimpan key di localStorage/URL/log. Server menyimpan key terenkripsi dengan APP_KEY. Implementasi mengikuti SRS-V1–V8, termasuk keterbatasan verifikasi metadata server tanpa decoder.
-4. Buat migration video_uploads dan UploadStatus, VideoImportService, policy/rute sesi/manifest/chunk/finalize/status/batal. Chunk <=5 MiB, per-segmen <=10 MiB, total output <=250 MiB, maksimum 2.000 segmen, manifest <=1 MiB. Semua batas konfigurabel, bukan jaminan kapasitas. Tidak menerima ZIP/path bebas. Validasi struktur manifest, hash/ukuran, AES/TS bertahap, allow-list nama, scope dan expiry.
+4. Buat migration video_uploads dan UploadStatus, VideoImportService, policy/rute sesi/manifest/chunk/finalize/status/batal. Chunk <=5 MiB, per-segmen <=25 MiB, total output <=750 MiB, maksimum 2.000 segmen, manifest <=1 MiB. Semua batas konfigurabel, bukan jaminan kapasitas. Tidak menerima ZIP/path bebas. Validasi struktur manifest, hash/ukuran, AES/TS bertahap, allow-list nama, scope dan expiry.
 5. Satu impor aktif per admin; chunk idempoten, lock ber-owner dan checkpoint validasi. Finalisasi maksimal 10 detik/request; browser meneruskan request hingga selesai. Transaksi singkat mengaktifkan aset baru hanya setelah seluruh hasil valid. Penggantian menjaga aset lama. Batal/refresh/gagal tidak boleh membuat konten parsial ready.
 6. Buat playback_sessions dan PlaybackService/VideoDelivery/HlsVideoDelivery: token hash, satu sesi aktif, TTL 10 menit, heartbeat 60 detik, batas 12 jam; periksa akses tiap manifest/playlist/key/segmen. Admin preview tanpa progres.
 7. Route streaming privat dengan playlist rewrite, anti traversal, no-store/private, auth/ownership dan Sec-Fetch-Site. Tidak ada URL file asli. Key hanya pada endpoint playback sah. Tambahkan CSP sesuai sumber aktual dan worker-src halaman admin; jangan memaksa isolasi cross-origin global untuk single-thread.
@@ -29,9 +29,9 @@ Asset ffmpeg.wasm lokal; JS browser preparation; halaman admin persiapan; migrat
 
 ## Variabel lingkungan
 
-QUEUE_CONNECTION=sync; VIDEO_DISK=video_private; VIDEO_SOURCE_MAX_SIZE_MB=200; VIDEO_SOURCE_MAX_DURATION_SECONDS=900; VIDEO_UPLOAD_MAX_SIZE_MB=250; VIDEO_SEGMENT_MAX_SIZE_MB=10; VIDEO_MAX_SEGMENTS=2000; VIDEO_SESSION_TTL_MINUTES=10; VIDEO_HEARTBEAT_SECONDS=60; VIDEO_ACCEL_REDIRECT=false. OPERATIONS_PLAYBACK_RETENTION_DAYS=30; OPERATIONS_UPLOAD_STALE_HOURS=24; OPERATIONS_BATCH_SIZE=20; OPERATIONS_MAX_SECONDS=10. APP_KEY dipertahankan.
+QUEUE_CONNECTION=sync; VIDEO_DISK=video_private; VIDEO_SOURCE_MAX_SIZE_MB=500; VIDEO_SOURCE_MAX_DURATION_SECONDS=1800; VIDEO_UPLOAD_MAX_SIZE_MB=750; VIDEO_SEGMENT_MAX_SIZE_MB=25; VIDEO_MAX_SEGMENTS=2000; VIDEO_MAX_WIDTH=1920; VIDEO_MAX_HEIGHT=1080; VIDEO_PROCESS_TIMEOUT_MINUTES=60; VIDEO_SESSION_TTL_MINUTES=10; VIDEO_HEARTBEAT_SECONDS=60; VIDEO_ACCEL_REDIRECT=false. OPERATIONS_PLAYBACK_RETENTION_DAYS=30; OPERATIONS_UPLOAD_STALE_HOURS=24; OPERATIONS_BATCH_SIZE=20; OPERATIONS_MAX_SECONDS=10. APP_KEY dipertahankan.
 
-VIDEO_FFMPEG_PATH, VIDEO_FFPROBE_PATH, VIDEO_MAX_SIZE_MB lama dan VIDEO_KEEP_ORIGINAL tidak dipakai pada rancangan MVP baru. Versi asset, batas dimensi, ukuran manifest/chunk dan anggaran finalisasi ditetapkan pada config/video.php; jangan menambah env tanpa kebutuhan.
+VIDEO_FFMPEG_PATH, VIDEO_FFPROBE_PATH, VIDEO_MAX_SIZE_MB lama dan VIDEO_KEEP_ORIGINAL tidak dipakai pada rancangan MVP baru. Versi asset, ukuran manifest/chunk dan anggaran finalisasi ditetapkan pada config/video.php. Batas dimensi dan waktu proses kini dapat diatur lewat env untuk UAT video besar.
 
 ## Perintah untuk user
 

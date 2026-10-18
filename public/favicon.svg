@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Namikulo Course">
+  <rect width="64" height="64" rx="14" fill="#0f172a"/>
+  <g fill="none" stroke="#5eead4" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M32 22v27"/>
+    <path d="M32 25c-4-6-10-7-20-7v25c10-1 16 0 20 6 4-6 10-7 20-6V18c-10 0-16 1-20 7Z"/>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+.nd-app .nc-course-actions { display:flex; align-items:center; gap:4px; width:max-content; }
+.nd-app .nc-icon-action { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; padding:0; border:1px solid transparent; border-radius:8px; background:transparent; color:var(--nd-muted); cursor:pointer; transition:background .15s,color .15s; }
+.nd-app .nc-icon-action .nd-icon { width:18px; height:18px; }
+.nd-app .nc-icon-action:hover { color:var(--nd-link); background:var(--nd-active); }
+.nd-app .nc-icon-action.nc-icon-danger:hover { color:var(--nd-bad-text); background:var(--nd-bad-bg); }
+.nd-app .nc-icon-action:focus-visible { outline:2px solid var(--nd-link); outline-offset:2px; }
+.nd-app .nc-course-modal .modal-dialog { max-width:900px; }
+@media(max-width:600px) { .nd-app .nc-course-modal .modal-dialog { margin:8px; } .nd-app .nc-icon-action { width:44px; height:44px; } }
+@media(prefers-reduced-motion:reduce) { .nd-app .nc-icon-action { transition:none; } }

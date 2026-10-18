@@ -10,7 +10,9 @@ Panduan lengkap penggunaan template Otika sebagai dasar aplikasi admin/dashboard
 >
 > Font Nunito untuk shell admin/member disimpan di `public/fonts/nunito` dan dipanggil lewat `public/css/app-custom.css` dari origin aplikasi. CSS Otika tetap dimuat dari `ASSET_URL`; deklarasi font lokal mencegah permintaan font Nunito lintas origin.
 
-> Font ikon Summernote yang dirujuk oleh `bundles/summernote/summernote-bs4.css` juga harus berasal dari origin aplikasi. Berkas WOFF/TTF ada di `public/fonts/summernote`, dan `public/css/content-admin.css` mendefinisikan ulang `@font-face` setelah CSS Summernote. Untuk plugin Otika lain yang memakai font relatif, periksa permintaan font di browser sebelum dipakai; host aset eksternal belum menyediakan CORS font untuk origin lokal.
+> Input rich text aplikasi kini memakai bundel Lexical lokal tanpa font ikon Summernote. Untuk plugin Otika lain yang memakai font relatif, periksa permintaan font di browser sebelum dipakai; host aset eksternal belum menyediakan CORS font untuk origin lokal.
+
+> **Desain admin terbaru:** semua halaman `/admin/*` menggunakan shell Slate/Teal khusus di `layouts/admin.blade.php`. Sidebar tetap, navbar lengket, dan tema terang/gelap disimpan di browser; tombol tema serta popover notifikasi berada di navbar. Dashboard memakai komponen dan CSS custom tanpa Otika. Halaman admin lainnya memakai Bootstrap 4 hanya untuk grid, form, modal, dan plugin yang sudah ada; tampilan visualnya diatur oleh `public/css/admin-pages.css`. Seluruh aturan shell Otika di bagian 1–18 dan baris Admin lama pada bagian 19 adalah referensi historis untuk halaman admin. Ketentuan modal tetap berlaku: render modal langsung di bawah `<body>` melalui `@push('modals')`, di atas backdrop.
 
 ## 1. Arsitektur template
 
@@ -282,6 +284,8 @@ Modal menggunakan `.modal`, `.modal-dialog`, `.modal-content`, `.modal-header`, 
 
 Untuk layout Admin, render semua modal melalui `@push('modals')` pada view. `layouts/admin.blade.php` merender `@stack('modals')` sebagai anak langsung `<body>`, di luar `#app`, `.main-wrapper`, dan `.main-content`. Bootstrap menaruh backdrop sebagai anak `<body>`; modal yang berada di dalam shell Otika dapat tertahan oleh stacking context shell sehingga backdrop menggelapkan modal dan memblokir klik. Jangan mengatasi kasus ini dengan menaikkan `z-index` modal atau backdrop secara global. Saat membuat modal baru, periksa bahwa dialog tetap terang, bisa difokuskan dan diklik, serta backdrop hanya menggelapkan halaman di belakangnya.
 
+Konfirmasi aksi formulir yang sebelumnya memakai `window.confirm()` menggunakan komponen `x-confirm-action-dialog` di layout Admin dan Player. Pasang `data-confirm` pada form, serta `data-confirm-title` dan `data-confirm-label` bila perlu. Dialog native dibuka dengan `showModal()` agar tetap berada di atas shell dan backdrop; teks dari atribut hanya ditulis sebagai `textContent`. Aksi baru dikirim setelah tombol konfirmasi dipilih. Warna dialog mengikuti token tema terang/gelap.
+
 ### Avatar, media, progress, list, empty state
 
 ```html
@@ -335,8 +339,8 @@ Setiap control harus punya label, `id`, name, dan pesan error. Validasi server t
 | `.datetimepicker` | date + time | `YYYY-MM-DD hh:mm`, 24 jam |
 | `.daterange` | rentang tanggal | `YYYY-MM-DD` |
 | `.timepicker` | pemilih waktu | ikon chevron |
-| `.summernote` | rich editor | min-height 250px |
-| `.summernote-simple` | editor ringkas | min-height 150px |
+| `[data-course-editor]` | Lexical untuk deskripsi course, bab, materi | toolbar lengkap, canvas terang untuk warna teks |
+| `[data-discussion-editor]` | Lexical untuk diskusi | toolbar ringkas, mengikuti tema halaman |
 | `.dropzone` | multiple upload | lihat `multiple-upload.html` |
 | `.image-preview` | preview gambar | lihat `forms-advanced-form.html` |
 
@@ -467,7 +471,7 @@ Pastikan bundle icon yang sesuai dimuat sebelum dipakai.
 
 ## 12. Theme dan global behavior
 
-`scripts.js` menyediakan loader, Feather, sidebar dropdown, sidebar mini, mobile overlay, sticky header, fullscreen, tooltip, popover, Select2, Selectric, date picker, time picker, Summernote, sortable card, dan setting panel.
+Bundle Otika lama menyediakan loader, Feather, sidebar dropdown, sidebar mini, mobile overlay, sticky header, fullscreen, tooltip, popover, Select2, Selectric, date picker, time picker, Summernote, sortable card, dan setting panel. Input rich text aplikasi menggunakan Lexical lokal; jangan tambahkan class `.summernote` pada input baru.
 
 Class body:
 
@@ -572,13 +576,16 @@ Bagian ini khusus proyek course berbayar. Template Otika adalah template **admin
 
 | Layout | Shell | CSS dimuat | JS dimuat |
 |---|---|---|---|
-| `layouts/admin` | Otika penuh (`.main-wrapper`) | `app.min.css`, `style.css`, `components.css`, `app-custom.css` | `app.min.js`, plugin halaman, `scripts.js`, `app-custom.js` |
-| `layouts/member` | Otika penuh, sidebar khusus member | sama dengan admin | sama dengan admin |
-| `layouts/auth` | Pola `auth-login.html` Otika, tanpa sidebar | `app.min.css`, `style.css`, `components.css`, `site.css` | `app.min.js`, `scripts.js` |
+| `layouts/admin` | Shell Slate/Teal custom; dashboard sepenuhnya custom, halaman admin lain mempertahankan komponen Bootstrap 4 | `admin-dashboard.css`, `admin-pages.css` untuk halaman selain dashboard; `app.min.css` dan plugin sesuai kebutuhan | `admin-dashboard-theme.js`, `admin-dashboard.js`, `app-custom.js`; `app.min.js` dan plugin sesuai kebutuhan halaman |
+| `layouts/member` | Shell Slate/Teal bersama admin, sidebar khusus member | `app.min.css`, CSS halaman, `admin-dashboard.css`, `admin-pages.css`, `admin-action-tooltip.css`, `member-area.css` | `app.min.js`, `admin-dashboard-theme.js`, `admin-dashboard.js`, `app-custom.js`, `admin-action-tooltip.js`, `member-area.js`; skrip halaman |
+| `layouts/auth` | Layout Otika lama; tidak dipakai halaman auth aktif | `app.min.css`, `style.css`, `components.css`, `site.css` | `app.min.js`, `scripts.js` |
+| `layouts/login` | Login, register, lupa password, dan reset password Slate/Teal; panel informasi dan form | `app.min.css`, `admin-dashboard.css`, `admin-pages.css`, `login.css` | `admin-dashboard-theme.js`, `app-custom.js`; tanpa skrip shell Otika |
 | `layouts/public` | Navbar atas + konten + footer, tanpa `.main-wrapper` | `app.min.css`, `site.css` | `app.min.js` (jQuery + Bootstrap 4), `app-custom.js`, skrip halaman. **Tanpa** `scripts.js` |
-| `layouts/player` | Fokus belajar, tanpa sidebar admin | `app.min.css`, `site.css` | `app.min.js`, `hls.js`, `pages/player.js`. **Tanpa** `scripts.js` |
+| `layouts/player` | Fokus belajar, tanpa sidebar aplikasi; tema Slate/Teal | `app.min.css`, CSS player/diskusi, `admin-dashboard.css`, `admin-pages.css`, `admin-action-tooltip.css`, `member-player.css` | `app.min.js`, `admin-dashboard-theme.js`, `app-custom.js`, `admin-action-tooltip.js`; `hls.js`, `pages/player.js`, `pages/discussion.js` sesuai halaman. **Tanpa** `scripts.js` |
 
 Aturan: `style.css`/`components.css` Otika mengasumsikan struktur admin, jadi tidak dimuat di Public dan Player kecuali sebuah komponen terbukti memerlukannya.
+
+Favicon semua layout berasal dari `public/favicon.svg` dengan `public/favicon.ico` sebagai fallback. Keduanya menampilkan simbol buku Namikulo dan dipanggil lewat `url()`, bukan favicon Otika dari host eksternal.
 
 ### 19.2 Token desain (Public, Auth, Player)
 
@@ -686,14 +693,26 @@ Jangan menjanjikan "tidak bisa direkam" di antarmuka. Tampilkan catatan netral: 
 
 ### 19.8 Area member (`layouts/member`)
 
-Sidebar: Dashboard, Course Saya, Pesanan, Profil. Dashboard menampilkan course aktif dengan progres, sisa waktu akses (badge, kuning bila <14 hari, merah bila <3 hari), dan rekomendasi course. Empty state mengarahkan ke katalog. Halaman Pesanan memakai tabel Otika dengan badge status dan tautan ke instruksi bayar untuk pesanan tertunda.
+Pembaruan 18 Oktober 2026: seluruh halaman member menggunakan desain Slate/Teal admin yang sudah disetujui. `layouts/member` memuat `admin-dashboard.css` (token dan shell), `admin-pages.css` (komponen Bootstrap 4), lalu `member-area.css` (konten member). Jangan memuat CSS shell dan `scripts.js` Otika pada layout member. Gunakan font sans-serif sistem serta sprite Lucide lokal yang sama dengan admin.
+
+- Sidebar: Dashboard, Course saya, Transaksi, Notifikasi, Profil saya, dan tautan katalog. Dashboard aktif hanya pada route dashboard; halaman pembayaran menyorot Transaksi.
+- Navbar menggunakan partial `admin.dashboard.topbar` yang menentukan tujuan notifikasi berdasarkan role. Popover menampilkan maksimal lima notifikasi terbaru. Tombol membuka notifikasi menggunakan POST ber-CSRF, memvalidasi ownership, menandai dibaca, lalu mengarahkan ke tujuan yang masih diizinkan; jika tujuan tidak tersedia, kembali ke pusat notifikasi sesuai role.
+- Theme toggle menggunakan `x-theme-toggle` dan preferensi browser yang sama dengan admin. Semua warna konten memakai token semantik; mode terang/gelap ikut terbawa ketika membuka halaman lain.
+- Dashboard menampilkan course aktif dengan progres, sisa waktu akses (badge, kuning bila <14 hari, merah bila <3 hari), pembayaran tertunda, akses berakhir, dan rekomendasi course. Panel sambutan Teal menekankan konteks belajar; seluruh angka berasal dari data server.
+- Course saya memakai grid kartu responsif; kurikulum memakai hierarki bab dan baris materi dengan status serta tombol putar. Empty state mengarahkan ke katalog.
+- Transaksi memakai tabel responsif dengan filter status otomatis saat JavaScript tersedia, fallback tombol submit, badge status, dan tombol ikon dengan tooltip yang sama dengan admin. Tooltip dapat dibaca melalui hover maupun fokus keyboard; aksi tetap memiliki `aria-label`.
+- Profil memakai komponen form, validasi, tombol, dan avatar yang sama. Pusat notifikasi membedakan item dibaca/belum dibaca lewat label serta warna.
+- Checkout dan instruksi pembayaran memakai shell member dengan tema yang sama. QR tetap berlatar putih agar kontrasnya terjaga.
+- Belajar dan thread diskusi memakai `layouts/player` tanpa sidebar aplikasi; warna, tombol, form, badge, navigasi dan mode tema mengikuti admin melalui `member-player.css`. Kontrol video, watermark, proteksi, progress, dan aturan akses tetap mengikuti implementasi playback. CSS khusus member/player tidak boleh mengubah halaman publik atau admin.
+
+UAT desain member: periksa dashboard, filter course, kurikulum, transaksi dan invoice, profil, notifikasi/popover, checkout/pembayaran, player dan diskusi pada mode terang/gelap serta lebar 375/768/1024/desktop. Cek sidebar aktif, navigasi keyboard/Escape, tooltip, pagination, validasi form, status akses berakhir, teks panjang dan empty state. Verifikasi tema tetap sama setelah navigasi dan refresh. Kelulusan menunggu hasil pengujian user.
 
 Atas permintaan user, menu **Transaksi** dan invoice PDF diselesaikan lebih awal dalam Phase 5. Halaman transaksi memakai tabel responsif Otika dengan course, nomor pesanan, tanggal, nominal, status, dan tindakan kontekstual. Invoice A4 memakai tipografi sederhana dan satu warna aksen proyek; tampilkan nomor invoice, identitas penjual/pembeli, satu baris course, total dibayar, metode, dan waktu pembayaran. Jangan mengarang alamat, NPWP, atau perincian pajak.
 
 ### 19.9 Admin: builder kurikulum
 
 - Halaman listing kategori dan course memakai seluruh lebar `.section-body` yang tersedia. Hindari `max-width` tetap pada wrapper tabel; batasi lebar hanya pada halaman dengan konten bacaan atau builder yang membutuhkan fokus.
-- Halaman daftar course memakai DataTables + modal create/edit. Field kaya (deskripsi) memakai Summernote di dalam modal besar (`modal-lg`) dan thumbnail memakai `image-preview`.
+- Halaman daftar course memakai DataTables + modal create/edit. Field kaya (deskripsi) memakai Lexical di dalam modal besar (`modal-lg`) dan thumbnail memakai `image-preview`. Editor diinisialisasi saat modal dibuka, dengan textarea sebagai fallback tanpa JavaScript.
 - Panel status course menampilkan **Terbitkan course** pada draf; tombol **Arsipkan course** hanya tampil saat status terbit. Aksi arsip juga divalidasi di server.
 - Halaman **Kurikulum** (`admin.courses.curriculum`) berupa halaman kustom: daftar bab sebagai card; tiap card berisi daftar video (judul, durasi, status pemrosesan video) dan tombol Tambah Video. Tambah/ubah bab dan video memakai modal. Urutan dapat diubah (drag `sortable` Otika atau tombol naik/turun) dan disimpan via AJAX.
 - Persiapan video menggunakan halaman kustom `admin.lessons.video.prepare` (GET `/admin/lessons/{lesson}/video/prepare`) dengan konteks course/bab/video; form CRUD metadata tetap modal. Halaman memeriksa browser, tanpa pilihan OS wajib. Tampilkan batas format/ukuran/durasi dari config sebelum memilih file.
@@ -704,6 +723,14 @@ Atas permintaan user, menu **Transaksi** dan invoice PDF diselesaikan lebih awal
 
 ### 19.10 State wajib di seluruh halaman baru
 
+**Penyempurnaan login dan ruang belajar, 18 Oktober 2026:**
+
+- Login, register, lupa password, dan reset password memakai `layouts/login`; CSS `login.css` terbatas pada layout ini. Desktop memiliki panel identitas Teal dan form fokus; pada layar kecil form didahulukan. Tema menggunakan preferensi yang sama dengan admin/member. Label, autocomplete, tampil/sembunyikan password, validasi per field, ringkasan kesalahan, pesan sukses/gagal, dan status submit harus tetap berfungsi. Registrasi mempertahankan nama, email, password dan konfirmasi, serta deteksi zona waktu browser. Lupa password mempertahankan respons umum agar keberadaan akun tidak terungkap; reset mempertahankan token, email tujuan, validasi konfirmasi, dan tautan meminta reset baru. Panel informasi menjelaskan fitur nyata tanpa statistik atau testimoni buatan.
+- Halaman `/learn/{lesson}` memakai partial `_player`, `_lesson-overview`, dan `_curriculum`, dengan override `learning-room.css` yang dibatasi `.nm-player`. Video menjadi fokus utama; Ringkasan/Kurikulum/Diskusi berupa tautan anchor, bukan tab yang menyembunyikan isi.
+- Kurikulum berada di samping video pada desktop, sticky dengan daftar yang dapat digulir. Setiap bab memakai `<details>` native; bab materi aktif terbuka otomatis. Pada layar kecil, kurikulum berada setelah ringkasan materi dan sebelum diskusi. Item belum siap tetap berupa teks tanpa tautan. Status selesai tetap berasal dari progress server.
+- Timeline video menempati satu baris sendiri. Tombol putar, waktu, volume, kecepatan, dan layar penuh dikelompokkan dengan area sentuh yang jelas. Target Fullscreen API adalah bingkai video beserta kontrolnya; watermark tetap di atas video dan kontrol tetap tersedia. Bila Fullscreen API tidak tersedia, tombol disembunyikan. Navigasi antarmateri menampilkan judul tujuan.
+- UAT: login benar/salah/nonaktif, tampilkan password, ingat saya, lupa password, registrasi, keyboard dan dua tema; player putar/jeda, seek, volume, speed, fullscreen/keluar, resume/progress, bab lipat, navigasi materi, diskusi, serta proteksi saat tab tidak aktif. Periksa lebar 375/768/1024/desktop dengan judul panjang. Pemeriksaan browser dan penerimaan desain tetap oleh user.
+
 Loading, empty, success, error, permission (403), tidak ditemukan (404), kedaluwarsa (akses habis), dan batas laju (429). Halaman error `403/404/419/429/500/503` tersedia di `resources/views/errors`.
 
 ### 19.11 Pusat notifikasi (Phase 8)
@@ -713,11 +740,31 @@ Loading, empty, success, error, permission (403), tidak ditemukan (404), kedaluw
 - Tindakan **Tandai dibaca** dan **Tandai semua dibaca** berupa tombol dengan state loading/hasil. Bila target hilang atau hak akses berakhir, item tetap dapat dibaca sebagai riwayat tanpa tautan yang membuka materi.
 - Player memakai tautan kecil ke pusat notifikasi pada header atau bagian bawah halaman, jauh dari kontrol video. Jangan mengubah area video hanya demi badge notifikasi.
 - Email rekap HTML + teks polos memakai identitas email yang sudah ada, judul spesifik, jumlah belum dibaca, maksimal 20 ringkasan, tautan aman ke pusat notifikasi, dan catatan bahwa waktu pengiriman dimulai 07.00 WIB. Tidak perlu tombol promosi atau visual baru.
+- Semua email keluar yang ada saat ini—reset password, instruksi pembayaran, konfirmasi lunas, dan rekap notifikasi—memakai `resources/views/emails/layout.blade.php` dengan identitas Slate/Teal yang sama. Tombol aksi, tautan cadangan, dan baris rincian memakai komponen `x-email.*`. Tata letak memakai tabel dan inline style agar terbaca di klien email; tanpa font, stylesheet, atau gambar dekoratif eksternal. Tiap email tetap memiliki alternatif teks polos. Email pembayaran mempertahankan jumlah, metode, batas bayar menurut zona member, VA/QRIS, invoice, dan tautan tindakan; reset password mempertahankan token dan masa berlaku. Tampilan tidak boleh menambah klaim hasil pengiriman, status bayar, atau akses sebelum sistem mengonfirmasinya.
+- UAT email oleh user: lihat HTML dan teks polos di klien email desktop/mobile; cek mode gelap klien, tautan, kode QR inline atau cadangan, VA, zona waktu, validasi tautan reset kedaluwarsa, serta ringkasan maksimal 20 notifikasi. Periksa bahwa pengiriman dan pencatatan status bisnis tetap sama.
 
 ### 19.12 Diskusi materi (Phase 9)
 
 - Letakkan **Diskusi materi** di bawah deskripsi dan navigasi video pada `layouts/player`. Desktop mengikuti lebar kolom konten video; mobile menumpuk setelah player, sebelum/atau setelah kurikulum sesuai pembacaan yang paling jelas. Diskusi tidak menjadi overlay video dan tidak memindahkan kontrol pemutar.
-- Tampilkan pertanyaan sebagai thread dengan nama penulis, waktu lokal, isi teks biasa, jumlah jawaban, dan aksi **Balas**. Jawaban satu tingkat dengan penanda **Admin** yang mudah dibedakan tanpa bergantung pada warna saja. Bila membalas komentar tertentu, tampilkan konteks `Membalas [nama]` tanpa indentasi bertingkat tak terbatas.
-- Form **Ajukan pertanyaan** dan **Tulis balasan** memakai textarea berlabel, petunjuk singkat panjang teks, tombol kirim jelas, pesan validasi di field, dan fokus kembali ke thread setelah submit. Pakai submit normal/Blade + Bootstrap 4; tidak perlu editor kaya, lampiran, live chat, atau library baru.
+- Tampilkan pertanyaan sebagai thread dengan avatar inisial, nama penulis, waktu lokal, isi berformat aman, jumlah jawaban, dan aksi **Balas**. Jawaban satu tingkat dengan penanda **Admin**. Konteks `Membalas [nama]` menyertakan potongan teks maksimal 160 karakter; klik menuju komentar asal, memfokuskan dan menyorotnya selama 3,5 detik. Target di halaman berbeda menggunakan `focus` yang dihitung server. Reduced motion menonaktifkan animasi dan smooth scroll. Kutipan tersembunyi/dihapus diganti pesan netral.
+- Form **Ajukan pertanyaan** dan **Tulis balasan** memakai `x-discussion-editor` (Lexical ringkas), label, penghitung teks 10–2.000 karakter, tombol kirim, pesan validasi, dan pemulihan `old()`. Toolbar menyediakan penekanan, daftar, kutipan/kode, tautan, undo/redo. Tidak ada upload, embed, atau mode HTML sumber. Paste sebagai teks polos; HTML disaring server. Tetap submit normal, dengan textarea sebagai fallback tanpa JavaScript.
+- Kanvas dan toolbar Lexical diskusi mengikuti token permukaan serta warna teks player pada light/dark mode. Toolbar deskripsi admin menyediakan heading, ukuran teks, penekanan, daftar, kutipan, perataan, warna teks, sorotan, dan tautan; kanvas dokumen putih menjaga keterbacaan warna teks authored pada dua tema. Tautan yang dibuat dengan opsi buka di tab baru hanya boleh mempertahankan `target="_blank"` setelah sanitasi, selalu bersama `rel="nofollow noopener noreferrer"`. Tautan tanpa opsi tersebut tetap membuka tab saat ini.
 - Admin memiliki daftar moderasi berhalaman dengan konteks course/materi, tombol sembunyikan/pulihkan, dan alasan status. Pada thread yang disembunyikan, member melihat state netral; isi bermasalah tidak ditampilkan di daftar atau preview notifikasi.
 - Sediakan state belum ada pertanyaan, akses sudah berakhir, kiriman dihapus, batas kirim tercapai, dan halaman jawaban berikutnya. Semua tombol dapat dicapai keyboard; teks panjang harus membungkus tanpa overflow pada 375/768/1024 px.
+
+### Deskripsi berformat dan halaman publik — revisi antarmuka
+
+- `x-rich-description` digunakan untuk deskripsi course, bab, materi, dan isi diskusi yang telah melalui sanitasi server. Gaya penulis yang aman dipertahankan; daftar dalam deskripsi tidak boleh mewarisi flex row/penomoran kurikulum. Tabel dapat digulir secara lokal, kode panjang membungkus, dan tautan selalu memiliki underline.
+- Konten yang menetapkan warna sendiri memakai kanvas putih agar warna penulis tidak berubah saat tema berganti. Konten tanpa warna khusus mengikuti token light/dark. Deskripsi bab tampil di course member dan bagian “Tentang bab” pada materi; deskripsi materi tersedia pada course member dengan akses aktif dan halaman belajar. Halaman publik tetap hanya menampilkan judul kurikulum, bukan isi materi privat.
+- Landing page dan katalog memakai `.np-page` dalam `public-site.css`, token Slate/Teal yang sama dengan area member, serta toggle tema pada navigasi. Aktivasi dibatasi halaman site dan pratinjau course; checkout tidak mewarisi override redesign ini.
+- Eksperimen landing page memakai `.nm-home` dan `public/css/landing-minimal.css`, khusus route `site.home`. Tema awal pengunjung baru adalah gelap, dengan preferensi terang/gelap yang tersimpan tetap dihormati. Layout hero menempatkan pesan utama di tengah dan course unggulan aktual sebagai sorotan horizontal; aksen emerald dan glow dibatasi pada CTA utama serta interaksi penting. Untuk kembali ke tampilan sebelumnya, lepaskan class dan stylesheet khusus landing serta atribut tema awal di layout publik.
+- Hero menampilkan course unggulan aktual, tanpa rating/testimoni/data contoh. Kartu course menampilkan pengajar bila tersedia, jumlah bab/video, harga, dan masa akses. Grid 3 kolom menjadi 2 dan 1 di layar kecil. Katalog memakai form GET dengan pencarian, kategori, urutan harga/waktu, hasil kosong, reset filter, dan pagination server yang mempertahankan filter.
+- Pengujian user: warna dan daftar/tabel deskripsi, kompatibilitas komentar lama, editor dengan validasi kosong/terlalu panjang, kutipan lintas halaman dan target tersembunyi, navigasi keyboard, light/dark, serta layout 375/768/1024 px dan desktop. Belum dinyatakan lulus sebelum feedback user.
+
+
+### Kurikulum admin — daftar bab dan materi
+
+- Konten `/admin/courses/{course}/curriculum` memakai CSS terisolasi `.nc-curriculum` di `admin-curriculum.css`, dengan token tema admin. Grid utama 70/30 beralih menjadi satu kolom pada layar kecil.
+- Satu panel per bab; materi berupa baris dengan pemisah tipis. Aksi ubah/hapus berada dalam menu tiga titik. Modal tetap dirender di stack modal layout.
+- Pegangan urutan mendukung pointer dan tombol panah keyboard. Menu menyediakan alternatif pindah ke atas/bawah. Urutan disimpan otomatis lewat endpoint reorder yang memvalidasi cakupan dan daftar ID lengkap; materi hanya berpindah di babnya sendiri.
+- Selama penyimpanan, pengurutan dikunci. Kegagalan meminta muat ulang untuk menyinkronkan kembali urutan server; jangan menampilkan keberhasilan sebelum respons server diterima.

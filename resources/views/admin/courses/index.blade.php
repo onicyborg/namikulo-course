@@ -1,9 +1,11 @@
 @extends('layouts.admin')
 @section('title', 'Course')
 @push('styles')
+<link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">
 <link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
-<link rel="stylesheet" href="{{ asset('bundles/summernote/summernote-bs4.css') }}">
+<link rel="stylesheet" href="{{ url('css/lexical-editor.css') }}?v=1">
 <link rel="stylesheet" href="{{ url('css/content-admin.css') }}">
+<link rel="stylesheet" href="{{ url('css/admin-courses.css') }}">
 @endpush
 @section('content')
 <x-page-header title="Course" parent="Dashboard" :parentUrl="route('admin.dashboard')" />
@@ -25,7 +27,13 @@
                     <td>Rp {{ number_format($course->discount_price ?? $course->price, 0, ',', '.') }} @if($course->discount_price !== null)<small class="d-block text-muted"><del>Rp {{ number_format($course->price, 0, ',', '.') }}</del></small>@endif</td>
                     <td>{{ $course->sections_count }} bab · {{ $course->lessons_count }} materi</td>
                     <td><span class="badge badge-{{ $course->status === \App\Enums\CourseStatus::Published ? 'success' : ($course->status === \App\Enums\CourseStatus::Archived ? 'secondary' : 'warning') }}">{{ $course->status->label() }}</span>@if($course->is_featured)<small class="d-block">Unggulan #{{ $course->featured_order }}</small>@endif</td>
-                    <td class="content-actions"><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.curriculum', $course) }}">Kurikulum</a><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.preview', $course) }}">Pratinjau</a><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.courses.members', $course) }}">Anggota</a><button class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target="#course-edit-{{ $course->id }}">Ubah</button><button class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#confirm-delete-modal" data-delete-url="{{ route('admin.courses.destroy', $course) }}" data-name="{{ $course->title }}">Hapus</button></td>
+                    <td><div class="nc-course-actions">
+                        <a class="nc-icon-action" href="{{ route('admin.courses.curriculum', $course) }}" data-action-tooltip="Kelola kurikulum" aria-label="Kelola kurikulum {{ $course->title }}"><x-dashboard.icon name="book-open" /></a>
+                        <a class="nc-icon-action" href="{{ route('admin.courses.preview', $course) }}" data-action-tooltip="Pratinjau course" aria-label="Pratinjau {{ $course->title }}"><x-dashboard.icon name="eye" /></a>
+                        <a class="nc-icon-action" href="{{ route('admin.courses.members', $course) }}" data-action-tooltip="Kelola anggota" aria-label="Kelola anggota {{ $course->title }}"><x-dashboard.icon name="users" /></a>
+                        <button type="button" class="nc-icon-action" data-toggle="modal" data-target="#course-edit-{{ $course->id }}" data-action-tooltip="Ubah course" aria-label="Ubah {{ $course->title }}"><x-dashboard.icon name="pencil" /></button>
+                        <button type="button" class="nc-icon-action nc-icon-danger" data-toggle="modal" data-target="#confirm-delete-modal" data-delete-url="{{ route('admin.courses.destroy', $course) }}" data-name="{{ $course->title }}" data-action-tooltip="Hapus course" aria-label="Hapus {{ $course->title }}"><x-dashboard.icon name="trash-2" /></button>
+                    </div></td>
                 </tr>@endforeach</tbody>
             </table></div>
             @endif
@@ -35,14 +43,15 @@
 @endsection
 
 @push('modals')
-<div class="modal fade" id="course-create" tabindex="-1" role="dialog" aria-labelledby="course-create-title" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-scrollable" role="document"><div class="modal-content"><form action="{{ route('admin.courses.store') }}" method="POST" enctype="multipart/form-data" data-loading-form>@csrf<div class="modal-header"><h2 class="modal-title h5" id="course-create-title">Tambah course</h2><button class="close" type="button" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button></div><div class="modal-body">@include('admin.courses._form', ['course' => null])</div><div class="modal-footer"><button class="btn btn-light" type="button" data-dismiss="modal">Batal</button><button class="btn btn-primary" type="submit">Simpan draf</button></div></form></div></div></div>
+<div class="modal fade nc-course-modal" id="course-create" tabindex="-1" role="dialog" aria-labelledby="course-create-title" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-scrollable" role="document"><div class="modal-content"><form action="{{ route('admin.courses.store') }}" method="POST" enctype="multipart/form-data" data-loading-form>@csrf<div class="modal-header"><h2 class="modal-title h5" id="course-create-title">Tambah course</h2><button class="close" type="button" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button></div><div class="modal-body">@include('admin.courses._form', ['course' => null])</div><div class="modal-footer"><button class="btn btn-light" type="button" data-dismiss="modal">Batal</button><button class="btn btn-primary" type="submit">Simpan draf</button></div></form></div></div></div>
 @foreach($courses as $course)
-<div class="modal fade" id="course-edit-{{ $course->id }}" tabindex="-1" role="dialog" aria-labelledby="course-edit-title-{{ $course->id }}" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-scrollable" role="document"><div class="modal-content"><form action="{{ route('admin.courses.update', $course) }}" method="POST" enctype="multipart/form-data" data-loading-form>@csrf @method('PUT')<div class="modal-header"><h2 class="modal-title h5" id="course-edit-title-{{ $course->id }}">Ubah course</h2><button class="close" type="button" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button></div><div class="modal-body">@include('admin.courses._form', ['course' => $course])</div><div class="modal-footer"><button class="btn btn-light" type="button" data-dismiss="modal">Batal</button><button class="btn btn-primary" type="submit">Simpan perubahan</button></div></form></div></div></div>
+<div class="modal fade nc-course-modal" id="course-edit-{{ $course->id }}" tabindex="-1" role="dialog" aria-labelledby="course-edit-title-{{ $course->id }}" aria-hidden="true"><div class="modal-dialog modal-lg modal-dialog-scrollable" role="document"><div class="modal-content"><form action="{{ route('admin.courses.update', $course) }}" method="POST" enctype="multipart/form-data" data-loading-form>@csrf @method('PUT')<div class="modal-header"><h2 class="modal-title h5" id="course-edit-title-{{ $course->id }}">Ubah course</h2><button class="close" type="button" data-dismiss="modal" aria-label="Tutup"><span aria-hidden="true">&times;</span></button></div><div class="modal-body">@include('admin.courses._form', ['course' => $course])</div><div class="modal-footer"><button class="btn btn-light" type="button" data-dismiss="modal">Batal</button><button class="btn btn-primary" type="submit">Simpan perubahan</button></div></form></div></div></div>
 @endforeach
 <x-confirm-delete-modal title="Hapus course" />
 @endpush
-@push('plugin-scripts')<script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script><script src="{{ asset('bundles/summernote/summernote-bs4.js') }}"></script>@endpush
+@push('plugin-scripts')<script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script><script src="{{ url('vendor/lexical/namikulo-editor.js') }}?v=1" defer></script>@endpush
 @push('scripts')
+<script src="{{ url('js/admin-action-tooltip.js') }}"></script>
 <script src="{{ url('js/pages/admin-content.js') }}"></script>
 @if($errors->any() && old('_form'))<script>window.contentModalToOpen = @json(old('_form') === 'create' ? 'course-create' : 'course-edit-'.old('_record'));</script>@endif
 @endpush

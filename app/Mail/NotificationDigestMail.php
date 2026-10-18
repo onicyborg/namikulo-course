@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\User;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 
 class NotificationDigestMail extends Mailable
 {
@@ -13,7 +14,7 @@ class NotificationDigestMail extends Mailable
 
     public function build(): self
     {
-        return $this->subject('Ringkasan notifikasi Anda · '.$this->date)
+        return $this->subject('Ringkasan notifikasi · '.Carbon::parse($this->date, 'Asia/Jakarta')->locale('id')->translatedFormat('d F Y'))
             ->view('emails.notification-digest')
             ->text('emails.notification-digest-text');
     }

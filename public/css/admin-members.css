@@ -1,0 +1,19 @@
+.nd-app .nc-members .nc-member-filters { display:grid; grid-template-columns:140px minmax(180px,1fr) minmax(150px,220px) 44px; align-items:end; gap:16px; margin-bottom:24px; }
+.nd-app .nc-member-filters label { display:block; margin-bottom:8px; font-size:12px; font-weight:600; color:var(--nd-muted); }
+.nd-app .nc-member-filters .form-control { margin:0; height:44px; border-radius:8px; background:var(--nd-surface); }
+.nd-app .nc-member-action { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; padding:0; border:0; border-radius:8px; background:transparent; color:var(--nd-muted); cursor:pointer; vertical-align:middle; transition:background .15s,color .15s; }
+.nd-app .nc-member-action .nd-icon { width:18px; height:18px; }
+.nd-app .nc-member-action:hover { color:var(--nd-link); background:var(--nd-active); }
+.nd-app .nc-member-danger:hover { color:var(--nd-bad-text); background:var(--nd-bad-bg); }
+.nd-app .nc-member-reset { width:44px; height:44px; }
+.nd-app .nc-member-action:focus-visible { outline:2px solid var(--nd-link); outline-offset:2px; }
+.nd-app .nc-members .nc-member-table { border:0; border-collapse:collapse !important; }
+.nd-app .nc-members .nc-member-table th, .nd-app .nc-members .nc-member-table td { border:0; border-bottom:1px solid var(--nd-border); padding:16px; vertical-align:middle; }
+.nd-app .nc-members .nc-member-table th { color:var(--nd-muted); font-size:12px; font-weight:600; background:var(--nd-subtle); }
+.nd-app .nc-members .nc-member-table tbody tr { background:transparent; transition:background .15s; }
+.nd-app .nc-members .nc-member-table tbody tr:hover { background:var(--nd-subtle); }
+.nd-app .nc-members .nc-member-table .content-actions { white-space:nowrap; }
+.nd-app .nc-members .dataTables_info { padding-top:18px; }
+.nd-app .nc-members .dataTables_paginate { padding-top:14px; }
+@media(max-width:767px) { .nd-app .nc-members .nc-member-filters { grid-template-columns:1fr 1fr; gap:12px; } .nd-app .nc-member-filters > :nth-child(2) { grid-column:1 / -1; grid-row:1; } .nd-app .nc-member-action { width:44px; height:44px; } }
+@media(prefers-reduced-motion:reduce) { .nd-app .nc-member-action, .nd-app .nc-members .nc-member-table tbody tr { transition:none; } }

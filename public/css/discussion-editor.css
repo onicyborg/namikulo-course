@@ -1,0 +1,19 @@
+.nm-player .discussion-body { white-space: normal; }
+.nm-player .discussion-post { scroll-margin-top: 100px; }
+.nm-player .discussion-post-meta { gap: 10px; }
+.nm-player .nc-discussion-avatar { display: inline-grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border: 1px solid var(--nd-active-border); border-radius: 50%; background: var(--nd-active); color: var(--nd-link); font-size: 12px; font-weight: 700; }
+.nm-player .discussion-reply { margin-left: 30px; border-left: 2px solid var(--nd-border); }
+.nm-player .discussion-post-actions { gap: 20px; padding-top: 4px; }
+.nm-player .nc-reply-quote { display: block; margin: 14px 0; padding: 12px 15px; border: 1px solid var(--nd-border); border-left: 3px solid var(--nd-link); border-radius: 8px; background: var(--nd-bg); text-decoration: none; }
+.nm-player .nc-reply-quote:hover { background: var(--nd-active); }
+.nm-player .nc-reply-quote > span { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; color: var(--nd-muted); font-size: 11px; }
+.nm-player .nc-reply-quote strong { color: var(--nd-text); }
+.nm-player .nc-reply-quote .nd-icon { width: 14px; height: 14px; margin-left: auto; }
+.nm-player .nc-reply-quote q { display: block; margin-top: 7px; color: var(--nd-muted); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.nm-player .nc-reply-unavailable { margin: 12px 0; padding: 10px; background: var(--nd-subtle); color: var(--nd-muted); border-radius: 6px; font-size: 12px; }
+.nm-player .discussion-post.is-reply-target { animation: nc-reply-highlight 3.5s ease-out; outline: 2px solid var(--nd-link); outline-offset: -2px; }
+@keyframes nc-reply-highlight { 0%, 30% { background: var(--nd-active); } 100% { background: transparent; } }
+.nm-player .nc-discussion-editor { margin-top: 8px; min-width: 0; }
+.nm-player .nc-discussion-editor.has-error + .invalid-feedback { display: block; }
+@media (max-width: 575px) { .nm-player .discussion-reply { margin-left: 12px; } }
+@media (prefers-reduced-motion: reduce) { .nm-player .discussion-post.is-reply-target { animation: none; } }

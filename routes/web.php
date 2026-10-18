@@ -107,6 +107,7 @@ Route::prefix('admin')
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::post('notifications/{notification}/open', [NotificationController::class, 'open'])->whereUuid('notification')->name('notifications.open');
         Route::get('discussions', [DiscussionController::class, 'index'])->name('discussions.index');
         Route::post('discussions/{post}/hide', [DiscussionController::class, 'hide'])->whereUuid('post')->name('discussions.hide');
         Route::post('discussions/{post}/restore', [DiscussionController::class, 'restore'])->whereUuid('post')->name('discussions.restore');
@@ -160,6 +161,7 @@ Route::prefix('my')
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::post('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+        Route::post('/notifications/{notification}/open', [NotificationController::class, 'open'])->whereUuid('notification')->name('notifications.open');
         Route::get('/courses', [MemberCourseController::class, 'index'])->name('courses.index');
         Route::get('/courses/{course:slug}', [MemberCourseController::class, 'show'])->withTrashed()->name('courses.show');
         Route::get('/profile', [MemberProfileController::class, 'edit'])->name('profile.edit');

@@ -1,0 +1,71 @@
+.nd-app .nc-curriculum { color:var(--nd-text); }
+.nc-curriculum .nc-grid { display:grid; grid-template-columns:minmax(0,7fr) minmax(280px,3fr); gap:28px; align-items:start; }
+.nc-curriculum .nc-main { min-width:0; }
+.nc-curriculum .nc-intro { display:flex; justify-content:space-between; align-items:flex-start; gap:24px; padding:8px 0 20px; }
+.nd-app .nc-curriculum .nc-intro h2 { font-size:22px; line-height:1.4; font-weight:700; margin:6px 0 8px; overflow-wrap:anywhere; }
+.nd-app .nc-curriculum p { margin:0; }
+.nc-curriculum .nc-intro p:not(.nc-eyebrow), .nc-curriculum .nc-description, .nc-curriculum .nc-setting p { color:var(--nd-muted); font-size:13px; line-height:1.7; }
+.nc-curriculum .nc-eyebrow { color:var(--nd-link); font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; }
+.nc-curriculum .nc-actions { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; }
+.nc-curriculum .nc-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; min-height:42px; border:1px solid var(--nd-border); border-radius:8px; background:var(--nd-surface); color:var(--nd-text); font:inherit; font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; transition:background .2s,border-color .2s; }
+.nc-curriculum .nc-button:hover { background:var(--nd-subtle); border-color:var(--nd-muted); }
+.nc-curriculum .nc-primary { background:var(--nd-primary); border-color:var(--nd-primary); color:#fff; }
+.nc-curriculum .nc-primary:hover { background:var(--nd-primary-hover); border-color:var(--nd-primary-hover); }
+.nc-curriculum .nd-icon { width:18px; height:18px; flex-shrink:0; }
+.nc-curriculum .nc-order-note { display:flex; flex-direction:column; gap:4px; color:var(--nd-muted); font-size:12px; margin:0 0 16px; }
+.nc-curriculum [data-order-status]:empty { display:none; }
+.nc-curriculum [data-order-status] { color:var(--nd-link); }
+.nc-curriculum [data-order-status][data-error] { color:var(--nd-bad-text); }
+.nc-curriculum .nc-chapters, .nc-curriculum .nc-settings { display:grid; gap:20px; }
+.nc-curriculum .nc-panel { background:var(--nd-surface); border:1px solid var(--nd-border); border-radius:12px; box-shadow:var(--nd-shadow); min-width:0; }
+.nc-curriculum .nc-chapter-header { display:flex; gap:12px; align-items:center; padding:22px 18px; }
+.nc-curriculum .nc-heading { flex:1; min-width:0; }
+.nd-app .nc-curriculum h3 { font-size:17px; font-weight:650; line-height:1.5; margin:4px 0; overflow-wrap:anywhere; }
+.nc-curriculum .nc-count { color:var(--nd-muted); letter-spacing:0; font-weight:400; text-transform:none; }
+.nc-curriculum .nc-description { margin-top:6px; white-space:pre-line; overflow-wrap:anywhere; }
+.nc-curriculum .nc-grip { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:28px; height:40px; border:0; border-radius:6px; background:transparent; color:var(--nd-muted); cursor:grab; touch-action:none; }
+.nc-curriculum .nc-grip:hover { background:var(--nd-subtle); color:var(--nd-link); }
+.nc-curriculum .nc-grip:active { cursor:grabbing; }
+.nc-curriculum .nc-grip:disabled { cursor:wait; opacity:.4; }
+.nc-curriculum .nc-lesson { display:flex; gap:12px; align-items:center; padding:18px; border-top:1px solid var(--nd-border); transition:background .2s; }
+.nc-curriculum .nc-lesson:hover { background:var(--nd-subtle); }
+.nc-curriculum .nc-video-icon { display:flex; align-items:center; justify-content:center; width:36px; height:40px; color:var(--nd-muted); flex-shrink:0; }
+.nc-curriculum .nc-lesson-info { flex:1; min-width:0; }
+.nd-app .nc-curriculum h4 { font-size:14px; font-weight:600; line-height:1.5; margin:0 0 5px; overflow-wrap:anywhere; }
+.nc-curriculum .nc-video-status { font-size:11px; color:var(--nd-muted); display:inline-flex; align-items:center; gap:6px; }
+.nc-curriculum .nc-video-status::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+.nc-curriculum .nc-ready { color:var(--nd-good-text); }
+.nc-curriculum .nc-small { font-size:12px; padding:7px 10px; min-height:34px; white-space:nowrap; }
+.nc-curriculum .nc-menu { position:relative; flex-shrink:0; }
+.nc-curriculum .nc-menu summary { display:flex; justify-content:center; align-items:center; width:36px; height:40px; border-radius:7px; list-style:none; color:var(--nd-muted); cursor:pointer; }
+.nc-curriculum .nc-menu summary::-webkit-details-marker { display:none; }
+.nc-curriculum .nc-menu summary:hover, .nc-curriculum .nc-menu[open] summary { background:var(--nd-subtle); color:var(--nd-text); }
+.nc-curriculum .nc-menu-panel { position:absolute; right:0; top:calc(100% + 4px); width:205px; z-index:20; padding:6px; background:var(--nd-surface); border:1px solid var(--nd-border); border-radius:10px; box-shadow:0 10px 30px rgb(0 0 0 / 15%); }
+.nc-curriculum .nc-menu-panel button { display:flex; align-items:center; gap:9px; width:100%; text-align:left; border:0; border-radius:6px; padding:10px; background:transparent; color:var(--nd-text); font:inherit; font-size:12px; cursor:pointer; }
+.nc-curriculum .nc-menu-panel button:hover { background:var(--nd-subtle); }
+.nc-curriculum .nc-menu-panel button:disabled { opacity:.4; cursor:not-allowed; }
+.nc-curriculum .nc-danger, .nc-curriculum .nc-menu-panel .nc-danger { color:var(--nd-bad-text); }
+.nc-curriculum .nc-button.nc-danger:hover { background:var(--nd-bad-bg); }
+.nc-curriculum .nc-chapter-footer { padding:12px 20px; border-top:1px solid var(--nd-border); }
+.nc-curriculum .nc-add-lesson { display:flex; align-items:center; gap:8px; padding:8px; border:0; border-radius:6px; color:var(--nd-link); background:transparent; font:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.nc-curriculum .nc-add-lesson:hover { background:var(--nd-active); }
+.nd-app .nc-curriculum .nc-no-lessons { padding:18px 24px; color:var(--nd-muted); font-size:13px; border-top:1px solid var(--nd-border); }
+.nc-curriculum .nc-setting { padding:24px; }
+.nd-app .nc-curriculum .nc-setting h2 { margin:0 0 20px; font-size:16px; font-weight:650; }
+.nd-app .nc-curriculum .nc-setting p { margin:16px 0 20px; }
+.nc-curriculum .nc-badge { display:inline-flex; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; background:var(--nd-warn-bg); color:var(--nd-warn-text); }
+.nc-curriculum .nc-published { background:var(--nd-good-bg); color:var(--nd-good-text); }
+.nc-curriculum .nc-setting form + form { margin-top:10px; }
+.nc-curriculum .nc-full { width:100%; }
+.nc-curriculum .nc-field { margin-bottom:20px; }
+.nc-curriculum .nc-field label { display:block; font-size:12px; font-weight:600; margin-bottom:8px; }
+.nc-curriculum .nc-field input, .nc-curriculum .nc-field select { width:100%; border:1px solid var(--nd-border); border-radius:8px; background:var(--nd-bg); color:var(--nd-text); padding:10px 12px; font:inherit; }
+.nc-curriculum :is(button,a,summary,input,select):focus-visible { outline:2px solid var(--nd-link); outline-offset:3px; }
+.nc-curriculum .nc-dragging { opacity:.6; outline:2px dashed var(--nd-link); outline-offset:-2px; }
+.nc-curriculum .nc-empty { padding:44px 24px; text-align:center; }
+.nc-curriculum .nc-empty > .nd-icon { width:36px; height:36px; color:var(--nd-link); margin-bottom:12px; }
+.nd-app .nc-curriculum .nc-empty p { color:var(--nd-muted); margin:8px 0 20px; }
+@media(max-width:1200px) { .nc-curriculum .nc-intro { flex-direction:column; } .nc-curriculum .nc-grid { gap:20px; grid-template-columns:minmax(0,2fr) minmax(260px,1fr); } }
+@media(max-width:960px) { .nc-curriculum .nc-grid { grid-template-columns:1fr; } .nc-curriculum .nc-settings { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .nc-curriculum .nc-settings { grid-template-columns:1fr; } .nc-curriculum .nc-lesson { flex-wrap:wrap; gap:8px; padding:14px 10px; } .nc-curriculum .nc-lesson-info { flex-basis:calc(100% - 122px); } .nc-curriculum .nc-prepare { margin-left:76px; } .nc-curriculum .nc-lesson > .nc-menu { margin-left:auto; } .nc-curriculum .nc-chapter-header { padding:18px 10px; gap:8px; } }
+@media(prefers-reduced-motion:reduce) { .nc-curriculum *, .nc-curriculum *::before { transition:none !important; } }

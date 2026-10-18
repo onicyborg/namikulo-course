@@ -1,0 +1,11 @@
+.nd-app .nc-user-filters { display:grid; grid-template-columns:140px minmax(180px,1fr) minmax(130px,170px) minmax(130px,170px) 44px; align-items:end; gap:16px; margin-bottom:24px; }
+.nd-app .nc-user-filters label { display:block; margin-bottom:8px; color:var(--nd-muted); font-size:12px; font-weight:600; }
+.nd-app .nc-user-filters .form-control { height:44px; margin:0; border-radius:8px; background:var(--nd-surface); }
+.nd-app .nc-users .nc-data-table-action--danger:hover { color:var(--nd-bad-text); background:var(--nd-bad-bg); }
+.nd-app .nc-users .nc-data-table-action--success:hover { color:var(--nd-good-text); background:var(--nd-good-bg); }
+.nd-app .nc-user-table-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:18px; color:var(--nd-muted); font-size:12px; }
+.nd-app .nc-user-table-footer .dataTables_info, .nd-app .nc-user-table-footer .dataTables_paginate { float:none; padding-top:0; }
+.nd-app .nc-user-table-footer .dataTables_paginate .paginate_button { border:1px solid var(--nd-border) !important; border-radius:7px; background:var(--nd-surface) !important; color:var(--nd-text) !important; box-shadow:none !important; }
+.nd-app .nc-user-table-footer .dataTables_paginate .paginate_button.current { border-color:var(--nd-primary) !important; background:var(--nd-primary) !important; color:#fff !important; }
+@media(max-width:1100px) { .nd-app .nc-user-filters { grid-template-columns:140px minmax(130px,1fr) minmax(130px,1fr) 44px; } .nd-app .nc-user-filters > :nth-child(2) { grid-column:1 / -1; grid-row:1; } }
+@media(max-width:767px) { .nd-app .nc-user-filters { grid-template-columns:1fr 1fr; gap:12px; } .nd-app .nc-user-filters > :nth-child(5) { justify-self:start; } .nd-app .nc-user-table-footer { align-items:flex-start; flex-direction:column; } }

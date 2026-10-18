@@ -1,4 +1,4 @@
-@extends('layouts.public')
+@extends('layouts.member')
 @section('title', 'Checkout '.$course->title)
 @push('styles')<link rel="stylesheet" href="{{ url('css/checkout.css') }}">@endpush
 @section('content')

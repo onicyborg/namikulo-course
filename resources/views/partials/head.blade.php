@@ -2,4 +2,5 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{{ $__env->yieldContent('title', config('app.name')) }} | {{ config('app.name') }}</title>
-<link rel="shortcut icon" href="{{ asset('img/favicon.ico') }}">
+<link rel="icon" type="image/x-icon" href="{{ url('favicon.ico') }}?v=1">
+<link rel="icon" type="image/svg+xml" sizes="any" href="{{ url('favicon.svg') }}?v=1">

@@ -16,7 +16,7 @@
                         <input type="hidden" name="parent_id" value="{{ $thread->id }}">
                         <input type="hidden" name="reply_to_id" value="{{ $thread->id }}">
                         <div class="form-group"><label for="reply-{{ $thread->id }}">Balasan Anda</label>
-                            <textarea id="reply-{{ $thread->id }}" name="body" rows="3" minlength="10" maxlength="2000" required class="form-control @if(old('parent_id') === $thread->id && $errors->has('body')) is-invalid @endif">{{ old('parent_id') === $thread->id ? old('body') : '' }}</textarea>
+                            <x-discussion-editor :id="'reply-'.$thread->id" :value="old('parent_id') === $thread->id ? old('body', '') : ''" :invalid="old('parent_id') === $thread->id && $errors->has('body')" />
                             @if(old('parent_id') === $thread->id && $errors->has('body'))<div class="invalid-feedback">{{ $errors->first('body') }}</div>@endif
                             @if(old('parent_id') === $thread->id && ($errors->has('parent_id') || $errors->has('reply_to_id')))<div class="text-danger">{{ $errors->first('parent_id') ?: $errors->first('reply_to_id') }}</div>@endif
                         </div>
@@ -35,7 +35,7 @@
         <h3>Ajukan pertanyaan</h3>
         <div class="form-group">
             <label for="question-body">Pertanyaan Anda</label>
-            <textarea id="question-body" name="body" rows="4" minlength="10" maxlength="2000" required class="form-control @if($errors->has('body') && !old('parent_id')) is-invalid @endif" aria-describedby="question-help @if($errors->has('body') && !old('parent_id')) question-error @endif">{{ old('parent_id') ? '' : old('body') }}</textarea>
+            <x-discussion-editor id="question-body" :value="old('parent_id') ? '' : old('body', '')" :invalid="$errors->has('body') && !old('parent_id')" help="question-help" />
             <small id="question-help" class="form-text">10–2.000 karakter. Tulis pertanyaan tentang materi ini.</small>
             @if($errors->has('body') && !old('parent_id'))<div id="question-error" class="invalid-feedback">{{ $errors->first('body') }}</div>@endif
         </div>

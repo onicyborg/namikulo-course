@@ -27,11 +27,14 @@ class ResetPasswordNotification extends Notification
         ]);
 
         return (new MailMessage)
-            ->subject('Atur Ulang Kata Sandi')
-            ->greeting('Halo, '.$notifiable->name.'.')
-            ->line('Kami menerima permintaan untuk mengatur ulang kata sandi akun Anda.')
-            ->action('Atur Ulang Kata Sandi', $resetUrl)
-            ->line('Tautan ini berlaku selama '.config('auth.passwords.users.expire').' menit.')
-            ->line('Abaikan email ini jika Anda tidak meminta perubahan kata sandi.');
+            ->subject('Atur ulang password akun Namikulo Course')
+            ->view([
+                'html' => 'emails.password-reset',
+                'text' => 'emails.password-reset-text',
+            ], [
+                'recipient' => $notifiable,
+                'resetUrl' => $resetUrl,
+                'expiresMinutes' => (int) config('auth.passwords.users.expire'),
+            ]);
     }
 }

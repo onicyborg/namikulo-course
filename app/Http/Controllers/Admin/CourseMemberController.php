@@ -23,7 +23,7 @@ class CourseMemberController extends Controller
     {
         Gate::authorize('view', $course);
         Gate::authorize('viewAny', Enrollment::class);
-        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'status' => ['nullable', Rule::enum(EnrollmentStatus::class)]]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'status' => ['nullable', Rule::enum(EnrollmentStatus::class)], 'per_page' => ['nullable', 'integer', Rule::in([10, 25, 50, 100])]]);
         $query = $course->enrollments()->with(['user', 'grantedBy', 'revokedBy'])->orderByDesc('created_at');
         if ($filters['q'] ?? null) {
             $term = '%'.mb_strtolower($filters['q']).'%';
@@ -32,7 +32,7 @@ class CourseMemberController extends Controller
         if ($filters['status'] ?? null) $query->where('status', $filters['status']);
         $serverSide = $course->enrollments()->count() > 2000;
         return view('admin.courses.members', [
-            'course' => $course, 'enrollments' => $serverSide ? $query->paginate(25)->withQueryString() : $query->get(),
+            'course' => $course, 'enrollments' => $serverSide ? $query->paginate((int) ($filters['per_page'] ?? 10))->withQueryString() : $query->get(),
             'serverSide' => $serverSide, 'filters' => $filters,
             'availableMembers' => User::query()->where('role', UserRole::Member->value)->where('is_active', true)
                 ->orderBy('name')->limit(50)->get(['id', 'name', 'email', 'timezone']),

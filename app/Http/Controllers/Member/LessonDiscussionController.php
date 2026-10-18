@@ -46,11 +46,12 @@ class LessonDiscussionController extends Controller
     public function store(Request $request, Lesson $lesson, LessonDiscussionService $discussion): RedirectResponse
     {
         $data = $request->validate([
-            'body' => ['required', 'string', 'min:10', 'max:2000'],
+            'body' => ['required', 'string', 'max:20000'],
+            'body_format' => ['nullable', 'in:plain,html'],
             'parent_id' => ['nullable', 'uuid'],
             'reply_to_id' => ['nullable', 'uuid'],
         ]);
-        $post = $discussion->create($request->user(), $lesson, $data['body'], $data['parent_id'] ?? null, $data['reply_to_id'] ?? null);
+        $post = $discussion->create($request->user(), $lesson, $data['body'], $data['parent_id'] ?? null, $data['reply_to_id'] ?? null, $data['body_format'] ?? 'plain');
         $target = $post->parent_id
             ? route('learn.discussion.thread', [$lesson, $post->parent_id]).'?focus='.$post->id.'#discussion-post-'.$post->id
             : route('learn.show', $lesson).'#discussion-post-'.$post->id;

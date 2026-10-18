@@ -1,0 +1,1 @@
+<span class="badge badge-{{ $order->status === \App\Enums\OrderStatus::Paid ? 'success' : ($order->status === \App\Enums\OrderStatus::Pending ? 'warning' : 'secondary') }}">{{ ['pending' => 'Menunggu', 'paid' => 'Lunas', 'expired' => 'Kedaluwarsa', 'cancelled' => 'Dibatalkan', 'failed' => 'Gagal', 'refunded' => 'Perlu tinjauan'][$order->status->value] }}</span>

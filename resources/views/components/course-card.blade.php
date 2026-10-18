@@ -12,8 +12,10 @@
             <span class="site-category">{{ $course->category?->name ?? 'Course' }}</span>
             @if($isActive)<span class="site-enrolled-label">Sedang diikuti</span>@endif
             <h3>{{ $course->title }}</h3>
+            @if($course->instructor_name)<p class="np-card-instructor">{{ $course->instructor_name }}</p>@endif
             <p class="site-course-meta">{{ $course->sections_count }} bab <span aria-hidden="true">·</span> {{ $course->lessons_count }} video <span aria-hidden="true">·</span> {{ $course->lessons_duration_seconds ? floor($course->lessons_duration_seconds / 60).' menit' : 'Durasi belum tersedia' }}</p>
             <div class="site-course-bottom"><div class="site-price">@if($course->discount_price !== null)<del>Rp {{ number_format($course->price, 0, ',', '.') }}</del>@endif<strong>{{ ($course->discount_price ?? $course->price) === 0 ? 'Gratis' : 'Rp '.number_format($course->discount_price ?? $course->price, 0, ',', '.') }}</strong></div><span>Akses {{ $course->access_months }} bulan</span></div>
+            <span class="np-card-action">Lihat course<x-dashboard.icon name="arrow-up-right" /></span>
         </div>
     </a>
 </article>

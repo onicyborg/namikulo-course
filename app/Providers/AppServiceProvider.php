@@ -17,6 +17,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -35,6 +36,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        View::composer('admin.dashboard.topbar', function ($view): void {
+            $user = auth()->user();
+            $view->with('unreadNotifications', $user->userNotifications()->whereNull('read_at')->count())
+                ->with('recentNotifications', $user->userNotifications()
+                    ->latest('created_at')->limit(5)->get());
+        });
         foreach ([Category::class, Course::class, Section::class, Lesson::class] as $model) {
             Gate::policy($model, ContentPolicy::class);
         }

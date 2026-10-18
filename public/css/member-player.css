@@ -1,0 +1,82 @@
+.nm-player { background: var(--nd-bg); color: var(--nd-text); }
+.nm-player :focus-visible { outline-color: var(--nd-link) !important; }
+.nm-player .learn-header, .nm-player .discussion-page-header { min-height: 76px; padding: 14px 28px; gap: 18px; border-color: var(--nd-border); background: var(--nd-surface); }
+.nm-player .learn-header .nm-back, .nm-player .discussion-page-header .nm-back { color: var(--nd-muted); }
+.nm-player .nm-back .nd-icon { transform: rotate(180deg); }
+.nm-player .learn-header .nm-learn-context { flex: 1; min-width: 0; gap: 5px; }
+.nm-player .learn-header small { color: var(--nd-muted); font-size: 12px; }
+.nm-player .learn-header strong { color: var(--nd-text); font-size: 14px; }
+.nm-player .learn-header .nm-learn-actions { display: flex; flex: 0 0 auto; gap: 8px; }
+.nm-player .learn-preview { margin: 0; background: var(--nd-active); color: var(--nd-link); border-radius: 999px; }
+.nm-player .learn-layout { grid-template-columns: minmax(0, 1fr) 330px; max-width: 1760px; margin: auto; padding: 28px; gap: 28px; align-items: start; }
+.nm-player .learn-stage { border: 1px solid var(--nd-border); border-bottom: 0; border-radius: 12px 12px 0 0; }
+.nm-player .learn-stage:fullscreen { border: 0; border-radius: 0; }
+.nm-player .learn-controls { padding: 14px 16px; border: 1px solid var(--nd-border); border-radius: 0 0 12px 12px; background: var(--nd-surface); }
+.nm-player .learn-controls button, .nm-player .learn-controls select { min-height: 44px; border-color: var(--nd-border); border-radius: 8px; background: var(--nd-subtle); color: var(--nd-text); font-size: 12px; }
+.nm-player .learn-controls button:hover { border-color: var(--nd-link); }
+.nm-player .learn-controls [data-play] { background: var(--nd-primary); border-color: var(--nd-primary); color: #fff; }
+.nm-player .learn-controls input[type="range"] { accent-color: var(--nd-link); }
+.nm-player .learn-controls [data-time] { color: var(--nd-muted); }
+.nm-player .learn-body { max-width: none; padding: 28px 0; }
+.nm-player .learn-body h1 { margin: 0 0 14px; color: var(--nd-text); font-size: clamp(23px, 2.6vw, 30px); font-weight: 750; line-height: 1.35; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.nm-player .learn-body p { margin-bottom: 14px; color: var(--nd-muted); line-height: 1.7; }
+.nm-player .learn-protection-note { border-color: var(--nd-active-border); }
+.nm-player .learn-body .nc-rich-description { color: var(--nd-text); }
+.nm-player .learn-neighbors { flex-wrap: wrap; margin-top: 26px; gap: 12px; }
+.nm-player .learn-neighbors a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 14px; border: 1px solid var(--nd-border); border-radius: 8px; background: var(--nd-surface); color: var(--nd-link); font-size: 13px; font-weight: 650; }
+.nm-player .learn-neighbors a:hover { background: var(--nd-active); }
+.nm-player .learn-curriculum { min-height: 0; padding: 22px; border: 1px solid var(--nd-border); border-radius: 12px; background: var(--nd-surface); }
+.nm-player .learn-curriculum h2 { margin-bottom: 24px; color: var(--nd-text); font-size: 18px; font-weight: 700; }
+.nm-player .learn-section { margin: 0 0 22px; }
+.nm-player .learn-section:last-child { margin-bottom: 0; }
+.nm-player .learn-section h3 { margin-bottom: 12px; color: var(--nd-muted); font-size: 12px; line-height: 1.6; text-transform: none; letter-spacing: 0; overflow-wrap: anywhere; }
+.nm-player .learn-section ol { margin: 0; padding: 0; list-style: none; }
+.nm-player .learn-section li { margin: 4px 0; padding: 12px; border: 1px solid transparent; border-radius: 8px; color: var(--nd-muted); font-size: 13px; overflow-wrap: anywhere; }
+.nm-player .learn-section li:hover { background: var(--nd-subtle); }
+.nm-player .learn-section li.is-current { border-color: var(--nd-active-border); background: var(--nd-active); }
+.nm-player .learn-section a { display: block; color: var(--nd-text); }
+.nm-player .learn-section li.is-current a { color: var(--nd-link); }
+.nm-player .learn-lesson-state { color: var(--nd-muted); font-size: 11px; }
+.nm-player .learn-discussion { max-width: none; padding: 28px 0 0; border-color: var(--nd-border); }
+.nm-player .discussion-heading { flex-wrap: wrap; }
+.nm-player .discussion-heading h2 { color: var(--nd-text); font-size: 22px; font-weight: 700; }
+.nm-player .discussion-heading p, .nm-player .discussion-heading > span { color: var(--nd-muted); font-size: 13px; line-height: 1.6; }
+.nm-player .discussion-thread, .nm-player .discussion-form { border-color: var(--nd-border); border-radius: 12px; background: var(--nd-surface); }
+.nm-player .discussion-reply, .nm-player .discussion-thread-footer { border-color: var(--nd-border); }
+.nm-player .discussion-post-meta strong { color: var(--nd-text); font-size: 13px; }
+.nm-player .discussion-post-meta time, .nm-player .discussion-context { color: var(--nd-muted); font-size: 12px; }
+.nm-player .discussion-body { margin: 14px 0; color: var(--nd-text); font-size: 14px; line-height: 1.8; }
+.nm-player .discussion-context { margin: 10px 0; }
+.nm-player .discussion-admin-label { border-color: var(--nd-active-border); background: var(--nd-active); color: var(--nd-link); border-radius: 999px; }
+.nm-player .discussion-hidden-label { border-color: var(--nd-warn-text); background: var(--nd-warn-bg); color: var(--nd-warn-text); }
+.nm-player .discussion-post-actions a, .nm-player .discussion-text-button, .nm-player .discussion-thread-footer a, .nm-player .discussion-reply-composer summary { color: var(--nd-link); font-size: 13px; text-underline-offset: 3px; }
+.nm-player .discussion-post-actions a, .nm-player .discussion-text-button { display: inline-flex; align-items: center; min-height: 44px; }
+.nm-player .discussion-reply-composer summary { min-height: 44px; padding: 12px 0; }
+.nm-player .discussion-empty { border-color: var(--nd-border); background: var(--nd-surface); color: var(--nd-muted); line-height: 1.7; }
+.nm-player .discussion-form h2, .nm-player .discussion-form h3 { margin: 0 0 16px; color: var(--nd-text); font-size: 18px; }
+.nm-player .discussion-form label, .nm-player .discussion-reply-composer label { color: var(--nd-text); font-size: 13px; }
+.nm-player .discussion-form textarea, .nm-player .discussion-reply-composer textarea { border-color: var(--nd-border); background: var(--nd-bg); color: var(--nd-text); font-size: 14px; line-height: 1.6; }
+.nm-player .discussion-form textarea:focus, .nm-player .discussion-reply-composer textarea:focus { border-color: var(--nd-link); background: var(--nd-surface); color: var(--nd-text); }
+.nm-player .discussion-form small { color: var(--nd-muted); }
+.nm-player .btn { min-height: 44px; font-size: 13px; }
+.nm-player .discussion-page-header span { flex: 1; color: var(--nd-muted); font-size: 13px; }
+.nm-player .discussion-page-main { width: min(100%, 920px); padding: 36px 24px; }
+.nm-player .discussion-page-main > h1 { margin-bottom: 26px; color: var(--nd-text); font-size: 30px; font-weight: 750; letter-spacing: -.03em; }
+.nm-player .discussion-pagination .pagination { flex-wrap: wrap; }
+@media (max-width: 1199px) {
+    .nm-player .learn-layout { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 575px) {
+    .nm-player .learn-layout { padding: 16px; gap: 20px; }
+    .nm-player .learn-header, .nm-player .discussion-page-header { padding: 12px; gap: 10px; flex-wrap: wrap; }
+    .nm-player .learn-header .nm-learn-context { min-width: 100px; }
+    .nm-player .learn-preview { order: 4; }
+    .nm-player .learn-controls { padding: 12px; }
+    .nm-player .learn-controls [data-seek] { flex-basis: calc(100% - 90px); }
+    .nm-player .learn-controls [data-volume] { width: 60px; }
+    .nm-player .learn-body { padding: 24px 0; }
+    .nm-player .discussion-post { padding: 18px; }
+    .nm-player .discussion-post-meta time { flex-basis: 100%; margin-left: 0; }
+    .nm-player .discussion-form { padding: 18px; }
+    .nm-player .discussion-page-main { padding: 24px 16px; }
+}

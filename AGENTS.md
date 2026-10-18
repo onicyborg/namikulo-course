@@ -11,6 +11,12 @@ Pedoman ini wajib diikuti oleh setiap agent AI. Urutan sumber kebenaran:
 
 Jika dokumen saling bertentangan, urutan prioritasnya: **AGENTS.md > SRS.md > PRD.md > design.md**. Jika ada hal yang tidak tercakup atau ambigu, ambil asumsi paling konservatif, tulis asumsinya di laporan serah-terima, dan jangan memperluas scope.
 
+**Pembaruan desain admin (disetujui user, 18 Oktober 2026):** seluruh `/admin/*` memakai shell Blade dan CSS custom Slate/Teal di `layouts/admin.blade.php`, `public/css/admin-dashboard.css`, dan `public/css/admin-pages.css`. Ikon shell memakai Lucide SVG lokal; light/dark mode ada di navbar. Ketentuan shell Otika dan Feather pada pedoman ini berlaku bagi area member dan halaman lama lain, kecuali bagian admin yang telah diganti. Halaman admin selain dashboard tetap memuat Bootstrap 4 dan plugin yang dipakai form, modal, DataTables, dan Select2. Rich text memakai Lexical lokal. Jangan memuat `scripts.js` Otika dalam shell admin baru karena skrip itu mengasumsikan markup shell lama.
+
+**Pembaruan desain member (disetujui user, 18 Oktober 2026):** area `/my/*`, checkout, dan detail pembayaran menggunakan shell Slate/Teal yang sama melalui `layouts/member.blade.php`. Token, komponen dasar, navbar, tema, dan tooltip menggunakan implementasi admin yang sudah ada; CSS khusus member berada di `member-area.css`. Layout belajar/diskusi tetap tanpa sidebar aplikasi dan menggunakan `member-player.css` untuk menyamakan tema. Ketentuan shell Otika/Feather lama tidak lagi berlaku bagi halaman tersebut. Bootstrap 4 tetap tersedia untuk form dan grid; tidak ada build atau Node.js saat runtime cPanel. Invoice PDF tetap memakai layout cetak tersendiri.
+
+**Penyempurnaan login dan belajar (18 Oktober 2026):** login memakai layout Blade `layouts/login` dan `login.css` dengan token Slate/Teal bersama. Halaman belajar memakai partial player, ringkasan, dan kurikulum serta CSS terisolasi `learning-room.css`. Register/lupa/reset password tetap menggunakan layout auth yang ada. Pertahankan hook playback, progres, watermark, validasi, serta proteksi akses saat menyunting UI.
+
 ---
 
 ## 0. Aturan kerja agent (prioritas tertinggi)
@@ -84,7 +90,7 @@ Akhiri setiap sesi kerja dengan laporan ringkas berisi:
 - MVP cPanel tanpa queue worker server: `QUEUE_CONNECTION=sync`; service dipanggil langsung, bukan mengantrekan pekerjaan. Cache/session memakai `database`. Web Worker ffmpeg.wasm berjalan di browser admin dan diizinkan.
 - Penjadwalan aplikasi memakai **cron-job.org** melalui endpoint HTTPS berautentikasi token. Dilarang memakai Laravel Scheduler (`Schedule`, `schedule:run`, `schedule:work`) atau crontab aplikasi. Endpoint menjalankan task allow-list dalam batch singkat dengan lock dan checkpoint; tanpa dispatch queue atau worker server. Lihat SRS bagian 5.10.
 - Payment gateway: Midtrans Core API dengan UI pembayaran custom (bukan Snap bawaan Midtrans).
-- Jangan memakai starter kit (Breeze, Jetstream, Fortify UI, Livewire, Inertia) dan jangan memakai Vite atau bundler frontend.
+- Jangan memakai starter kit (Breeze, Jetstream, Fortify UI, Livewire, Inertia) atau bundler frontend saat runtime/deployment. Pengecualian: build Lexical satu kali di lingkungan pengembangan untuk menghasilkan asset statis yang disimpan di `public/vendor/lexical/`.
 - Jangan mengasumsikan Metronic atau Bootstrap 5. Periksa implementasi aktual sebelum mengubah layout global.
 
 ---
@@ -144,11 +150,12 @@ Migration hanya boleh memakai Schema Builder yang portabel. Wajib:
 ## 4. Frontend: Blade murni
 
 - Hanya **Blade templating** (termasuk Blade component/anonymous component, `@include`, `@extends`, `@push`).
-- **Dilarang**: Vue, React, Angular, Svelte, Alpine.js, Livewire, Inertia, htmx, Turbo, dan framework/SPA sejenis. Dilarang pula Vite, Webpack, atau build step frontend.
+- **Dilarang**: Vue, React, Angular, Svelte, Alpine.js, Livewire, Inertia, htmx, Turbo, dan framework/SPA sejenis. Vite/Webpack serta build frontend umum tetap dilarang; pengecualian terbatas untuk bundel Lexical statis yang dibuat dengan npm/esbuild di luar cPanel. Kode sumber dan `node_modules` build sementara tidak dikirim ke deployment.
 - JavaScript yang diizinkan: JavaScript vanilla dan jQuery yang sudah ada di bundle Otika, plus plugin Otika yang tersedia.
 - Library tambahan hanya jika kebutuhannya nyata dan tercantum di daftar izin berikut:
   - `hls.js` — pemutar HLS pada halaman player (Phase 4).
   - `ffmpeg.wasm` beserta wrapper/core/Web Worker — pemrosesan video di browser admin (Phase 4), disetujui user. Asset distribusi siap pakai dipin versinya dan di-host lokal; tanpa framework/bundler frontend tambahan. Mulai dengan single-thread dan satu kualitas; dukungan HLS AES-128 serta batas perangkat wajib melalui UAT user.
+  - Lexical Vanilla JS untuk semua input rich text course, bab, materi, dan diskusi. Gunakan bundel statis lokal `public/vendor/lexical/namikulo-editor.js`; textarea asli tetap menjadi fallback tanpa JavaScript. Jangan memakai paket React Lexical. HTML disanitasi server sebelum disimpan dan saat ditampilkan.
   - Midtrans JS tokenisasi kartu — hanya jika pembayaran kartu diaktifkan (di luar MVP).
 - Library lain (SweetAlert, Toastr, chart baru, dll.) dilarang tanpa persetujuan user.
 - Chrome DevTools MCP hanya perkakas pengujian agent di luar aplikasi; jangan memuat paketnya ke frontend atau menambahkannya ke dependency runtime proyek.
@@ -205,6 +212,7 @@ Ada dua jenis asset dengan helper berbeda. Jangan tertukar.
 - `public/css/site.css` — gaya Public, Auth custom, Player.
 - `public/js/app-custom.js` — helper umum (CSRF, error 422, modal hapus).
 - `public/js/pages/*.js` — skrip khusus halaman.
+- `public/vendor/lexical/namikulo-editor.js` dan `public/css/lexical-editor.css` — editor rich text statis untuk admin dan diskusi; muat hanya pada halaman yang memakainya.
 - `public/fonts`, `public/img` milik aplikasi.
 - Upload (thumbnail course, avatar) memakai `url('storage/...')` setelah `storage:link`.
 - **Video dan materi privat tidak boleh berada di `public/` atau `storage/app/public`.** Lihat bagian 11.
@@ -222,7 +230,7 @@ Urutan JS: vendor/global (`app.min.js`) → plugin halaman → konfigurasi page 
 - Jangan membuat `create.blade.php`/`edit.blade.php` untuk master yang memakai modal.
 - Selalu `@csrf`; edit memakai `@method('PUT'|'PATCH')`.
 - Tombol delete menyimpan `data-id` dan `data-name`; form delete memakai `@method('DELETE')`.
-- Plugin Otika yang tersedia: select2, selectric, datepicker, datetimepicker, daterange, timepicker, summernote, dropzone, image-preview. Pastikan plugin berfungsi di dalam modal.
+- Plugin Otika yang tersedia: select2, selectric, datepicker, datetimepicker, daterange, timepicker, dropzone, image-preview. Rich text memakai Lexical lokal yang diinisialisasi saat modal atau panel balasan dibuka.
 - Komponen berulang dijadikan Blade component di `resources/views/components` (mis. `x-page-header`, `x-empty-state`, `x-course-card`, `x-confirm-delete-modal`).
 - Teks UI berbahasa Indonesia, formal-ramah, singkat, tanpa teks pengisi.
 

@@ -37,7 +37,7 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         Gate::authorize('viewAny', User::class);
-        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'role' => ['nullable', Rule::enum(UserRole::class)], 'status' => ['nullable', Rule::in(['active', 'inactive'])]]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'role' => ['nullable', Rule::enum(UserRole::class)], 'status' => ['nullable', Rule::in(['active', 'inactive'])], 'per_page' => ['nullable', 'integer', 'in:10,25,50,100']]);
         $query = User::query()->withCount('enrollments')->orderBy('name');
         if ($filters['q'] ?? null) {
             $like = '%'.str_replace(['%', '_'], ['\\%', '\\_'], Str::lower($filters['q'])).'%';
@@ -46,7 +46,7 @@ class UserController extends Controller
         if ($filters['role'] ?? null) $query->where('role', $filters['role']);
         if ($filters['status'] ?? null) $query->where('is_active', $filters['status'] === 'active');
         $serverSide = User::query()->count() > 2000;
-        return view('admin.users.index', ['users' => $serverSide ? $query->paginate(25)->withQueryString() : $query->get(), 'serverSide' => $serverSide, 'filters' => $filters]);
+        return view('admin.users.index', ['users' => $serverSide ? $query->paginate((int) ($filters['per_page'] ?? 10))->withQueryString() : $query->get(), 'serverSide' => $serverSide, 'filters' => $filters]);
     }
 
     public function store(Request $request, ActivityLogger $logger): RedirectResponse

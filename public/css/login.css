@@ -1,0 +1,63 @@
+.nl-page { min-height: 100vh; display: flex; flex-direction: column; }
+.nl-page .nl-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: min(100%, 1440px); margin: 0 auto; padding: 28px clamp(24px, 4vw, 64px); }
+.nl-page .nl-header-actions { display: flex; align-items: center; gap: 24px; }
+.nl-page .nl-header-actions > a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--nd-muted); font-size: 13px; font-weight: 600; }
+.nl-page .nl-header-actions > a:hover { color: var(--nd-link); }
+.nl-page .nl-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); width: min(100% - 80px, 1280px); margin: auto; border: 1px solid var(--nd-border); border-radius: 20px; overflow: hidden; background: var(--nd-surface); box-shadow: var(--nd-shadow); }
+.nl-page .nl-story { display: flex; flex-direction: column; justify-content: space-between; gap: 40px; min-width: 0; padding: clamp(32px, 4vw, 56px); background: #103e3c; color: #f0fdfa; }
+.nl-page .nl-eyebrow { display: block; margin-bottom: 18px; font-size: 11px; font-weight: 700; letter-spacing: .13em; }
+.nl-page .nl-story .nl-eyebrow { color: #99f6e4; }
+.nl-page .nl-story h2 { margin: 0 0 22px; font-size: clamp(30px, 3.5vw, 46px); font-weight: 750; line-height: 1.18; letter-spacing: -.04em; }
+.nl-page .nl-story h2 span { color: #99f6e4; }
+.nl-page .nl-story-copy > p { max-width: 38ch; color: #c5dfdc; font-size: 15px; line-height: 1.8; }
+.nl-page .nl-learning-notes { display: grid; gap: 24px; margin: 0; }
+.nl-page .nl-learning-notes dt { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 14px; font-weight: 650; }
+.nl-page .nl-learning-notes dt .nd-icon { color: #99f6e4; }
+.nl-page .nl-learning-notes dd { max-width: 42ch; margin: 0; padding-left: 32px; color: #c5dfdc; font-size: 13px; line-height: 1.7; }
+.nl-page .nl-story-footer { display: flex; gap: 12px; align-items: center; padding-top: 24px; border-top: 1px solid #376360; color: #c5dfdc; font-size: 12px; line-height: 1.6; }
+.nl-page .nl-form-panel { display: flex; align-items: center; min-width: 0; padding: clamp(28px, 4.5vw, 64px); }
+.nl-page .nl-form-content { width: 100%; max-width: 410px; margin: auto; }
+.nl-page .nl-form-heading { margin-bottom: 32px; }
+.nl-page .nl-form-heading .nl-eyebrow { color: var(--nd-link); margin-bottom: 12px; }
+.nl-page .nl-form-heading h1 { margin: 0 0 12px; font-size: clamp(26px, 2.4vw, 32px); font-weight: 750; line-height: 1.25; letter-spacing: -.035em; }
+.nl-page .nl-form-heading > p:last-child { color: var(--nd-muted); font-size: 14px; line-height: 1.7; }
+.nl-page .form-group { margin-bottom: 22px; }
+.nl-page .form-group label { margin-bottom: 8px; color: var(--nd-text); font-size: 13px; font-weight: 650; }
+.nl-page .form-control { min-height: 50px; padding: 12px 14px; border-radius: 9px; font-size: 16px; }
+.nl-page .nl-password-label { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; }
+.nl-page .nl-password-label a { padding: 4px 0 8px; color: var(--nd-link); font-size: 12px; font-weight: 600; }
+.nl-page .password-field { position: relative; }
+.nl-page .password-field .form-control { padding-right: 110px; background-image: none; }
+.nl-page .password-toggle { position: absolute; top: 3px; right: 3px; width: 100px; min-height: 44px; padding: 8px; border: 0; border-radius: 7px; background: transparent; color: var(--nd-link); font-size: 12px; font-weight: 600; }
+.nl-page .password-toggle:hover { background: var(--nd-subtle); }
+.nl-page .nl-remember { display: flex; align-items: center; gap: 10px; margin: 0 0 24px; min-height: 44px; }
+.nl-page .nl-remember input { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--nd-primary); }
+.nl-page .nl-remember label { margin: 0; padding: 10px 0; color: var(--nd-muted); font-size: 13px; cursor: pointer; }
+.nl-page .nl-submit { justify-content: space-between; min-height: 50px; padding: 12px 18px; font-size: 14px; }
+.nl-page .nl-submit:disabled { cursor: wait; }
+.nl-page .nl-account-switch { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--nd-border); color: var(--nd-muted); font-size: 13px; line-height: 1.8; }
+.nl-page .nl-account-switch a { color: var(--nd-link); font-weight: 650; }
+.nl-page .nl-account-switch a:hover, .nl-page .nl-password-label a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.nl-page .form-text { color: var(--nd-muted); font-size: 12px; }
+.nl-page .nl-form-content .invalid-feedback { font-size: 12px; }
+.nl-page .alert { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.nl-page .nl-footer { display: flex; justify-content: space-between; gap: 16px; width: min(100%, 1440px); margin: 0 auto; padding: 28px clamp(24px, 4vw, 64px); color: var(--nd-muted); font-size: 12px; }
+.nl-page .nl-footer a:hover { color: var(--nd-link); }
+@media (max-width: 900px) {
+    .nl-page .nl-layout { width: min(100% - 40px, 560px); grid-template-columns: minmax(0, 1fr); }
+    .nl-page .nl-story { order: 2; padding: 28px 32px; gap: 0; }
+    .nl-page .nl-story h2 { font-size: 26px; margin-bottom: 12px; }
+    .nl-page .nl-story h2 br { display: none; }
+    .nl-page .nl-story-copy > p { max-width: none; font-size: 13px; }
+    .nl-page .nl-learning-notes, .nl-page .nl-story-footer { display: none; }
+    .nl-page .nl-form-panel { padding: 36px 32px; }
+}
+@media (max-width: 480px) {
+    .nl-page .nl-header { padding: 20px; }
+    .nl-page .nd-brand { font-size: 13px; }
+    .nl-page .nl-header-actions { gap: 0; }
+    .nl-page .nl-header-actions > a { display: none; }
+    .nl-page .nl-layout { width: calc(100% - 32px); border-radius: 14px; }
+    .nl-page .nl-form-panel, .nl-page .nl-story { padding: 28px 22px; }
+    .nl-page .nl-footer { flex-wrap: wrap; padding: 24px 20px; font-size: 11px; }
+}

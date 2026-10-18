@@ -44,7 +44,7 @@ Dilakukan user. Tambahkan pemeriksaan umum [roadmap](README.md#prosedur-tiap-pha
 |---|---|
 | 1. Tambah/edit kategori dan course, slug duplikat, diskon tidak valid | Modal mempertahankan input/error; server menolak data tidak sah. |
 | Buka modal tambah, ubah, dan hapus pada kategori, course, serta kurikulum | Modal berada di depan backdrop, isian dan tombol dapat diklik, fokus keyboard masuk ke dialog, dan backdrop hanya menggelapkan halaman belakang. |
-| Buka modal tambah/ubah course dan periksa toolbar deskripsi serta Console/Network browser | Ikon Summernote tampil; font WOFF/TTF dimuat dari origin aplikasi tanpa permintaan font Summernote lintas origin atau error CORS. |
+| Buka modal tambah/ubah course dan periksa toolbar deskripsi serta Console/Network browser | Lexical lokal tampil pada kedua modal tanpa permintaan asset Summernote lintas origin atau error CORS. |
 | 2. Upload thumbnail valid dan berkas salah format/lebih dari batas | Hanya gambar valid tersimpan acak; URL berasal host aplikasi. |
 | 3. Masukkan HTML/script berbahaya di deskripsi | Tag/atribut tidak diizinkan dibuang; konten aman saat dirender. |
 | 4. Tambah bab/video dan reorder; kirim ID dari course lain | Urutan tersimpan; scope salah ditolak tanpa perubahan parsial. |

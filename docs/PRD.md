@@ -181,7 +181,7 @@ Prioritas **M (Phase 8/9)** berlaku untuk perluasan ini setelah user mengaktifka
 | BR-11 | Harga disimpan dalam Rupiah bulat. Harga diskon, bila ada, harus lebih kecil dari harga normal. |
 | BR-12 | Perubahan akses (beri, perpanjang, cabut) dan perubahan status pesanan dicatat di log sistem. |
 | BR-13 | Membaca/menulis diskusi materi memerlukan login aktif dan akses course yang masih berlaku; admin dapat mengakses untuk moderasi/pratinjau. Akses yang berakhir tidak membuka kembali materi melalui tautan notifikasi. |
-| BR-14 | Pertanyaan dan balasan berupa teks biasa tanpa HTML, gambar, tautan otomatis, atau lampiran. Balasan dapat ditujukan ke komentar tertentu tetapi ditampilkan dalam satu tingkat di bawah pertanyaan agar percakapan mudah diikuti. |
+| BR-14 | Pertanyaan dan balasan memakai Lexical ringkas untuk teks berformat (tebal, miring, garis bawah, coret, daftar, kutipan, kode, dan tautan aman), tanpa unggahan gambar atau lampiran. Deskripsi course, bab, dan materi memakai toolbar Lexical yang lebih lengkap. HTML disanitasi di server; konten lama tetap dapat dibuka untuk diubah. Balasan tetap satu tingkat, dengan potongan komentar asal yang dapat diklik untuk menuju dan menyorot komentar tersebut. Kutipan komentar tersembunyi/dihapus tidak dibocorkan. Komentar lama tetap diperlakukan sebagai teks biasa. |
 | BR-15 | Notifikasi dibuat sekali untuk setiap peristiwa bisnis yang sah dan hanya untuk penerima terkait. Pembuatan ulang webhook/pemicu tidak menggandakan notifikasi. Notifikasi pembayaran tidak menentukan status bayar atau hak akses. |
 | BR-16 | Rekap email memakai tanggal **Asia/Jakarta**, sedangkan semua timestamp database tetap UTC. Batas rekap hari D adalah notifikasi belum dibaca yang dibuat sebelum 07.00 WIB hari D; notifikasi setelahnya masuk kesempatan hari berikutnya. Jika masih belum dibaca, item dapat muncul kembali pada rekap hari berikutnya. |
 | BR-17 | Rekap tidak dikirim untuk akun nonaktif. Kegagalan/ketidakpastian SMTP tidak menghapus notifikasi dan tidak memicu pengiriman otomatis berulang pada tanggal rekap yang sama. |
@@ -215,7 +215,7 @@ Agent memakai asumsi di kolom "Default" sampai user menyatakan lain.
 
 | ID | Pertanyaan | Default yang dipakai |
 |---|---|---|
-| Q1 | Nama aplikasi dan identitas visual (logo, warna)? | Nama dari `APP_NAME`; warna primer sama dengan tema Otika; logo placeholder. |
+| Q1 | Nama aplikasi dan identitas visual (logo, warna)? | Nama dari `APP_NAME`; area admin memakai identitas NAMIKULO COURSE dengan palet Slate/Teal dan ikon Lucide lokal. Area lain mengikuti desain masing-masing hingga redesign berikutnya. |
 | Q2 | Hosting cPanel mendukung HTTPS, PHP yang sesuai, OpenSSL, storage privat dan batas request yang memadai? | Tidak memerlukan FFmpeg/ffprobe, subprocess atau worker server. Video diproses di browser desktop admin; task cron-job.org dijalankan dalam batch singkat. Kecocokan hosting dan browser dikonfirmasi lewat UAT. |
 | Q3 | Apakah akun Midtrans sudah aktif dan kanal pembayaran apa saja yang diaktifkan? | Sandbox dulu; VA BCA/BNI/BRI/Permata/CIMB, QRIS, GoPay/ShopeePay ditampilkan sesuai konfigurasi. |
 | Q4 | Registrasi: perlu verifikasi email? | Tidak wajib di MVP. |
@@ -223,7 +223,7 @@ Agent memakai asumsi di kolom "Default" sampai user menyatakan lain.
 | Q6 | Apakah perlu video pratinjau gratis pada halaman detail? | Tidak di MVP. |
 | Q7 | Batas waktu bayar? | 24 jam. |
 | Q8 | Pengiriman email (SMTP) tersedia untuk reset password dan notifikasi? | Diasumsikan SMTP diisi lewat `.env`. |
-| Q9 | Perkiraan jumlah user, course, dan ukuran video? Menentukan ruang disk dan beban streaming. | Ratusan user, puluhan course. Batas awal usulan video sumber 200 MiB, durasi 15 menit, maksimum 720p, MP4 H.264/AAC; bukan jaminan kapasitas browser. Tetapkan ulang setelah UAT perangkat admin. Batas 2 GB sebelumnya dibatalkan. |
+| Q9 | Perkiraan jumlah user, course, dan ukuran video? Menentukan ruang disk dan beban streaming. | Ratusan user, puluhan course. Batas percobaan terbaru: sumber 500 MiB, durasi 30 menit, maksimum 1080p, MP4 H.264/AAC; hasil HLS hingga 750 MiB. Kapasitas tersebut perlu UAT pada perangkat admin dan cPanel, bukan jaminan. Batas 2 GB sebelumnya dibatalkan. |
 | Q10 | Materi selain video (PDF/slide)? | Di luar scope MVP. |
 | Q11 | Apakah email pembayaran yang sensitif waktu tetap dikirim segera di samping rekap 07.00 WIB? | **Diputuskan user: ya.** Email instruksi dan konfirmasi lunas tetap dikirim segera; rekap harian memuat status pembayaran bila notifikasinya belum dibaca. |
 
@@ -266,6 +266,6 @@ Phase 8–9 telah diaktifkan atas instruksi user dan menunggu UAT. Satu phase se
 
 Admin memakai halaman persiapan video di browser Windows/macOS/Linux yang kompatibel; tidak perlu memilih OS atau memasang alat lokal. Deteksi kemampuan WebAssembly/Web Worker dilakukan sebelum proses; deteksi OS hanya bantuan, bukan gate. Target awal Chrome/Edge desktop, Firefox/Safari hanya setelah UAT; pembatasan ini khusus persiapan video, bukan player member. HP/tablet belum menjadi target persiapan.
 
-Satu kualitas mengikuti sumber yang memenuhi profil (maksimum 720p), tanpa transcoding otomatis atau pilihan kualitas ganda. Input tidak sesuai ditolak dengan petunjuk ekspor ulang. Pengepakan HLS memakai stream copy untuk mengurangi beban perangkat. Browser tetap perlu terbuka; dukungan AES-128 build ffmpeg.wasm terpilih harus dibuktikan sebelum implementasi penuh Phase 4 diluluskan.
+Satu kualitas mengikuti sumber yang memenuhi profil (maksimum 1080p), tanpa transcoding otomatis atau pilihan kualitas ganda. Input tidak sesuai ditolak dengan petunjuk ekspor ulang. Pengepakan HLS memakai stream copy untuk mengurangi beban perangkat. Browser tetap perlu terbuka; dukungan AES-128 build ffmpeg.wasm terpilih harus dibuktikan sebelum implementasi penuh Phase 4 diluluskan.
 
 Seluruh MVP tidak membutuhkan worker server: email sinkron dengan timeout, pekerjaan berkala melalui cron-job.org dalam batch. Migrasi ke VPS/encoding server dan queue adalah peningkatan setelah MVP, bukan implementasi dua sistem sekaligus.

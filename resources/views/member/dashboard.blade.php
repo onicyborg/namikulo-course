@@ -7,7 +7,7 @@
 @endpush
 
 @section('content')
-<x-page-header title="Dashboard member" />
+<x-page-header title="Dashboard" />
 
 <div class="section-body member-dashboard">
     <x-flash-message />
@@ -44,7 +44,7 @@
                         @if($course->thumbnail_path)
                             <img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="320" height="180" loading="lazy">
                         @else
-                            <div class="member-course-image-placeholder" aria-hidden="true"><i data-feather="book-open"></i></div>
+                            <div class="member-course-image-placeholder" aria-hidden="true"><x-dashboard.icon name="book-open" /></div>
                         @endif
                     </div>
                     <div class="member-course-content">

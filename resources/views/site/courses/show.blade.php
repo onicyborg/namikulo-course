@@ -20,7 +20,7 @@
             @if($course->instructor_name)<p class="site-instructor">Pengajar: <strong>{{ $course->instructor_name }}</strong></p>@endif
             <div class="site-detail-image">@if($course->thumbnail_path)<img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="960" height="540">@else<div class="site-course-placeholder" aria-hidden="true"><span>N</span></div>@endif</div>
 
-            <section class="site-detail-section" aria-labelledby="description-title"><h2 id="description-title">Tentang course ini</h2>@if($safeDescription)<div class="site-rich-text">{!! $safeDescription !!}</div>@else<p>Deskripsi lengkap belum tersedia. Lihat ringkasan dan daftar materi di bawah.</p>@endif</section>
+            <section class="site-detail-section" aria-labelledby="description-title"><h2 id="description-title">Tentang course ini</h2>@if($safeDescription)<x-rich-description :html="$safeDescription" />@else<p>Deskripsi lengkap belum tersedia. Lihat ringkasan dan daftar materi di bawah.</p>@endif</section>
 
             <section class="site-detail-section" aria-labelledby="curriculum-title"><div class="site-section-heading"><div><h2 id="curriculum-title">Kurikulum</h2><p>Judul materi dapat dilihat sebelum membeli. Video siap dapat diputar saat akses course aktif.</p></div></div>
                 @forelse($course->sections as $section)

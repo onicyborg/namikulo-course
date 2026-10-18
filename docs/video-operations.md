@@ -11,11 +11,14 @@ Implementasi Phase 4 menunggu UAT langsung oleh user. Server cPanel tidak menjal
 
 ```dotenv
 VIDEO_DISK=video_private
-VIDEO_SOURCE_MAX_SIZE_MB=200
-VIDEO_SOURCE_MAX_DURATION_SECONDS=900
-VIDEO_UPLOAD_MAX_SIZE_MB=250
-VIDEO_SEGMENT_MAX_SIZE_MB=10
+VIDEO_SOURCE_MAX_SIZE_MB=500
+VIDEO_SOURCE_MAX_DURATION_SECONDS=1800
+VIDEO_UPLOAD_MAX_SIZE_MB=750
+VIDEO_SEGMENT_MAX_SIZE_MB=25
 VIDEO_MAX_SEGMENTS=2000
+VIDEO_MAX_WIDTH=1920
+VIDEO_MAX_HEIGHT=1080
+VIDEO_PROCESS_TIMEOUT_MINUTES=60
 VIDEO_SESSION_TTL_MINUTES=10
 VIDEO_HEARTBEAT_SECONDS=60
 VIDEO_ACCEL_REDIRECT=false
@@ -23,7 +26,7 @@ OPERATIONS_PLAYBACK_RETENTION_DAYS=30
 OPERATIONS_UPLOAD_STALE_HOURS=24
 ```
 
-`VIDEO_ACCEL_REDIRECT` harus tetap `false`: stream saat ini dialirkan oleh PHP. Batas 200 MiB/15 menit/720p adalah target UAT awal, bukan jaminan cPanel atau semua perangkat. Tidak ada variabel path FFmpeg server. Dua migration Phase 4 menambah tabel baru dan tidak mengubah timestamp/data lama.
+`VIDEO_ACCEL_REDIRECT` harus tetap `false`: stream saat ini dialirkan oleh PHP. Batas 500 MiB/30 menit/1080p adalah target percobaan setelah UAT awal, bukan jaminan cPanel atau semua perangkat. Chunk request tetap 5 MiB; segmen hingga 25 MiB divalidasi di PHP dan membutuhkan memory_limit yang memadai (anjuran awal >=256 MiB) serta ruang disk sementara untuk chunk dan hasil akhir. Tidak ada variabel path FFmpeg server. Dua migration Phase 4 menambah tabel baru dan tidak mengubah timestamp/data lama.
 
 ## Perintah untuk user
 
@@ -47,7 +50,7 @@ Pemicu `expire-enrollments` dari Phase 2 tetap berjalan tiap jam. Respons `parti
 
 ## Alur admin dan pemulihan
 
-Di kurikulum, pilih **Siapkan video** pada materi. Gunakan MP4 dengan satu video H.264 8-bit `yuv420p`, audio AAC bila ada, maksimum 1280×720 atau 720×1280, 15 menit, dan 200 MiB. Keyframe pendek sekitar 6 detik membantu menjaga segmen di bawah 10 MiB. Browser desktop perlu HTTPS, WebAssembly, Web Worker, Web Crypto, memori dan waktu CPU yang cukup. Biarkan tab terbuka. Browser menilai codec dan durasi melalui metadata lokal; server memeriksa struktur playlist, hash, ukuran, dekripsi AES, dan paket MPEG-TS, tetapi tidak memiliki decoder untuk membuktikan codec secara mandiri.
+Di kurikulum, pilih **Siapkan video** pada materi. Gunakan MP4 dengan satu video H.264 8-bit `yuv420p`, audio AAC bila ada, maksimum 1920×1080 atau 1080×1920, 30 menit, dan 500 MiB. Keyframe pendek sekitar 6 detik membantu menjaga segmen di bawah 25 MiB. Browser desktop perlu HTTPS, WebAssembly, Web Worker, Web Crypto, memori dan waktu CPU yang cukup. Biarkan tab terbuka. Browser menilai codec dan durasi melalui metadata lokal; server memeriksa struktur playlist, hash, ukuran, dekripsi AES, dan paket MPEG-TS, tetapi tidak memiliki decoder untuk membuktikan codec secara mandiri.
 
 Potongan diunggah maksimal 5 MiB/request, dengan retry idempoten. Jika tab ditutup atau di-refresh, hasil sementara di memori browser hilang; pilih ulang sumber dan proses ulang setelah sesi lama dibatalkan atau kedaluwarsa. Sesi impor berlaku 24 jam. Hasil lama tetap aktif sampai hasil baru seluruhnya siap. Jangan menghapus sumber lokal sebelum UAT playback dan backup selesai.
 

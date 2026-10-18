@@ -54,6 +54,51 @@
         });
     }
 
+    function initializeConfirmDialog() {
+        var dialog = document.querySelector('[data-confirm-dialog]');
+        if (!dialog) return;
+
+        var title = dialog.querySelector('[data-confirm-dialog-title]');
+        var message = dialog.querySelector('[data-confirm-dialog-message]');
+        var confirmButton = dialog.querySelector('[data-confirm-dialog-submit]');
+        var cancelButton = dialog.querySelector('[data-confirm-dialog-cancel]');
+        var approved = new WeakSet();
+        var pending = null;
+
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (!(form instanceof HTMLFormElement) || !form.hasAttribute('data-confirm') || approved.has(form) || event.defaultPrevented) return;
+
+            event.preventDefault();
+            if (typeof dialog.showModal !== 'function') return;
+
+            pending = { form: form, submitter: event.submitter };
+            title.textContent = form.dataset.confirmTitle || 'Konfirmasi tindakan';
+            message.textContent = form.dataset.confirm || '';
+            confirmButton.textContent = form.dataset.confirmLabel || 'Konfirmasi';
+            dialog.classList.toggle('is-warning', form.dataset.confirmTone === 'warning');
+            if (!dialog.open) dialog.showModal();
+            cancelButton.focus();
+        }, true);
+
+        cancelButton.addEventListener('click', function () { dialog.close(); });
+        dialog.addEventListener('close', function () { pending = null; });
+        confirmButton.addEventListener('click', function () {
+            if (!pending) return;
+            var form = pending.form;
+            var submitter = pending.submitter;
+            dialog.close();
+            if (!form.isConnected) return;
+            approved.add(form);
+            try {
+                if (submitter && submitter.form === form) form.requestSubmit(submitter);
+                else form.requestSubmit();
+            } finally {
+                approved.delete(form);
+            }
+        });
+    }
+
     function normalizeSidebarTabOrder() {
         var sidebar = document.querySelector('.main-sidebar');
         if (!sidebar) return;
@@ -131,6 +176,7 @@
         initializeLoadingForms();
         initializePasswordToggles();
         initializeDeleteModal();
+        initializeConfirmDialog();
         normalizeSidebarTabOrder();
         initializeTimezone();
 

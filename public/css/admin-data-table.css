@@ -1,0 +1,33 @@
+.nd-app .nc-data-table-note { margin:0 0 22px; color:var(--nd-muted); font-size:13px; line-height:1.6; }
+.nd-app .nc-data-table-filters { display:grid; grid-template-columns:140px minmax(180px,1fr) minmax(165px,220px) 44px; gap:16px; align-items:end; margin-bottom:22px; }
+.nd-app .nc-data-table-filters label { display:block; margin-bottom:8px; color:var(--nd-muted); font-size:12px; font-weight:600; }
+.nd-app .nc-data-table-filters .form-control { height:44px; margin:0; border-radius:8px; background:var(--nd-surface); }
+.nd-app .nc-data-table-filters .form-control:focus { border-color:var(--nd-link); box-shadow:0 0 0 3px var(--nd-active); }
+.nd-app .nc-data-table-reset, .nd-app .nc-data-table-action { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; padding:0; border:1px solid transparent; border-radius:8px; background:transparent; color:var(--nd-muted); cursor:pointer; text-decoration:none; transition:background .15s,color .15s; }
+.nd-app .nc-data-table-reset { width:44px; height:44px; }
+.nd-app .nc-data-table-action .nd-icon, .nd-app .nc-data-table-reset .nd-icon { width:18px; height:18px; }
+.nd-app .nc-data-table-action:hover, .nd-app .nc-data-table-reset:hover { color:var(--nd-link); background:var(--nd-active); text-decoration:none; }
+.nd-app .nc-data-table-action:focus-visible, .nd-app .nc-data-table-reset:focus-visible { outline:2px solid var(--nd-link); outline-offset:2px; }
+.nd-app .nc-data-table-actions { display:flex; align-items:center; gap:4px; }
+.nd-app .nc-data-table-actions form { margin:0; }
+body.nd-app.nd-legacy .nc-admin-table { border:0; border-collapse:collapse !important; }
+body.nd-app.nd-legacy .nc-admin-table thead th, body.nd-app.nd-legacy .nc-admin-table tbody td { padding:15px; border:0; border-bottom:1px solid var(--nd-border); vertical-align:middle; }
+body.nd-app.nd-legacy .nc-admin-table thead th { color:var(--nd-muted); background:var(--nd-subtle); font-size:12px; font-weight:600; }
+body.nd-app.nd-legacy .nc-admin-table tbody tr { background:transparent; transition:background .15s; }
+body.nd-app.nd-legacy .nc-admin-table tbody tr:hover { background:var(--nd-subtle); }
+.nd-app .nc-admin-table td:last-child { white-space:nowrap; }
+.nd-app .nc-admin-table .nc-table-summary { display:block; min-width:180px; max-width:420px; white-space:normal; overflow-wrap:anywhere; }
+.nd-app .nc-data-table-enhanced .nc-data-table-fallback-empty { display:none; }
+.nd-app .nc-data-table-feedback { margin:0 0 14px; color:var(--nd-bad-text); }
+.nd-app .nc-data-table-area .dataTables_info, .nd-app .nc-data-table-area .dataTables_paginate { padding-top:18px; }
+.nd-app .nc-data-table-pagination { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:18px; color:var(--nd-muted); font-size:12px; }
+.nd-app .nc-data-table-page-buttons, .nd-app .nc-data-table-page-numbers { display:flex; align-items:center; gap:6px; }
+.nd-app .nc-data-table-page-buttons a { display:inline-flex; align-items:center; justify-content:center; min-width:36px; min-height:36px; padding:7px 10px; border:1px solid var(--nd-border); border-radius:7px; background:var(--nd-surface); color:var(--nd-text); text-decoration:none; }
+.nd-app .nc-data-table-page-buttons a:hover:not([aria-disabled="true"]) { border-color:var(--nd-link); color:var(--nd-link); text-decoration:none; }
+.nd-app .nc-data-table-page-buttons a[aria-current="page"] { border-color:var(--nd-primary); background:var(--nd-primary); color:#fff; }
+.nd-app .nc-data-table-page-buttons a[aria-disabled="true"] { color:var(--nd-muted); opacity:.5; cursor:not-allowed; pointer-events:none; }
+.nd-app .nc-data-table-page-buttons a:focus-visible { outline:2px solid var(--nd-link); outline-offset:2px; }
+.nd-app .nc-data-table-page-numbers span { padding:0 3px; }
+@media(max-width:767px) { .nd-app .nc-data-table-filters { grid-template-columns:1fr 1fr; gap:12px; } .nd-app .nc-data-table-filters > :nth-child(2) { grid-column:1 / -1; grid-row:1; } .nd-app .nc-data-table-action { width:44px; height:44px; } }
+@media(max-width:767px) { .nd-app .nc-data-table-pagination { align-items:flex-start; flex-direction:column; } .nd-app .nc-data-table-page-buttons { max-width:100%; flex-wrap:wrap; } }
+@media(prefers-reduced-motion:reduce) { .nd-app .nc-data-table-action, .nd-app .nc-data-table-reset, body.nd-app.nd-legacy .nc-admin-table tbody tr { transition:none; } }

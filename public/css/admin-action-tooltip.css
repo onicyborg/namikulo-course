@@ -1,0 +1,2 @@
+.nd-app .nc-action-tooltip { position:fixed; z-index:1090; max-width:240px; padding:7px 10px; border:1px solid var(--nd-border); border-radius:7px; background:var(--nd-text); color:var(--nd-bg); font-size:12px; line-height:1.4; box-shadow:0 4px 12px rgb(0 0 0 / 15%); }
+.nd-app .nc-action-tooltip[hidden] { display:none; }

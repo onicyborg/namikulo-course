@@ -4,16 +4,15 @@
 @push('styles')<link rel="stylesheet" href="{{ url('css/member-learning.css') }}">@endpush
 
 @section('content')
-<x-page-header title="Detail course" />
+<x-page-header title="Kurikulum course" parent="Course saya" :parentUrl="route('member.courses.index')" />
 <div class="section-body member-learning">
     <x-flash-message />
-    <nav class="member-learning-back"><a href="{{ route('member.courses.index') }}">← Course Saya</a></nav>
     <div class="row">
         <div class="col-12 col-lg-8">
             <div class="card member-learning-detail">
                 <div class="card-body">
                     <div class="member-learning-overline">{{ $course->category?->name ?? 'Course' }} @if($course->status === \App\Enums\CourseStatus::Archived || $course->trashed()) · Diarsipkan @endif</div>
-                    <h1>{{ $course->title }}</h1>
+                    <h2 class="nm-course-title">{{ $course->title }}</h2>
                     @if($course->summary)<p>{{ $course->summary }}</p>@endif
                     <div class="member-learning-progress-meta"><strong>{{ $summaryData['percent'] }}% selesai</strong><span>{{ $summaryData['completed'] }} dari {{ $summaryData['total'] }} materi</span></div>
                     <div class="progress" aria-label="Progres belajar {{ $summaryData['percent'] }} persen"><div class="progress-bar" role="progressbar" style="width: {{ $summaryData['percent'] }}%" aria-valuenow="{{ $summaryData['percent'] }}" aria-valuemin="0" aria-valuemax="100"></div></div>
@@ -24,14 +23,16 @@
                 <div class="card-header"><h2 id="member-curriculum-title">Kurikulum</h2></div>
                 <div class="card-body">
                     @forelse($course->sections as $section)
-                        <div class="member-learning-section"><h3>{{ $section->title }}</h3>
-                            @if($section->description)<p>{{ $section->description }}</p>@endif
+                        <div class="member-learning-section"><span class="nm-chapter-label">Bab {{ $loop->iteration }}</span><h3>{{ $section->title }}</h3>
+                            @if($section->description)<x-rich-description :html="$section->description" />@endif
                             <ol>
                                 @forelse($section->lessons as $lesson)
                                     @php($saved = $lessonProgress->get($lesson->id))
                                     @php($ready = $lesson->videoAsset?->status === \App\Enums\VideoStatus::Ready)
-                                    <li><div><strong>{{ $lesson->title }}</strong><small>{{ $saved?->completed_at ? 'Selesai' : ($saved?->last_position_seconds ? 'Sedang dipelajari' : 'Belum dimulai') }} · {{ $ready ? 'Video siap' : 'Video belum siap' }}</small></div>
-                                        @if($active && ! $course->trashed() && $ready)<a href="{{ route('learn.show', $lesson) }}" aria-label="Putar {{ $lesson->title }}">Putar</a>@endif
+                                    <li><span class="nm-lesson-icon" aria-hidden="true"><x-dashboard.icon :name="$saved?->completed_at ? 'circle-check' : 'file-video'" /></span><div class="nm-lesson-copy"><strong>{{ $lesson->title }}</strong><small>{{ $saved?->completed_at ? 'Selesai' : ($saved?->last_position_seconds ? 'Sedang dipelajari' : 'Belum dimulai') }} · {{ $ready ? 'Video siap' : 'Video belum siap' }}</small>
+                                        @if($active && ! $course->trashed() && $lesson->description)<details class="nc-description-details"><summary>Deskripsi materi</summary><x-rich-description :html="$lesson->description" /></details>@endif
+                                    </div>
+                                        @if($active && ! $course->trashed() && $ready)<a class="btn btn-outline-primary btn-sm" href="{{ route('learn.show', $lesson) }}" aria-label="Putar {{ $lesson->title }}">Putar<x-dashboard.icon name="arrow-right" /></a>@endif
                                     </li>
                                 @empty
                                     <li class="text-muted">Belum ada materi pada bab ini.</li>
