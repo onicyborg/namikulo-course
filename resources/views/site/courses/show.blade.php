@@ -8,7 +8,7 @@
 @section('content')
 <div class="container site-page site-detail">
     @if($preview)
-        <div class="site-preview-banner" role="status"><strong>Pratinjau admin</strong><span>Course ini berstatus {{ $course->status->label() }}. Hanya admin yang dapat melihat halaman pratinjau.</span><a href="{{ route('admin.courses.curriculum', $course) }}">Kembali ke kurikulum</a></div>
+        <div class="site-preview-banner" role="status"><strong>Pratinjau admin</strong><span>Course ini berstatus {{ $course->status->label() }}. Hanya admin yang dapat melihat halaman pratinjau. Tutup tab ini untuk kembali ke area admin.</span></div>
     @endif
     <nav class="site-breadcrumb" aria-label="Breadcrumb"><a href="{{ route('site.home') }}">Beranda</a><span aria-hidden="true">/</span><a href="{{ route('site.courses.index') }}">Katalog</a><span aria-hidden="true">/</span><span aria-current="page">{{ $course->title }}</span></nav>
     <div class="site-detail-grid">
@@ -35,7 +35,7 @@
 
         <aside class="site-purchase-card" aria-label="Harga dan akses"><div class="site-price">@if($course->discount_price !== null)<del>Rp {{ number_format($course->price, 0, ',', '.') }}</del>@endif<strong>{{ ($course->discount_price ?? $course->price) === 0 ? 'Gratis' : 'Rp '.number_format($course->discount_price ?? $course->price, 0, ',', '.') }}</strong></div><p>Satu pembelian memberi akses {{ $course->access_months }} bulan sejak pembayaran terkonfirmasi.</p>
             @if($preview)
-                <span class="site-state-tag">Mode pratinjau</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}">Pratinjau video</a>@endif<a class="btn btn-outline-primary btn-block" href="{{ route('admin.courses.curriculum', $course) }}">Kelola course</a>
+                <span class="site-state-tag">Mode pratinjau</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}" target="_blank" rel="noopener noreferrer">Pratinjau video di tab baru</a>@endif
             @elseif($accessState === 'guest')
                 <a class="btn btn-primary btn-block" href="{{ route('checkout.show', $course->slug) }}">Masuk untuk membeli</a><a class="site-card-secondary" href="{{ route('register') }}">Belum punya akun? Daftar</a>
             @elseif($accessState === 'active')

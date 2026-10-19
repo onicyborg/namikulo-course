@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Services\ServerTable;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
@@ -18,7 +19,17 @@ use Illuminate\View\View;
 
 class OrderController extends Controller
 {
-    public function index(Request $request): View|JsonResponse
+    public function index(Request $request, ServerTable $table): View
+    {
+        return $this->listing($request, $table, false);
+    }
+
+    public function data(Request $request, ServerTable $table): JsonResponse
+    {
+        return $this->listing($request, $table, true);
+    }
+
+    private function listing(Request $request, ServerTable $table, bool $asData): View|JsonResponse
     {
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:120'],
@@ -34,36 +45,11 @@ class OrderController extends Controller
         }
         if ($filters['status'] ?? null) $orders->where('status', $filters['status']);
 
-        if ($request->has('draw')) {
-            $page = $request->validate([
-                'draw' => ['required', 'integer', 'min:0'],
-                'start' => ['required', 'integer', 'min:0'],
-                'length' => ['required', 'integer', 'in:10,25,50,100'],
-            ]);
-            $columns = [0 => 'order_number', 2 => 'course_title', 3 => 'amount', 4 => 'status', 6 => 'created_at'];
-            $sort = $columns[(int) $request->input('order.0.column')] ?? 'created_at';
-            $direction = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
-            $filteredCount = (clone $orders)->count();
-            $rows = $orders->with(['user:id,name,email'])->withCount('payments')
-                ->orderBy('orders.'.$sort, $direction)->orderBy('orders.id')
-                ->skip((int) $page['start'])->take((int) $page['length'])->get();
-
-            return response()->json([
-                'draw' => (int) $page['draw'],
-                'recordsTotal' => Order::query()->count(),
-                'recordsFiltered' => $filteredCount,
-                'data' => $rows->map(fn ($order) => [
-                    'number' => view('admin.orders.cells.number', compact('order'))->render(),
-                    'member' => view('admin.orders.cells.member', compact('order'))->render(),
-                    'course' => view('admin.orders.cells.course', compact('order'))->render(),
-                    'amount' => view('admin.orders.cells.amount', compact('order'))->render(),
-                    'status' => view('admin.orders.cells.status', compact('order'))->render(),
-                    'attempts' => view('admin.orders.cells.attempts', compact('order'))->render(),
-                    'created' => view('admin.orders.cells.created', compact('order'))->render(),
-                    'actions' => view('admin.orders.cells.actions', compact('order'))->render(),
-                ]),
-            ]);
-        }
+        if ($asData) return $table->response($request,
+            $orders->with('user:id,name,email')->withCount('payments'),
+            ['number', 'member', 'course', 'amount', 'status', 'attempts', 'created', 'actions'],
+            'admin.orders._cell', 'order', [0 => 'orders.order_number', 2 => 'orders.course_title', 3 => 'orders.amount', 4 => 'orders.status', 6 => 'orders.created_at'],
+            'orders.created_at', 'desc', Order::query()->count());
 
         return view('admin.orders.index', [
             'orders' => $orders->with(['user:id,name,email'])->withCount('payments')

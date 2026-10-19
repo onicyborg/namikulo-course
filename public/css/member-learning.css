@@ -31,6 +31,7 @@
 .member-learning-section li:first-child { border-top: 0; }
 .member-learning-section li strong { display: block; overflow-wrap: anywhere; }
 .member-learning-section li small { display: block; margin-top: 4px; color: var(--app-muted); }
+.member-learning-section li .member-lesson-locked { color: var(--app-primary-dark); }
 .member-learning-section li a { flex: 0 0 auto; font-weight: 700; }
 .member-learning-access p { margin: 18px 0; color: var(--app-muted); }
 .member-profile-avatar { display: flex; align-items: center; gap: 18px; margin-bottom: 24px; }

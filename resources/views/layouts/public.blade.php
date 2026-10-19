@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="{{ url('css/site.css') }}">
     @if($redesignedSite)<link rel="stylesheet" href="{{ url('css/public-site.css') }}?v=1">@endif
     @stack('styles')
+    <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
 </head>
 <body class="public-page {{ $redesignedSite ? 'nd-app np-page' : '' }} {{ request()->routeIs('site.home') ? 'nm-home' : '' }}" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
@@ -44,7 +45,8 @@
         <div class="container site-footer-inner"><div><strong>{{ config('app.name') }}</strong><p>Belajar sesuai ritme Anda, dengan kurikulum yang dapat dilihat sejak awal.</p></div><nav aria-label="Tautan footer"><a href="{{ route('site.courses.index') }}">Katalog</a><a href="{{ route('site.home') }}#cara-belajar">Cara belajar</a>@guest<a href="{{ route('register') }}">Daftar</a>@endguest</nav><small>&copy; {{ date('Y') }} {{ config('app.name') }}</small></div>
     </footer>
     <script src="{{ asset('js/app.min.js') }}"></script>
-    <script src="{{ url('js/app-custom.js') }}?v=3"></script>
+    <script src="{{ url('js/app-custom.js') }}?v=5"></script>
+    <script src="{{ url('js/interaction-motion.js') }}?v=1"></script>
     <script src="{{ url('js/pages/site.js') }}"></script>
     @stack('scripts')
 </body>

@@ -19,6 +19,7 @@
         : (defaultTheme === 'dark' || systemDark ? 'dark' : 'light');
 
     root.setAttribute('data-nc-theme', theme);
+    requestAnimationFrame(function () { root.classList.add('nd-theme-ready'); });
 
     document.addEventListener('DOMContentLoaded', function () {
         var toggle = document.querySelector('[data-nc-theme-toggle]');

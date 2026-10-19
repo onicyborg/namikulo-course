@@ -1,0 +1,42 @@
+html.nd-theme-ready .nd-app,
+html.nd-theme-ready .nd-app .nd-sidebar,
+html.nd-theme-ready .nd-app .nd-topbar,
+html.nd-theme-ready .nd-app .nd-panel,
+html.nd-theme-ready .nd-app .card,
+html.nd-theme-ready .nd-app .modal-content,
+html.nd-theme-ready .nd-app .form-control,
+html.nd-theme-ready .nd-app .public-header,
+html.nd-theme-ready .nd-app .public-footer,
+html.nd-theme-ready .nd-app .learn-header,
+html.nd-theme-ready .nd-app .learn-curriculum,
+html.nd-theme-ready .nd-app .discussion-thread,
+html.nd-theme-ready .nd-app .discussion-post {
+    transition: background-color 260ms ease, border-color 260ms ease, color 260ms ease, box-shadow 260ms ease;
+}
+.nd-app [data-nc-theme-toggle] { position: relative; }
+.nd-app [data-nc-theme-toggle] .nd-theme-sun,
+.nd-app [data-nc-theme-toggle] .nd-theme-moon { display: block; position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; margin: -10px 0 0 -10px; transition: opacity 220ms ease, transform 260ms ease; }
+.nd-app [data-nc-theme-toggle] .nd-theme-sun { opacity: 0; transform: rotate(-35deg) scale(.7); }
+html[data-nc-theme="dark"] .nd-app [data-nc-theme-toggle] .nd-theme-sun { display: block; opacity: 1; transform: rotate(0) scale(1); }
+html[data-nc-theme="dark"] .nd-app [data-nc-theme-toggle] .nd-theme-moon { display: block; opacity: 0; transform: rotate(35deg) scale(.7); }
+.nd-app .modal.fade .modal-dialog { transform: translateY(14px) scale(.985); transition: transform 240ms cubic-bezier(.2,.8,.2,1); }
+.nd-app .modal.show .modal-dialog { transform: translateY(0) scale(1); }
+.nd-app .modal.fade { transition: opacity 200ms ease; }
+.nd-app .modal-backdrop.fade { transition: opacity 200ms ease; }
+.nd-app .nc-confirm-dialog[open] { animation: nc-dialog-enter 210ms cubic-bezier(.2,.8,.2,1); }
+.nd-app .nc-confirm-dialog::backdrop { transition: background-color 160ms ease; animation: nc-backdrop-enter 210ms ease-out; }
+.nd-app .nc-confirm-dialog.is-closing::backdrop { background: transparent; }
+@keyframes nc-dialog-enter { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes nc-backdrop-enter { from { background: transparent; } to { background: rgb(2 6 23 / 70%); } }
+.nd-app .nd-profile-dropdown, .nd-app .nd-notification-popover { transform-origin: top right; animation: nc-popover-enter 180ms ease-out; }
+@keyframes nc-popover-enter { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.nd-app .alert { animation: nc-feedback-enter 220ms ease-out; }
+@keyframes nc-feedback-enter { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+    html.nd-theme-ready .nd-app, html.nd-theme-ready .nd-app *, html.nd-theme-ready .nd-app *::before,
+    .nd-app .modal.fade, .nd-app .modal.fade .modal-dialog, .nd-app .modal-backdrop.fade,
+    .nd-app .nd-profile-dropdown, .nd-app .nd-notification-popover, .nd-app .alert,
+    .nd-app .nc-confirm-dialog, .nd-app .nc-confirm-dialog::backdrop {
+        animation: none !important; transition-duration: .01ms !important;
+    }
+}

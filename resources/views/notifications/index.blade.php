@@ -4,9 +4,8 @@
 @push('styles')
 <link rel="stylesheet" href="{{ url('css/notifications.css') }}">
 @if($adminTable)
-<link rel="stylesheet" href="{{ asset('bundles/datatables/datatables.min.css') }}">
+
 <link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">
-<link rel="stylesheet" href="{{ url('css/admin-data-table.css') }}?v=3">
 @endif
 @endpush
 
@@ -21,21 +20,8 @@
             @if($hasNotifications)<form method="POST" action="{{ route('admin.notifications.read-all') }}">@csrf<button type="submit" class="btn btn-outline-primary">Tandai semua dibaca</button></form>@endif
         </div>
         <div class="card-body">
-            @include('admin.partials.data-table-filters', [
-                'action' => route('admin.notifications.index'),
-                'idPrefix' => 'notifications',
-                'searchLabel' => 'Cari notifikasi',
-                'searchPlaceholder' => 'Judul atau ringkasan…',
-                'statusOptions' => ['unread' => 'Belum dibaca', 'read' => 'Sudah dibaca'],
-            ])
-            @if($items->isEmpty())<p class="nc-data-table-fallback-empty">{{ ($filters['status'] ?? null) || ($filters['q'] ?? null) ? 'Tidak ada notifikasi yang sesuai filter.' : 'Belum ada notifikasi.' }}</p>@endif
-            <p class="nc-data-table-feedback" role="status" data-admin-table-feedback hidden></p>
-            <div class="table-responsive"><table class="table nc-admin-table" data-admin-data-table data-source-url="{{ route('admin.notifications.index') }}" data-columns="title,summary,created,status,actions" data-sortable="0,1,2,3" data-order-column="2" data-order-direction="desc" data-display-start="{{ ($items->currentPage() - 1) * $items->perPage() }}" data-empty-message="Belum ada notifikasi."><thead><tr><th>Notifikasi</th><th>Ringkasan</th><th>Waktu</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
-                @foreach($items as $item)<tr>
-                    <td>@include('admin.notifications.cells.title')</td><td>@include('admin.notifications.cells.summary')</td><td>@include('admin.notifications.cells.created')</td><td>@include('admin.notifications.cells.status')</td><td>@include('admin.notifications.cells.actions', ['target' => $targets[$item->id]])</td>
-                </tr>@endforeach
-            </tbody></table></div>
-            @include('admin.partials.data-table-pagination', ['paginator' => $items])
+            <x-server-table :rows="$items" :columns="['title' => 'Notifikasi', 'summary' => 'Ringkasan', 'created' => 'Waktu', 'status' => 'Status', 'actions' => 'Aksi']" cells="admin.notifications._cell" record="item" :source="route('admin.notifications.data')" :filters="$filters" sortable="0,1,2,3" order-column="2" direction="desc" :statuses="['unread'=>'Belum dibaca','read'=>'Sudah dibaca']" />
+
         </div>
     </div>
 </div>
@@ -72,9 +58,8 @@
 @endif
 @endsection
 @if($adminTable)
-@push('plugin-scripts')<script src="{{ asset('bundles/datatables/datatables.min.js') }}"></script>@endpush
 @push('scripts')
 <script src="{{ url('js/admin-action-tooltip.js') }}"></script>
-<script src="{{ url('js/pages/admin-data-table.js') }}?v=3"></script>
+
 @endpush
 @endif

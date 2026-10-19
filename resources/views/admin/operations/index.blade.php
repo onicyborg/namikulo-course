@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Tugas dan Log')
-@push('styles')<link rel="stylesheet" href="{{ url('css/admin-operations.css') }}?v=2">@endpush
+@push('styles')<link rel="stylesheet" href="{{ url('css/admin-operations.css') }}?v=3">@endpush
 
 @section('content')
 <x-page-header title="Tugas dan log" parent="Dashboard" :parentUrl="route('admin.dashboard')" />
@@ -48,28 +48,21 @@
             <div>
                 <p class="nc-operations-kicker">RIWAYAT</p>
                 <h2 id="system-log-title">Log aktivitas</h2>
-                <p>Telusuri tindakan pengguna dan kejadian penting sistem.</p>
+                <p>Cari aksi, pelaku, sumber atau ID record, dan keterangan log.</p>
             </div>
         </div>
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.operations.index') }}" class="nc-log-filters">
-                <div class="form-group"><label for="log-action">Aksi</label><select id="log-action" name="action" class="form-control"><option value="">Semua aksi</option>@foreach($actionLabels as $value => $label)<option value="{{ $value }}" @selected(($filters['action'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
-                <div class="form-group"><label for="log-table">Sumber</label><select id="log-table" name="table" class="form-control"><option value="">Semua sumber</option>@foreach($tableLabels as $value => $label)<option value="{{ $value }}" @selected(($filters['table'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
-                <div class="form-group"><label for="log-search">ID record atau keterangan</label><input id="log-search" name="q" type="search" maxlength="100" value="{{ $filters['q'] ?? '' }}" class="form-control" placeholder="Cari aktivitas…"></div>
-                <div class="nc-log-filter-actions"><button type="submit" class="btn btn-primary">Cari log</button><a href="{{ route('admin.operations.index') }}" class="btn btn-light">Reset</a></div>
-            </form>
+            <x-server-table :rows="$logs"
+                :columns="['created' => 'Waktu', 'action' => 'Aksi', 'actor' => 'Pelaku', 'source' => 'Sumber / ID record', 'description' => 'Keterangan']"
+                cells="admin.operations._log-cell" record="log" :source="route('admin.operations.data')"
+                :filters="$filters" sortable="0,1,3" order-column="0" direction="desc"
+                :extra-filters="['action' => ['Aksi', $actionLabels], 'table' => ['Sumber', $tableLabels]]"
+                :cell-data="compact('actionLabels', 'tableLabels')" />
 
-            @if($logs->isEmpty())
-                <x-empty-state title="Tidak ada log" description="Ubah filter atau tunggu aktivitas baru." icon="activity" />
-            @else
-                <div class="nc-log-list">
-                    @foreach($logs as $log)
-                        @include('admin.operations._log-item', ['log' => $log])
-                    @endforeach
-                </div>
-                <div class="nc-log-pagination">{{ $logs->links('pagination::bootstrap-4') }}</div>
-            @endif
         </div>
     </section>
 </div>
 @endsection
+
+@push('styles')<link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">@endpush
+@push('scripts')<script src="{{ url('js/admin-action-tooltip.js') }}"></script>@endpush

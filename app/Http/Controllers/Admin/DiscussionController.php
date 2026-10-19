@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Services\ServerTable;
 use App\Enums\DiscussionPostStatus;
 use App\Http\Controllers\Controller;
 use App\Models\LessonDiscussionPost;
@@ -13,7 +14,17 @@ use Illuminate\View\View;
 
 class DiscussionController extends Controller
 {
-    public function index(Request $request): View|JsonResponse
+    public function index(Request $request, ServerTable $table): View
+    {
+        return $this->listing($request, $table, false);
+    }
+
+    public function data(Request $request, ServerTable $table): JsonResponse
+    {
+        return $this->listing($request, $table, true);
+    }
+
+    private function listing(Request $request, ServerTable $table, bool $asData): View|JsonResponse
     {
         $filters = $request->validate([
             'status' => ['nullable', 'in:visible,hidden,deleted'],
@@ -35,30 +46,11 @@ class DiscussionController extends Controller
             });
         }
 
-        if ($request->has('draw')) {
-            $page = $request->validate([
-                'draw' => ['required', 'integer', 'min:0'],
-                'start' => ['required', 'integer', 'min:0'],
-                'length' => ['required', 'integer', 'in:10,25,50,100'],
-            ]);
-            $filteredCount = (clone $query)->count();
-            $posts = $query->with(['user:id,name', 'lesson.course', 'root'])
-                ->orderBy('created_at', $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc')
-                ->orderBy('id')->skip((int) $page['start'])->take((int) $page['length'])->get();
-
-            return response()->json([
-                'draw' => (int) $page['draw'],
-                'recordsTotal' => LessonDiscussionPost::query()->withTrashed()->count(),
-                'recordsFiltered' => $filteredCount,
-                'data' => $posts->map(fn ($post) => [
-                    'lesson' => view('admin.discussions.cells.lesson', compact('post'))->render(),
-                    'author' => view('admin.discussions.cells.author', compact('post'))->render(),
-                    'body' => view('admin.discussions.cells.body', compact('post'))->render(),
-                    'status' => view('admin.discussions.cells.status', compact('post'))->render(),
-                    'actions' => view('admin.discussions.cells.actions', compact('post'))->render(),
-                ]),
-            ]);
-        }
+        if ($asData) return $table->response($request,
+            $query->with(['user:id,name', 'lesson.course', 'root']),
+            ['lesson', 'author', 'body', 'status', 'actions'], 'admin.discussions._cell', 'post',
+            [1 => 'lesson_discussion_posts.created_at'], 'lesson_discussion_posts.created_at', 'desc',
+            LessonDiscussionPost::query()->withTrashed()->count());
 
         $posts = $query->with(['user:id,name', 'lesson.course', 'root'])
             ->orderByDesc('created_at')->orderBy('id')

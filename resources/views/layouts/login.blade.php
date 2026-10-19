@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url('css/admin-dashboard.css') }}?v=3">
     <link rel="stylesheet" href="{{ url('css/admin-pages.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/login.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
 </head>
 <body class="nd-app nd-legacy nl-page">
     <a class="nd-skip" href="#main-content">Lewati ke formulir akun</a>
@@ -33,6 +34,7 @@
         <section class="nl-form-panel" aria-labelledby="@yield('form_title_id', 'login-title')">@yield('content')</section>
     </main>
     <footer class="nl-footer"><span>&copy; {{ date('Y') }} {{ config('app.name') }}</span><a href="{{ route('site.home') }}">Kembali ke beranda</a></footer>
-    <script src="{{ url('js/app-custom.js') }}?v=3"></script>
+    <script src="{{ url('js/app-custom.js') }}?v=5"></script>
+    <script src="{{ url('js/interaction-motion.js') }}?v=1"></script>
 </body>
 </html>

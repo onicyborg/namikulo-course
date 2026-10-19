@@ -1,36 +1,61 @@
 (function () {
     'use strict';
-    document.addEventListener('DOMContentLoaded', function () {
+    function initializeTable() {
         const tableElement = document.querySelector('[data-admin-data-table]');
         const filters = document.querySelector('[data-admin-table-filters]');
         if (!tableElement || !filters) return;
 
         const size = filters.querySelector('[name="per_page"]');
         const search = filters.querySelector('[name="q"]');
-        const status = filters.querySelector('[name="status"]');
+        const selectFilters = Array.from(filters.querySelectorAll('select[name]')).filter(element => element !== size);
         const reset = filters.querySelector('[data-admin-table-reset]');
-        const feedback = document.querySelector('[data-admin-table-feedback]');
         const area = filters.closest('[data-admin-table-area]');
+        const feedback = area.querySelector('[data-admin-table-feedback]');
+        const stage = area.querySelector('[data-server-table-stage]');
+        const scroll = area.querySelector('[data-server-table-scroll]');
+        const loader = area.querySelector('[data-server-table-loader]');
         const pagination = area.querySelector('[data-admin-table-pagination]');
         const pageInfo = pagination.querySelector('[data-admin-table-page-info]');
         const pageNumbers = pagination.querySelector('[data-admin-table-page-numbers]');
         const previous = pagination.querySelector('[data-admin-table-previous]');
         const next = pagination.querySelector('[data-admin-table-next]');
         const $ = window.jQuery;
+        if (!$ || !$.fn || !$.fn.DataTable) {
+            feedback.hidden = false;
+            feedback.textContent = 'Tabel interaktif gagal dimuat. Muat ulang halaman untuk mencoba lagi.';
+            return;
+        }
         let table;
         let timer;
         let composing = false;
+        let loaderTimer;
+        let loadingSince = 0;
+        let loadVersion = 0;
 
-        function syncUrl() {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('page');
-            for (const [key, value] of [['q', search.value.trim()], ['status', status.value]]) {
-                if (value) url.searchParams.set(key, value);
-                else url.searchParams.delete(key);
-            }
-            if (size.value !== '10') url.searchParams.set('per_page', size.value);
-            else url.searchParams.delete('per_page');
-            window.history.replaceState(null, '', url);
+        function beginLoad() {
+            const version = ++loadVersion;
+            clearTimeout(loaderTimer);
+            stage.setAttribute('aria-busy', 'true');
+            scroll.inert = true;
+            loaderTimer = setTimeout(function () {
+                if (version !== loadVersion) return;
+                loadingSince = Date.now();
+                loader.hidden = false;
+            }, 120);
+        }
+
+        function finishLoad() {
+            const version = loadVersion;
+            clearTimeout(loaderTimer);
+            const visibleFor = loadingSince ? Date.now() - loadingSince : 0;
+            const remaining = loader.hidden ? 0 : Math.max(0, 180 - visibleFor);
+            loaderTimer = setTimeout(function () {
+                if (version !== loadVersion) return;
+                loader.hidden = true;
+                loadingSince = 0;
+                stage.setAttribute('aria-busy', 'false');
+                scroll.inert = false;
+            }, remaining);
         }
 
         function formatTimes() {
@@ -45,37 +70,22 @@
 
         function updatePagination(api) {
             const info = api.page.info();
-            const pageUrl = function (index) {
-                const url = new URL(window.location.href);
-                if (index > 0) url.searchParams.set('page', String(index + 1));
-                else url.searchParams.delete('page');
-                return url.toString();
-            };
-            const setNavigation = function (link, disabled, index) {
-                link.href = disabled ? '#' : pageUrl(index);
-                if (disabled) {
-                    link.setAttribute('aria-disabled', 'true');
-                    link.tabIndex = -1;
-                } else {
-                    link.removeAttribute('aria-disabled');
-                    link.removeAttribute('tabindex');
-                }
-            };
+            const setNavigation = function (button, disabled) { button.disabled = disabled; };
             pageInfo.textContent = info.recordsDisplay
                 ? 'Menampilkan ' + (info.start + 1) + '–' + info.end + ' dari ' + info.recordsDisplay + ' data'
                 : 'Tidak ada data';
-            setNavigation(previous, info.page <= 0, info.page - 1);
-            setNavigation(next, info.pages === 0 || info.page >= info.pages - 1, info.page + 1);
+            setNavigation(previous, info.page <= 0);
+            setNavigation(next, info.pages === 0 || info.page >= info.pages - 1);
             pageNumbers.replaceChildren();
 
             function addPage(index) {
-                const link = document.createElement('a');
-                link.href = pageUrl(index);
-                link.textContent = String(index + 1);
-                link.dataset.adminTablePage = String(index);
-                link.setAttribute('aria-label', 'Halaman ' + (index + 1));
-                if (index === info.page) link.setAttribute('aria-current', 'page');
-                pageNumbers.appendChild(link);
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = String(index + 1);
+                button.dataset.adminTablePage = String(index);
+                button.setAttribute('aria-label', 'Halaman ' + (index + 1));
+                if (index === info.page) button.setAttribute('aria-current', 'page');
+                pageNumbers.appendChild(button);
             }
 
             function addEllipsis() {
@@ -85,8 +95,8 @@
                 pageNumbers.appendChild(ellipsis);
             }
 
-            const first = Math.max(0, Math.min(info.page - 2, info.pages - 5));
-            const last = Math.min(info.pages, first + 5);
+            const first = Math.max(0, Math.min(info.page - 1, info.pages - 3));
+            const last = Math.min(info.pages, first + 3);
             if (first > 0) {
                 addPage(0);
                 if (first > 1) addEllipsis();
@@ -97,50 +107,71 @@
                 addPage(info.pages - 1);
             }
 
-            window.history.replaceState(null, '', pageUrl(info.page));
             area.classList.add('nc-data-table-enhanced');
         }
 
         function applyFilters() {
             clearTimeout(timer);
-            if (!table) {
-                filters.requestSubmit();
-                return;
-            }
-            syncUrl();
+            if (!table) return;
             table.page('first').draw();
         }
 
-        if ($ && $.fn.DataTable) {
-            const columns = tableElement.dataset.columns.split(',');
-            const sortable = tableElement.dataset.sortable.split(',').map(Number);
-            const orderColumn = Number(tableElement.dataset.orderColumn);
-            $(tableElement).on('xhr.dt', function (event, settings, json) {
-                feedback.hidden = Boolean(json);
-                if (!json) feedback.textContent = 'Daftar gagal dimuat. Periksa koneksi, lalu ubah filter untuk mencoba lagi.';
+        {
+            const columns = tableElement.dataset.ncColumns.split(',');
+            const sortable = tableElement.dataset.ncSortable.split(',').map(Number);
+            const orderColumn = Number(tableElement.dataset.ncOrderColumn);
+            $(tableElement).on('preXhr.dt', beginLoad);
+            $(tableElement).on('xhr.dt', function (event, settings, json, xhr) {
+                if (json && Number(json.draw) < settings.iDraw) return;
+                if (!json && xhr !== settings.jqXHR) return;
+                feedback.hidden = Boolean(json && !json.error);
+                if (!json || json.error) {
+                    finishLoad();
+                    feedback.textContent = 'Daftar gagal dimuat. Periksa koneksi atau sesi Anda. ';
+                    const retry = document.createElement('button');
+                    retry.type = 'button';
+                    retry.className = 'btn btn-outline-primary btn-sm';
+                    retry.textContent = 'Coba lagi';
+                    retry.addEventListener('click', function () { table.ajax.reload(null, false); });
+                    feedback.appendChild(retry);
+                    return true;
+                }
             });
+            $.fn.dataTable.ext.errMode = 'none';
             table = $(tableElement).DataTable({
+                orderMulti: false,
                 processing: true,
                 serverSide: true,
                 responsive: true,
                 pageLength: Number(size.value),
-                displayStart: Number(tableElement.dataset.displayStart) || 0,
+                displayStart: Number(tableElement.dataset.ncDisplayStart) || 0,
                 lengthMenu: [10, 25, 50, 100],
                 dom: 't',
-                order: [[orderColumn, tableElement.dataset.orderDirection || 'desc']],
+                order: tableElement.dataset.ncOrderColumn === '' ? [] : [[orderColumn, tableElement.dataset.ncOrderDirection || 'desc']],
                 columns: columns.map(function (name, index) {
                     return { data: name, orderable: sortable.includes(index), searchable: false };
                 }),
                 ajax: {
-                    url: tableElement.dataset.sourceUrl,
+                    url: tableElement.dataset.ncSourceUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
                     data: function (data) {
                         data.q = search.value.trim();
-                        data.status = status.value;
+                        selectFilters.forEach(element => { data[element.name] = element.value; });
                     }
                 },
                 drawCallback: function () {
                     formatTimes();
-                    updatePagination(this.api());
+                    if (window.ncEnhanceDetails) window.ncEnhanceDetails(tableElement);
+                    const api = this.api();
+                    const info = api.page.info();
+                    if (info.recordsDisplay > 0 && info.start >= info.recordsDisplay) {
+                        api.page('last').draw('page');
+                        return;
+                    }
+                    updatePagination(api);
+                    finishLoad();
                 },
                 language: {
                     processing: 'Memuat data…',
@@ -156,41 +187,40 @@
 
         pagination.addEventListener('click', function (event) {
             if (!table) return;
-            const link = event.target.closest('a');
-            if (!link || link.getAttribute('aria-disabled') === 'true') return;
-            event.preventDefault();
-            if (link === previous) table.page('previous').draw('page');
-            else if (link === next) table.page('next').draw('page');
-            else if (link.dataset.adminTablePage !== undefined) table.page(Number(link.dataset.adminTablePage)).draw('page');
+            const button = event.target.closest('button');
+            if (!button || button.disabled) return;
+            if (button === previous) table.page('previous').draw('page');
+            else if (button === next) table.page('next').draw('page');
+            else if (button.dataset.adminTablePage !== undefined) table.page(Number(button.dataset.adminTablePage)).draw('page');
         });
 
         size.addEventListener('change', function () {
             if (table) {
-                syncUrl();
-                table.page.len(Number(size.value)).draw();
+                table.page.len(Number(size.value));
+                table.page('first').draw();
             } else applyFilters();
         });
-        status.addEventListener('change', applyFilters);
+        selectFilters.forEach(element => element.addEventListener('change', applyFilters));
         search.addEventListener('compositionstart', function () { composing = true; clearTimeout(timer); });
-        search.addEventListener('compositionend', function () { composing = false; timer = setTimeout(applyFilters, 450); });
+        search.addEventListener('compositionend', function () { composing = false; timer = setTimeout(applyFilters, 250); });
         search.addEventListener('input', function () {
             clearTimeout(timer);
-            if (!composing) timer = setTimeout(applyFilters, 450);
+            if (!composing) timer = setTimeout(applyFilters, 250);
         });
-        filters.addEventListener('submit', function (event) {
+        reset.addEventListener('click', function () {
             if (!table) return;
-            event.preventDefault();
-            applyFilters();
-        });
-        reset.addEventListener('click', function (event) {
-            if (!table) return;
-            event.preventDefault();
             clearTimeout(timer);
             search.value = '';
-            status.value = '';
+            selectFilters.forEach(element => { element.value = ''; });
             size.value = '10';
-            syncUrl();
-            table.page.len(10).draw();
+            table.page.len(10);
+            table.page('first').draw();
         });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeTable, { once: true });
+    } else {
+        initializeTable();
+    }
 })();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Services\ServerTable;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -34,19 +35,39 @@ class UserController extends Controller
         return response()->json(['results' => $users->map(fn (User $user) => ['id' => $user->id, 'text' => $user->name.' · '.$user->email, 'timezone' => $user->timezone])]);
     }
 
-    public function index(Request $request): View
+    public function index(Request $request, ServerTable $table): View
+    {
+        return $this->listing($request, $table, false);
+    }
+
+    public function data(Request $request, ServerTable $table): JsonResponse
+    {
+        return $this->listing($request, $table, true);
+    }
+
+    private function listing(Request $request, ServerTable $table, bool $asData): View|JsonResponse
     {
         Gate::authorize('viewAny', User::class);
         $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'role' => ['nullable', Rule::enum(UserRole::class)], 'status' => ['nullable', Rule::in(['active', 'inactive'])], 'per_page' => ['nullable', 'integer', 'in:10,25,50,100']]);
-        $query = User::query()->withCount('enrollments')->orderBy('name');
+        $query = User::query()->withCount('enrollments');
         if ($filters['q'] ?? null) {
-            $like = '%'.str_replace(['%', '_'], ['\\%', '\\_'], Str::lower($filters['q'])).'%';
-            $query->where(fn ($q) => $q->whereRaw('LOWER(name) LIKE ?', [$like])->orWhereRaw('LOWER(email) LIKE ?', [$like]));
+            $term = '%'.mb_strtolower(trim($filters['q'])).'%';
+            $query->where(fn ($q) => $q->whereRaw('LOWER(name) LIKE ?', [$term])->orWhereRaw('LOWER(email) LIKE ?', [$term]));
         }
         if ($filters['role'] ?? null) $query->where('role', $filters['role']);
         if ($filters['status'] ?? null) $query->where('is_active', $filters['status'] === 'active');
-        $serverSide = User::query()->count() > 2000;
-        return view('admin.users.index', ['users' => $serverSide ? $query->paginate((int) ($filters['per_page'] ?? 10))->withQueryString() : $query->get(), 'serverSide' => $serverSide, 'filters' => $filters]);
+        if ($asData) return $table->response($request, $query,
+            ['name', 'email', 'role', 'status', 'access', 'actions'], 'admin.users._cell', 'user',
+            [0 => 'name', 1 => 'email', 2 => 'role', 3 => 'is_active', 4 => 'enrollments_count'], 'name', 'asc', User::query()->count());
+        return view('admin.users.index', ['users' => $query->orderBy('name')->orderBy('id')
+            ->paginate((int) ($filters['per_page'] ?? 10))->withQueryString(), 'filters' => $filters,
+            'modalRecords' => $table->modalRecords(User::query(), old('_record'))]);
+    }
+
+    public function modal(User $user): View
+    {
+        Gate::authorize('update', $user);
+        return view('admin.users._edit-modal', compact('user'));
     }
 
     public function store(Request $request, ActivityLogger $logger): RedirectResponse

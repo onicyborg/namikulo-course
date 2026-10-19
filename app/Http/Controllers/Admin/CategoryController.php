@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
+use App\Services\ServerTable;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Services\ActivityLogger;
@@ -15,10 +17,38 @@ use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request, ServerTable $table): View
+    {
+        return $this->listing($request, $table, false);
+    }
+
+    public function data(Request $request, ServerTable $table): JsonResponse
+    {
+        return $this->listing($request, $table, true);
+    }
+
+    private function listing(Request $request, ServerTable $table, bool $asData): View|JsonResponse
     {
         Gate::authorize('viewAny', Category::class);
-        return view('admin.categories.index', ['categories' => Category::query()->withCount('courses')->orderBy('sort_order')->orderBy('name')->get()]);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'per_page' => ['nullable', 'integer', 'in:10,25,50,100']]);
+        $query = Category::query()->withCount('courses');
+        if ($filters['q'] ?? null) {
+            $term = '%'.mb_strtolower(trim($filters['q'])).'%';
+            $query->where(fn ($q) => $q->whereRaw('LOWER(name) LIKE ?', [$term])->orWhereRaw('LOWER(slug) LIKE ?', [$term]));
+        }
+        if ($asData) return $table->response($request, $query,
+            ['name', 'slug', 'sort', 'courses', 'actions'], 'admin.categories._cell', 'category',
+            [0 => 'name', 1 => 'slug', 2 => 'sort_order', 3 => 'courses_count'], 'sort_order', 'asc', Category::query()->count());
+        return view('admin.categories.index', [
+            'categories' => $query->orderBy('sort_order')->orderBy('id')->paginate((int) ($filters['per_page'] ?? 10))->withQueryString(),
+            'filters' => $filters, 'modalRecords' => $table->modalRecords(Category::query(), old('_record')),
+        ]);
+    }
+
+    public function modal(Category $category): View
+    {
+        Gate::authorize('update', $category);
+        return view('admin.categories._edit-modal', compact('category'));
     }
 
     public function store(Request $request, ActivityLogger $logger, UniqueSlug $uniqueSlug): RedirectResponse

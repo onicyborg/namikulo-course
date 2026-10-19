@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Storage;
 
 class HlsVideoDelivery implements VideoDelivery
 {
-    public function __construct(private readonly EnrollmentService $enrollments, private readonly ActivityLogger $logger) {}
+    public function __construct(private readonly EnrollmentService $enrollments, private readonly ActivityLogger $logger,
+        private readonly LessonSequence $sequence) {}
 
     public function startSession(User $user, Lesson $lesson): array
     {
         $lesson->loadMissing(['course', 'videoAsset']);
         abort_unless($user->isAdmin() || $this->enrollments->activeFor($user, $lesson->course), 403, 'Akses course tidak aktif.');
+        $this->sequence->assertAccessible($user, $lesson);
         $asset = $lesson->videoAsset;
         abort_unless($asset && $asset->status === VideoStatus::Ready && $asset->hls_path && $asset->encryption_key, 404, 'Video belum siap.');
 
@@ -54,6 +56,7 @@ class HlsVideoDelivery implements VideoDelivery
         $lesson = $session->lesson;
         abort_unless($lesson && ($user->isAdmin() || $this->enrollments->activeFor($user, $lesson->course)),
             403, 'Akses course tidak aktif.');
+        $this->sequence->assertAccessible($user, $lesson);
         return $session;
     }
 

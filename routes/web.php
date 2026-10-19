@@ -15,6 +15,7 @@ use App\Http\Controllers\Operations\ScheduledJobController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Member\LessonDiscussionController;
 use App\Http\Controllers\Admin\DiscussionController;
+use App\Http\Controllers\EditorImageController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -35,6 +36,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [CoursePageController::class, 'home'])->name('site.home');
 Route::get('/courses', [CoursePageController::class, 'index'])->name('site.courses.index');
 Route::get('/courses/{course:slug}', [CoursePageController::class, 'show'])->name('site.courses.show');
+Route::get('/editor/images/{image}', [EditorImageController::class, 'show'])
+    ->whereUuid('image')->name('editor.images.show');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -67,6 +70,8 @@ Route::post('/account/timezone', [UserTimezoneController::class, 'update'])
     ->name('account.timezone.update');
 
 Route::middleware(['auth', 'active'])->group(function (): void {
+    Route::post('/editor/images', [EditorImageController::class, 'store'])
+        ->middleware('throttle:10,1,editor-image:')->name('editor.images.store');
     Route::get('/learn/{lesson}', [LearnController::class, 'show'])->name('learn.show');
     Route::get('/learn/{lesson}/discussion', [LearnController::class, 'show'])->name('learn.discussion.index');
     Route::get('/learn/{lesson}/discussion/{post}', [LessonDiscussionController::class, 'thread'])->whereUuid('post')->name('learn.discussion.thread');
@@ -106,13 +111,17 @@ Route::prefix('admin')
     ->middleware(['auth', 'active', 'role:'.UserRole::Admin->value])
     ->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('dashboard/orders/data', [AdminDashboardController::class, 'data'])->name('dashboard.orders.data');
+        Route::get('notifications/data', [NotificationController::class, 'data'])->name('notifications.data');
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
         Route::post('notifications/{notification}/open', [NotificationController::class, 'open'])->whereUuid('notification')->name('notifications.open');
+        Route::get('discussions/data', [DiscussionController::class, 'data'])->name('discussions.data');
         Route::get('discussions', [DiscussionController::class, 'index'])->name('discussions.index');
         Route::post('discussions/{post}/hide', [DiscussionController::class, 'hide'])->whereUuid('post')->name('discussions.hide');
         Route::post('discussions/{post}/restore', [DiscussionController::class, 'restore'])->whereUuid('post')->name('discussions.restore');
         Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
         Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+        Route::get('operations/data', [OperationController::class, 'data'])->name('operations.data');
         Route::get('operations', [OperationController::class, 'index'])->name('operations.index');
         Route::get('courses/{course}/preview', [CoursePageController::class, 'preview'])->name('courses.preview');
         Route::get('lessons/{lesson}/video/prepare', [VideoUploadController::class, 'prepare'])->name('lessons.video.prepare');
@@ -123,6 +132,13 @@ Route::prefix('admin')
         Route::post('video-uploads/{upload}/finalize', [VideoUploadController::class, 'finalize'])->middleware('throttle:30,1,upload-finalize:')->name('video-uploads.finalize');
         Route::get('video-uploads/{upload}/status', [VideoUploadController::class, 'status'])->middleware('throttle:30,1,upload-status:')->name('video-uploads.status');
         Route::post('video-uploads/{upload}/cancel', [VideoUploadController::class, 'cancel'])->middleware('throttle:30,1,upload-cancel:')->name('video-uploads.cancel');
+        Route::get('categories/{category}/modal', [CategoryController::class, 'modal'])->whereUuid('category')->name('categories.modal');
+        Route::get('courses/{course}/modal', [CourseController::class, 'modal'])->whereUuid('course')->name('courses.modal');
+        Route::get('users/{user}/modal', [UserController::class, 'modal'])->whereUuid('user')->name('users.modal');
+        Route::get('members/{enrollment}/modal', [CourseMemberController::class, 'modal'])->whereUuid('enrollment')->name('members.modal');
+        Route::get('categories/data', [CategoryController::class, 'data'])->name('categories.data');
+        Route::get('courses/data', [CourseController::class, 'data'])->name('courses.data');
+        Route::get('users/data', [UserController::class, 'data'])->name('users.data');
         Route::resource('categories', CategoryController::class)->except(['show', 'create', 'edit']);
         Route::resource('courses', CourseController::class)->except(['show', 'create', 'edit']);
         Route::post('courses/{course}/publish', [CourseController::class, 'publish'])->name('courses.publish');
@@ -142,7 +158,9 @@ Route::prefix('admin')
         Route::resource('users', UserController::class)->except(['show', 'create', 'edit']);
         Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
         Route::post('users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('users.toggle-active');
+        Route::get('courses/{course}/members/data', [CourseMemberController::class, 'data'])->name('courses.members.data');
         Route::get('courses/{course}/members', [CourseMemberController::class, 'index'])->name('courses.members');
+        Route::get('orders/data', [AdminOrderController::class, 'data'])->name('orders.data');
         Route::get('orders', [AdminOrderController::class, 'index'])->name('orders.index');
         Route::get('orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
         Route::post('orders/{order}/sync', [AdminOrderController::class, 'sync'])->middleware('throttle:10,1,admin-sync:')->name('orders.sync');
@@ -166,6 +184,7 @@ Route::prefix('my')
         Route::get('/courses/{course:slug}', [MemberCourseController::class, 'show'])->withTrashed()->name('courses.show');
         Route::get('/profile', [MemberProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profile', [MemberProfileController::class, 'update'])->name('profile.update');
+        Route::get('/orders/data', [MemberOrderController::class, 'data'])->name('orders.data');
         Route::get('/orders', [MemberOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}/invoice', [MemberOrderController::class, 'invoice'])->middleware('throttle:10,1,invoice:')->name('orders.invoice');
     });

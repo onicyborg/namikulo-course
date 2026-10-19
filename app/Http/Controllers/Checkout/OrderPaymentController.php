@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\Checkout\OrderService;
+use App\Services\LessonSequence;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,14 +14,13 @@ use Illuminate\View\View;
 
 class OrderPaymentController extends Controller
 {
-    public function show(Request $request, Order $order): View
+    public function show(Request $request, Order $order, LessonSequence $sequence): View
     {
         $this->own($request, $order);
         $order->load(['course' => fn ($query) => $query->withTrashed(), 'enrollment']);
         $payment = $order->payments()->latest()->first();
         $firstReadyLesson = $order->status === OrderStatus::Paid && ! $order->course->trashed()
-            ? $order->course->lessons()->whereHas('videoAsset', fn ($query) => $query->where('status', 'ready'))
-                ->orderBy('sort_order')->first()
+            ? $sequence->readyLessons($order->course)->first()
             : null;
 
         return view('checkout.pay', compact('order', 'payment', 'firstReadyLesson'));

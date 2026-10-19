@@ -284,6 +284,8 @@ Modal menggunakan `.modal`, `.modal-dialog`, `.modal-content`, `.modal-header`, 
 
 Untuk layout Admin, render semua modal melalui `@push('modals')` pada view. `layouts/admin.blade.php` merender `@stack('modals')` sebagai anak langsung `<body>`, di luar `#app`, `.main-wrapper`, dan `.main-content`. Bootstrap menaruh backdrop sebagai anak `<body>`; modal yang berada di dalam shell Otika dapat tertahan oleh stacking context shell sehingga backdrop menggelapkan modal dan memblokir klik. Jangan mengatasi kasus ini dengan menaikkan `z-index` modal atau backdrop secara global. Saat membuat modal baru, periksa bahwa dialog tetap terang, bisa difokuskan dan diklik, serta backdrop hanya menggelapkan halaman di belakangnya.
 
+Transisi interaksi memakai `interaction-motion.css` dan `interaction-motion.js` di layout bersama: perubahan tema memudarkan warna permukaan/teks, Bootstrap modal bergerak halus saat buka/tutup, dan `<details>` konten meluas/menutup dengan animasi tinggi. Popover dan pesan status muncul singkat tanpa menghambat input. Hormati `prefers-reduced-motion`; navigasi dan form harus tetap berfungsi tanpa JavaScript. Jangan memberi transisi pada properti layout seluruh halaman sehingga scroll atau pengetikan terasa lambat.
+
 Konfirmasi aksi formulir yang sebelumnya memakai `window.confirm()` menggunakan komponen `x-confirm-action-dialog` di layout Admin dan Player. Pasang `data-confirm` pada form, serta `data-confirm-title` dan `data-confirm-label` bila perlu. Dialog native dibuka dengan `showModal()` agar tetap berada di atas shell dan backdrop; teks dari atribut hanya ditulis sebagai `textContent`. Aksi baru dikirim setelah tombol konfirmasi dipilih. Warna dialog mengikuti token tema terang/gelap.
 
 ### Avatar, media, progress, list, empty state
@@ -340,7 +342,7 @@ Setiap control harus punya label, `id`, name, dan pesan error. Validasi server t
 | `.daterange` | rentang tanggal | `YYYY-MM-DD` |
 | `.timepicker` | pemilih waktu | ikon chevron |
 | `[data-course-editor]` | Lexical untuk deskripsi course, bab, materi | toolbar lengkap, canvas terang untuk warna teks |
-| `[data-discussion-editor]` | Lexical untuk diskusi | toolbar ringkas, mengikuti tema halaman |
+| `[data-discussion-editor]` | Lexical untuk diskusi | toolbar lengkap, mengikuti tema halaman |
 | `.dropzone` | multiple upload | lihat `multiple-upload.html` |
 | `.image-preview` | preview gambar | lihat `forms-advanced-form.html` |
 
@@ -376,7 +378,7 @@ Table dasar:
 </div>
 ```
 
-DataTables:
+DataTables (contoh lama; untuk daftar interaktif gunakan standar server-side 19 Oktober 2026 di bawah):
 
 ```html
 <link rel="stylesheet" href="ASSET_URL/bundles/datatables/datatables.min.css">
@@ -676,6 +678,7 @@ Tata letak desktop: area video lebar (kiri) + panel kurikulum (kanan, dapat dili
 
 Komponen:
 - Header ramping: tombol kembali ke course, judul video, progres.
+- Pratinjau course dan video yang dibuka dari area admin memakai tab baru (`target="_blank"` dan `rel="noopener noreferrer"`). Pada pratinjau admin, sembunyikan tombol kembali ke course/kurikulum di header, panel kurikulum, dan akhir materi; navigasi antar materi tetap tersedia. Member tetap memakai navigasi kembali biasa.
 - Pemutar: elemen `<video>` tanpa kontrol bawaan; kontrol custom (play/pause, seek, volume, kecepatan, layar penuh; pilihan kualitas hanya bila ada lebih dari satu rendition).
 - Panel kurikulum: bab → video, penanda sedang diputar, penanda selesai, gembok bila tidak boleh.
 - Tombol "Sebelumnya" dan "Berikutnya".
@@ -747,8 +750,9 @@ Loading, empty, success, error, permission (403), tidak ditemukan (404), kedaluw
 
 - Letakkan **Diskusi materi** di bawah deskripsi dan navigasi video pada `layouts/player`. Desktop mengikuti lebar kolom konten video; mobile menumpuk setelah player, sebelum/atau setelah kurikulum sesuai pembacaan yang paling jelas. Diskusi tidak menjadi overlay video dan tidak memindahkan kontrol pemutar.
 - Tampilkan pertanyaan sebagai thread dengan avatar inisial, nama penulis, waktu lokal, isi berformat aman, jumlah jawaban, dan aksi **Balas**. Jawaban satu tingkat dengan penanda **Admin**. Konteks `Membalas [nama]` menyertakan potongan teks maksimal 160 karakter; klik menuju komentar asal, memfokuskan dan menyorotnya selama 3,5 detik. Target di halaman berbeda menggunakan `focus` yang dihitung server. Reduced motion menonaktifkan animasi dan smooth scroll. Kutipan tersembunyi/dihapus diganti pesan netral.
-- Form **Ajukan pertanyaan** dan **Tulis balasan** memakai `x-discussion-editor` (Lexical ringkas), label, penghitung teks 10–2.000 karakter, tombol kirim, pesan validasi, dan pemulihan `old()`. Toolbar menyediakan penekanan, daftar, kutipan/kode, tautan, undo/redo. Tidak ada upload, embed, atau mode HTML sumber. Paste sebagai teks polos; HTML disaring server. Tetap submit normal, dengan textarea sebagai fallback tanpa JavaScript.
-- Kanvas dan toolbar Lexical diskusi mengikuti token permukaan serta warna teks player pada light/dark mode. Toolbar deskripsi admin menyediakan heading, ukuran teks, penekanan, daftar, kutipan, perataan, warna teks, sorotan, dan tautan; kanvas dokumen putih menjaga keterbacaan warna teks authored pada dua tema. Tautan yang dibuat dengan opsi buka di tab baru hanya boleh mempertahankan `target="_blank"` setelah sanitasi, selalu bersama `rel="nofollow noopener noreferrer"`. Tautan tanpa opsi tersebut tetap membuka tab saat ini.
+- Form **Ajukan pertanyaan** dan **Tulis balasan** memakai `x-discussion-editor` (Lexical lengkap), label, penghitung teks 10–2.000 karakter, tombol kirim, pesan validasi, dan pemulihan `old()`. Toolbar menyediakan gaya paragraf, font, ukuran, perataan, warna, sorotan, tabel, penekanan, daftar, kutipan/kode, tautan, gambar, undo/redo. Gambar JPG/PNG/WebP diunggah ke penyimpanan privat, dibatasi tiga per kiriman, memiliki teks alternatif, dan mengikuti izin akses materi. Paste sebagai teks polos; HTML disaring server. Balasan pada modal dikirim tanpa navigasi; submit normal dan textarea tetap menjadi fallback tanpa JavaScript.
+- Aksi **Balas**, **Tulis balasan**, dan **Lihat semua balasan** pada ruang belajar membuka modal diskusi lebar. Isi thread, kutipan, editor, pagination, dan validasi dimuat dari route thread yang sama. URL thread yang dibuka langsung mengarah kembali ke halaman materi dengan `focus`; tidak ada halaman diskusi terpisah. Kiriman dari modal memberi umpan balik tanpa berpindah halaman. Modal berada langsung di bawah `<body>`, tidak di dalam shell player. Tautan admin dan notifikasi menuju materi dengan `focus`; server memilih halaman pertanyaan yang memuat target, lalu UI menggulir dan menyorot komentarnya.
+- Toolbar Lexical diskusi mengikuti token permukaan serta warna teks player pada light/dark mode. Kanvas diskusi dan tampilan konten `x-rich-description` pada shell admin/member/player berwarna putih di light mode, slate gelap di dark mode; warna teks dan tabel menyesuaikan tema tanpa mengubah HTML yang tersimpan. Aturan ini juga berlaku untuk deskripsi bab dan materi di halaman course dan ruang belajar. Kanvas editor deskripsi tetap putih untuk pratinjau warna dokumen. Tautan yang dibuat dengan opsi buka di tab baru hanya boleh mempertahankan `target="_blank"` setelah sanitasi, selalu bersama `rel="nofollow noopener noreferrer"`. Tautan tanpa opsi tersebut tetap membuka tab saat ini.
 - Admin memiliki daftar moderasi berhalaman dengan konteks course/materi, tombol sembunyikan/pulihkan, dan alasan status. Pada thread yang disembunyikan, member melihat state netral; isi bermasalah tidak ditampilkan di daftar atau preview notifikasi.
 - Sediakan state belum ada pertanyaan, akses sudah berakhir, kiriman dihapus, batas kirim tercapai, dan halaman jawaban berikutnya. Semua tombol dapat dicapai keyboard; teks panjang harus membungkus tanpa overflow pada 375/768/1024 px.
 
@@ -768,3 +772,18 @@ Loading, empty, success, error, permission (403), tidak ditemukan (404), kedaluw
 - Satu panel per bab; materi berupa baris dengan pemisah tipis. Aksi ubah/hapus berada dalam menu tiga titik. Modal tetap dirender di stack modal layout.
 - Pegangan urutan mendukung pointer dan tombol panah keyboard. Menu menyediakan alternatif pindah ke atas/bawah. Urutan disimpan otomatis lewat endpoint reorder yang memvalidasi cakupan dan daftar ID lengkap; materi hanya berpindah di babnya sendiri.
 - Selama penyimpanan, pengurutan dikunci. Kegagalan meminta muat ulang untuk menyinkronkan kembali urutan server; jangan menampilkan keberhasilan sebelum respons server diterima.
+
+## Tabel server-side — 19 Oktober 2026
+
+- Seluruh daftar tabel memakai komponen `x-server-table`, Yajra di backend, dan `admin-data-table.js`. Jangan menambahkan inisialisasi DataTables client-side kedua.
+- Layout memuat bundle DataTables Bootstrap 4 dari `public/vendor/datatables/` melalui `url()` hanya pada halaman tabel. Setiap tabel mengambil JSON melalui route `/data` sendiri; route halaman hanya merender HTML. Pencarian, filter, dan pagination tidak mengubah URL halaman; jika plugin gagal dimuat, tampilkan kesalahan yang jelas.
+- Baris kontrol terpadu: jumlah data, pencarian, filter peran/status bila tersedia, reset ikon. Pencarian bereaksi setelah jeda 250 ms tiap input; filter diterapkan tanpa tombol tambahan. Reset dan pagination memakai tombol agar tidak melakukan navigasi halaman.
+- Pagination selalu tersedia dengan sebelumnya/berikutnya, maksimal lima nomor dan elipsis, serta status aktif/nonaktif yang dapat diakses keyboard. Tabel lebar tetap dapat digulir horizontal.
+- Aksi memakai ikon berwarna dan tooltip bersama. Handler harus terdelegasi agar berlaku setelah redraw; modal edit dimuat dari endpoint berdasarkan ID, bukan hanya dibuat untuk halaman pertama.
+- Modal dinamis berada di luar shell konten, menginisialisasi Lexical melalui event Bootstrap dan input waktu melalui `nc:content-ready`.
+- Loading, data kosong, kegagalan dengan tombol coba lagi, light/dark dan reduced motion dipertahankan. Matriks halaman dan UAT: `docs/SERVER-SIDE-TABLES.md`.
+- Tabel untuk email, invoice PDF, dan konten rich text tidak menggunakan DataTables.
+
+Log aktivitas pada `/admin/operations` juga menggunakan `x-server-table` (bukan daftar kartu dengan pagination tersendiri). Filter tambahan aksi/sumber mengikuti baris kontrol bersama dan otomatis diterapkan; detail perangkat menggunakan `details` yang tetap berfungsi setelah redraw.
+
+Pada semua tabel `x-server-table`, indikator pemuatan ditempatkan dalam area tabel saja. Gunakan ikon buku Namikulo dan animasi halaman yang singkat; tunda kemunculannya untuk respons cepat dan hormati `prefers-reduced-motion`. Baris lama tidak dapat dioperasikan saat menunggu respons, sementara filter tetap dapat diubah. Respons Yajra hanya menggambar ulang tabel dan pagination, tanpa memuat ulang halaman atau bagian lain.

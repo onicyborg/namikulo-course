@@ -6,6 +6,7 @@ use App\Enums\DiscussionPostStatus;
 use App\Enums\UserRole;
 use App\Models\Lesson;
 use App\Models\LessonDiscussionPost;
+use App\Models\EditorImage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -13,13 +14,15 @@ use Illuminate\Validation\ValidationException;
 class LessonDiscussionService
 {
     public function __construct(private readonly EnrollmentService $enrollments,
-        private readonly NotificationService $notifications, private readonly ActivityLogger $logger) {}
+        private readonly NotificationService $notifications, private readonly ActivityLogger $logger,
+        private readonly LessonSequence $sequence) {}
 
     public function authorizeLesson(User $viewer, Lesson $lesson): void
     {
         $lesson->loadMissing('course');
         abort_if($lesson->trashed() || ! $lesson->course || $lesson->course->trashed(), 404);
         abort_unless($viewer->isAdmin() || $this->enrollments->activeFor($viewer, $lesson->course), 403, 'Akses course tidak aktif.');
+        $this->sequence->assertAccessible($viewer, $lesson);
     }
 
     public function visibleRoot(Lesson $lesson, LessonDiscussionPost $post, User $viewer): LessonDiscussionPost
@@ -39,6 +42,12 @@ class LessonDiscussionService
             throw ValidationException::withMessages(['body' => 'Tulis 10 sampai 2.000 karakter.']);
         }
         $body = $content->html($body, $format);
+        preg_match_all('~<img\b[^>]*\bsrc="/editor/images/([0-9a-f-]{36})"~i', $body, $matches);
+        $imageIds = array_unique($matches[1]);
+        if (count($matches[1]) > 3 || ($imageIds && EditorImage::query()
+            ->whereIn('id', $imageIds)->where('scope', 'lesson')->where('lesson_id', $lesson->id)->count() !== count($imageIds))) {
+            throw ValidationException::withMessages(['body' => 'Gunakan maksimal tiga gambar yang diunggah untuk materi ini.']);
+        }
         if (! $parentId && $replyToId) {
             throw ValidationException::withMessages(['reply_to_id' => 'Pilih pertanyaan sebelum membalas.']);
         }

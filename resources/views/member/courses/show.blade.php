@@ -16,7 +16,7 @@
                     @if($course->summary)<p>{{ $course->summary }}</p>@endif
                     <div class="member-learning-progress-meta"><strong>{{ $summaryData['percent'] }}% selesai</strong><span>{{ $summaryData['completed'] }} dari {{ $summaryData['total'] }} materi</span></div>
                     <div class="progress" aria-label="Progres belajar {{ $summaryData['percent'] }} persen"><div class="progress-bar" role="progressbar" style="width: {{ $summaryData['percent'] }}%" aria-valuenow="{{ $summaryData['percent'] }}" aria-valuemin="0" aria-valuemax="100"></div></div>
-                    @if($active && ! $course->trashed() && $firstReady)<a class="btn btn-primary mt-3" href="{{ route('learn.show', $firstReady) }}">Buka materi</a>@endif
+                    @if($active && ! $course->trashed() && $continueLesson)<a class="btn btn-primary mt-3" href="{{ route('learn.show', $continueLesson) }}">Lanjutkan belajar</a>@endif
                 </div>
             </div>
             <section class="card" aria-labelledby="member-curriculum-title">
@@ -29,10 +29,12 @@
                                 @forelse($section->lessons as $lesson)
                                     @php($saved = $lessonProgress->get($lesson->id))
                                     @php($ready = $lesson->videoAsset?->status === \App\Enums\VideoStatus::Ready)
+                                    @php($unlocked = isset($unlockedIds[$lesson->id]))
                                     <li><span class="nm-lesson-icon" aria-hidden="true"><x-dashboard.icon :name="$saved?->completed_at ? 'circle-check' : 'file-video'" /></span><div class="nm-lesson-copy"><strong>{{ $lesson->title }}</strong><small>{{ $saved?->completed_at ? 'Selesai' : ($saved?->last_position_seconds ? 'Sedang dipelajari' : 'Belum dimulai') }} · {{ $ready ? 'Video siap' : 'Video belum siap' }}</small>
+                                        @if($ready && ! $unlocked)<small class="member-lesson-locked">Terkunci · selesaikan materi sebelumnya</small>@endif
                                         @if($active && ! $course->trashed() && $lesson->description)<details class="nc-description-details"><summary>Deskripsi materi</summary><x-rich-description :html="$lesson->description" /></details>@endif
                                     </div>
-                                        @if($active && ! $course->trashed() && $ready)<a class="btn btn-outline-primary btn-sm" href="{{ route('learn.show', $lesson) }}" aria-label="Putar {{ $lesson->title }}">Putar<x-dashboard.icon name="arrow-right" /></a>@endif
+                                        @if($active && ! $course->trashed() && $ready && $unlocked)<a class="btn btn-outline-primary btn-sm" href="{{ route('learn.show', $lesson) }}" aria-label="Putar {{ $lesson->title }}">Putar<x-dashboard.icon name="arrow-right" /></a>@endif
                                     </li>
                                 @empty
                                     <li class="text-muted">Belum ada materi pada bab ini.</li>

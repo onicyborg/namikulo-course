@@ -8,8 +8,34 @@
     var profile = document.querySelector('[data-profile-menu]');
     var notifications = document.querySelector('[data-notification-menu]');
     var mobile = window.matchMedia('(max-width: 1023px)');
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     if (!sidebar || !toggle || !backdrop || !workspace) return;
+
+    function closeMenu(menu) {
+        if (!menu || !menu.open || menu.dataset.closing) return;
+        var popover = menu.querySelector('.nd-profile-dropdown, .nd-notification-popover');
+        if (reducedMotion.matches || !popover || !popover.animate) {
+            menu.open = false;
+            return;
+        }
+        menu.dataset.closing = '1';
+        popover.animate([{ opacity: 1, transform: 'translateY(0)' },
+            { opacity: 0, transform: 'translateY(-6px)' }],
+            { duration: 150, easing: 'ease-in' }).finished.catch(function () {}).then(function () {
+                menu.open = false;
+                delete menu.dataset.closing;
+            });
+    }
+
+    [profile, notifications].forEach(function (menu) {
+        if (!menu) return;
+        menu.querySelector('summary').addEventListener('click', function (event) {
+            if (!menu.open) return;
+            event.preventDefault();
+            closeMenu(menu);
+        });
+    });
 
     function setSidebar(open, restoreFocus) {
         open = Boolean(open && mobile.matches);
@@ -21,8 +47,8 @@
         sidebar.inert = mobile.matches && !open;
 
         if (open) {
-            if (profile) profile.open = false;
-            if (notifications) notifications.open = false;
+            closeMenu(profile);
+            closeMenu(notifications);
             sidebar.setAttribute('role', 'dialog');
             sidebar.setAttribute('aria-modal', 'true');
             sidebar.querySelector('[data-sidebar-close]').focus();
@@ -50,11 +76,11 @@
         if (event.key === 'Escape') {
             if (document.body.hasAttribute('data-sidebar-open')) setSidebar(false, true);
             if (profile && profile.open) {
-                profile.open = false;
+                closeMenu(profile);
                 profile.querySelector('summary').focus();
             }
             if (notifications && notifications.open) {
-                notifications.open = false;
+                closeMenu(notifications);
                 notifications.querySelector('summary').focus();
             }
         }
@@ -77,25 +103,25 @@
 
     if (profile) {
         profile.addEventListener('toggle', function () {
-            if (profile.open && notifications) notifications.open = false;
+            if (profile.open) closeMenu(notifications);
         });
         document.addEventListener('click', function (event) {
-            if (!profile.contains(event.target)) profile.open = false;
+            if (!profile.contains(event.target)) closeMenu(profile);
         });
         document.addEventListener('focusin', function (event) {
-            if (!profile.contains(event.target)) profile.open = false;
+            if (!profile.contains(event.target)) closeMenu(profile);
         });
     }
 
     if (notifications) {
         notifications.addEventListener('toggle', function () {
-            if (notifications.open && profile) profile.open = false;
+            if (notifications.open) closeMenu(profile);
         });
         document.addEventListener('click', function (event) {
-            if (!notifications.contains(event.target)) notifications.open = false;
+            if (!notifications.contains(event.target)) closeMenu(notifications);
         });
         document.addEventListener('focusin', function (event) {
-            if (!notifications.contains(event.target)) notifications.open = false;
+            if (!notifications.contains(event.target)) closeMenu(notifications);
         });
     }
 

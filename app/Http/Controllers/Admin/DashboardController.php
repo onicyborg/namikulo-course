@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
+use App\Services\ServerTable;
 use App\Enums\CourseStatus;
 use App\Enums\EnrollmentStatus;
 use App\Enums\OrderStatus;
@@ -19,8 +21,29 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request, ServerTable $table): View
     {
+        return $this->listing($request, $table, false);
+    }
+
+    public function data(Request $request, ServerTable $table): JsonResponse
+    {
+        return $this->listing($request, $table, true);
+    }
+
+    private function listing(Request $request, ServerTable $table, bool $asData): View|JsonResponse
+    {
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'per_page' => ['nullable', 'integer', 'in:10,25,50,100']]);
+        $orderQuery = Order::query()->with('user:id,name,email');
+        if ($filters['q'] ?? null) {
+            $term = '%'.mb_strtolower(trim($filters['q'])).'%';
+            $orderQuery->where(fn ($q) => $q->whereRaw('LOWER(order_number) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(course_title) LIKE ?', [$term])
+                ->orWhereHas('user', fn ($q) => $q->whereRaw('LOWER(name) LIKE ?', [$term])));
+        }
+        if ($asData) return $table->response($request, $orderQuery,
+            ['order', 'amount', 'status', 'created', 'actions'], 'admin.dashboard._order-cell', 'order',
+            [0 => 'order_number', 1 => 'amount', 2 => 'status', 3 => 'created_at'], 'created_at', 'desc', Order::query()->count());
         $zone = $request->user()->timezone ?: 'UTC';
         $monthStart = now($zone)->startOfMonth();
         $nextMonth = $monthStart->copy()->addMonth();
@@ -35,7 +58,7 @@ class DashboardController extends Controller
             'pending' => Order::query()->where('status', OrderStatus::Pending->value)
                 ->where('expires_at', '>', now())->count(),
         ];
-        $orders = Order::query()->with('user:id,name,email')->latest()->limit(6)->get();
+        $orders = $orderQuery->latest('created_at')->orderBy('id')->paginate((int) ($filters['per_page'] ?? 10))->withQueryString();
         $failedUploads = VideoUpload::query()->where('status', UploadStatus::Failed->value)
             ->with('lesson.course')->latest()->limit(6)->get()
             ->map(fn (VideoUpload $upload): array => [
@@ -50,6 +73,6 @@ class DashboardController extends Controller
             ]);
         $failedVideos = $failedUploads->concat($failedAssets)->sortByDesc('at')->take(6);
 
-        return view('admin.dashboard', compact('kpis', 'orders', 'failedVideos', 'monthStart'));
+        return view('admin.dashboard', compact('kpis', 'orders', 'failedVideos', 'monthStart', 'filters'));
     }
 }

@@ -39,3 +39,41 @@
 .discussion-page-main{width:min(100%,850px);padding:32px 24px;margin:auto}
 .discussion-page .alert,.learn-discussion .alert{margin-bottom:18px}
 @media(max-width:575.98px){.learn-discussion{padding:24px 18px}.discussion-heading{flex-direction:column}.discussion-post{padding:18px}.discussion-reply{margin-left:12px}.discussion-page-main{padding:24px 16px}}
+
+.nm-player .discussion-thread { border-color: var(--nd-border); background: var(--nd-surface); border-radius: 12px; }
+.nm-player .discussion-post { background: var(--nd-surface); color: var(--nd-text); transition: background-color 220ms ease, box-shadow 220ms ease; }
+.nm-player .discussion-reply, .nm-player .discussion-thread-footer { border-color: var(--nd-border); }
+.nm-player .discussion-post-meta strong, .nm-player .discussion-body, .nm-player .discussion-form label { color: var(--nd-text); }
+.nm-player .discussion-admin-label { border-color: var(--nd-active-border); background: var(--nd-active); color: var(--nd-link); }
+.nm-player .discussion-hidden-label { border-color: var(--nd-warn-text); background: var(--nd-warn-bg); color: var(--nd-warn-text); }
+.nm-player .discussion-post-meta time, .nm-player .discussion-context, .nm-player .discussion-heading p,
+.nm-player .discussion-heading > span, .nm-player .discussion-form small { color: var(--nd-muted); }
+.nm-player .discussion-post-actions a, .nm-player .discussion-text-button, .nm-player .discussion-thread-footer a,
+.nm-player .discussion-reply-composer summary { color: var(--nd-link); }
+.nm-player .discussion-form { border-color: var(--nd-border); background: var(--nd-surface); }
+.nm-player .discussion-form textarea, .nm-player .discussion-reply-composer textarea { border-color: var(--nd-border); background: var(--nd-bg); color: var(--nd-text); }
+.nm-player .discussion-form textarea:focus, .nm-player .discussion-reply-composer textarea:focus { background: var(--nd-bg); color: var(--nd-text); }
+.nm-player .discussion-empty { border-color: var(--nd-border); color: var(--nd-muted); }
+.nm-player .discussion-page-header { border-color: var(--nd-border); background: var(--nd-surface); }
+.nm-player .discussion-page-header span { color: var(--nd-text); }
+.nm-player .discussion-page-header a { color: var(--nd-link); }
+.nm-player .discussion-thread-footer { display: flex; flex-wrap: wrap; gap: 16px; }
+.nm-player .discussion-post:target { outline: 2px solid var(--nd-link); outline-offset: -2px; background: var(--nd-active); }
+.nm-player .nc-discussion-modal .modal-dialog { width: min(920px, calc(100vw - 24px)); max-width: 920px; margin: 12px auto; }
+.nm-player .nc-discussion-modal .modal-content { max-height: calc(100dvh - 24px); }
+.nm-player .nc-discussion-modal .modal-body { max-height: calc(100dvh - 105px); overflow-y: auto; padding: 24px; overscroll-behavior: contain; }
+.nm-player .nc-discussion-modal .modal-header { align-items: flex-start; padding: 18px 24px; }
+.nm-player .nc-discussion-modal .modal-title { font-size: 20px; }
+.nm-player .nc-discussion-modal .discussion-modal-eyebrow { display: block; margin-bottom: 3px; color: var(--nd-link); font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+.nm-player .nc-discussion-modal .discussion-thread { margin-bottom: 0; }
+.nm-player .nc-discussion-modal .discussion-form { margin: 20px 0 0; }
+.nm-player .discussion-modal-loading, .nm-player .discussion-modal-error { padding: 30px 10px; color: var(--nd-muted); text-align: center; }
+.nm-player .discussion-modal-success { margin-bottom: 16px; padding: 12px 14px; border: 1px solid var(--nd-active-border); border-radius: 8px; background: var(--nd-active); color: var(--nd-link); }
+.nm-player .discussion-dialog-feedback { margin: 12px 0; color: var(--nd-bad-text); }
+.nm-player .nc-discussion-modal .discussion-modal-error + a { display: block; color: var(--nd-link); text-align: center; text-decoration: underline; }
+.has-discussion-dialog .discussion-page-main > .discussion-thread-dialog-content > .discussion-form { display: none; }
+@media (max-width: 575.98px) {
+    .nm-player .nc-discussion-modal .modal-dialog { width: calc(100vw - 16px); margin: 8px auto; }
+    .nm-player .nc-discussion-modal .modal-content { max-height: calc(100dvh - 16px); }
+    .nm-player .nc-discussion-modal .modal-body { max-height: calc(100dvh - 95px); padding: 16px; }
+}

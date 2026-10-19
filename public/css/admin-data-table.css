@@ -22,11 +22,11 @@ body.nd-app.nd-legacy .nc-admin-table tbody tr:hover { background:var(--nd-subtl
 .nd-app .nc-data-table-area .dataTables_info, .nd-app .nc-data-table-area .dataTables_paginate { padding-top:18px; }
 .nd-app .nc-data-table-pagination { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:18px; color:var(--nd-muted); font-size:12px; }
 .nd-app .nc-data-table-page-buttons, .nd-app .nc-data-table-page-numbers { display:flex; align-items:center; gap:6px; }
-.nd-app .nc-data-table-page-buttons a { display:inline-flex; align-items:center; justify-content:center; min-width:36px; min-height:36px; padding:7px 10px; border:1px solid var(--nd-border); border-radius:7px; background:var(--nd-surface); color:var(--nd-text); text-decoration:none; }
-.nd-app .nc-data-table-page-buttons a:hover:not([aria-disabled="true"]) { border-color:var(--nd-link); color:var(--nd-link); text-decoration:none; }
-.nd-app .nc-data-table-page-buttons a[aria-current="page"] { border-color:var(--nd-primary); background:var(--nd-primary); color:#fff; }
-.nd-app .nc-data-table-page-buttons a[aria-disabled="true"] { color:var(--nd-muted); opacity:.5; cursor:not-allowed; pointer-events:none; }
-.nd-app .nc-data-table-page-buttons a:focus-visible { outline:2px solid var(--nd-link); outline-offset:2px; }
+.nd-app .nc-data-table-page-buttons button { display:inline-flex; align-items:center; justify-content:center; min-width:36px; min-height:36px; padding:7px 10px; border:1px solid var(--nd-border); border-radius:7px; background:var(--nd-surface); color:var(--nd-text); font:inherit; cursor:pointer; }
+.nd-app .nc-data-table-page-buttons button:hover:not(:disabled) { border-color:var(--nd-link); color:var(--nd-link); }
+.nd-app .nc-data-table-page-buttons button[aria-current="page"] { border-color:var(--nd-primary); background:var(--nd-primary); color:#fff; }
+.nd-app .nc-data-table-page-buttons button:disabled { color:var(--nd-muted); opacity:.5; cursor:not-allowed; }
+.nd-app .nc-data-table-page-buttons button:focus-visible { outline:2px solid var(--nd-link); outline-offset:2px; }
 .nd-app .nc-data-table-page-numbers span { padding:0 3px; }
 @media(max-width:767px) { .nd-app .nc-data-table-filters { grid-template-columns:1fr 1fr; gap:12px; } .nd-app .nc-data-table-filters > :nth-child(2) { grid-column:1 / -1; grid-row:1; } .nd-app .nc-data-table-action { width:44px; height:44px; } }
 @media(max-width:767px) { .nd-app .nc-data-table-pagination { align-items:flex-start; flex-direction:column; } .nd-app .nc-data-table-page-buttons { max-width:100%; flex-wrap:wrap; } }

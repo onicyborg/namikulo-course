@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ServerTable;
 use App\Enums\EnrollmentStatus;
 use App\Models\Enrollment;
 use App\Models\UserNotification;
@@ -13,7 +14,19 @@ use Illuminate\View\View;
 
 class NotificationController extends Controller
 {
-    public function index(Request $request, NotificationService $service): View|JsonResponse
+    public function index(Request $request, NotificationService $service, ServerTable $table): View
+    {
+        return $this->listing($request, $service, $table, false);
+    }
+
+    public function data(Request $request, NotificationService $service, ServerTable $table): JsonResponse
+    {
+        abort_unless($request->user()->isAdmin(), 403);
+
+        return $this->listing($request, $service, $table, true);
+    }
+
+    private function listing(Request $request, NotificationService $service, ServerTable $table, bool $asData): View|JsonResponse
     {
         $user = $request->user();
         if ($user->isAdmin()) {
@@ -33,35 +46,10 @@ class NotificationController extends Controller
             }
 
             $relations = ['course', 'order:id,user_id,status', 'discussionPost.lesson.course', 'discussionPost.root'];
-            if ($request->has('draw')) {
-                $page = $request->validate([
-                    'draw' => ['required', 'integer', 'min:0'],
-                    'start' => ['required', 'integer', 'min:0'],
-                    'length' => ['required', 'integer', 'in:10,25,50,100'],
-                ]);
-                $columns = [0 => 'title', 1 => 'summary', 2 => 'created_at', 3 => 'read_at'];
-                $sort = $columns[(int) $request->input('order.0.column')] ?? 'created_at';
-                $direction = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
-                $filteredCount = (clone $query)->count();
-                $items = $query->with($relations)->orderBy('user_notifications.'.$sort, $direction)
-                    ->orderBy('user_notifications.id')->skip((int) $page['start'])->take((int) $page['length'])->get();
-
-                return response()->json([
-                    'draw' => (int) $page['draw'],
-                    'recordsTotal' => $user->userNotifications()->count(),
-                    'recordsFiltered' => $filteredCount,
-                    'data' => $items->map(function ($item) use ($service, $user) {
-                        $target = $service->target($item, $user);
-                        return [
-                            'title' => view('admin.notifications.cells.title', compact('item'))->render(),
-                            'summary' => view('admin.notifications.cells.summary', compact('item'))->render(),
-                            'created' => view('admin.notifications.cells.created', compact('item'))->render(),
-                            'status' => view('admin.notifications.cells.status', compact('item'))->render(),
-                            'actions' => view('admin.notifications.cells.actions', compact('item', 'target'))->render(),
-                        ];
-                    }),
-                ]);
-            }
+            if ($asData) return $table->response($request, $query->with($relations),
+                ['title', 'summary', 'created', 'status', 'actions'], 'admin.notifications._cell', 'item',
+                [0 => 'user_notifications.title', 1 => 'user_notifications.summary', 2 => 'user_notifications.created_at', 3 => 'user_notifications.read_at'],
+                'user_notifications.created_at', 'desc', $user->userNotifications()->count(), ['notificationService' => $service, 'viewer' => $user]);
 
             $items = $query->with($relations)->orderByDesc('user_notifications.created_at')
                 ->orderBy('user_notifications.id')->paginate((int) ($filters['per_page'] ?? 10))->withQueryString();

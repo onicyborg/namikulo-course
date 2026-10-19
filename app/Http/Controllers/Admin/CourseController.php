@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
+use App\Services\ServerTable;
 use App\Enums\CourseStatus;
 use App\Enums\VideoStatus;
 use App\Http\Controllers\Controller;
@@ -21,13 +23,41 @@ use Illuminate\View\View;
 
 class CourseController extends Controller
 {
-    public function index(): View
+    public function index(Request $request, ServerTable $table): View
+    {
+        return $this->listing($request, $table, false);
+    }
+
+    public function data(Request $request, ServerTable $table): JsonResponse
+    {
+        return $this->listing($request, $table, true);
+    }
+
+    private function listing(Request $request, ServerTable $table, bool $asData): View|JsonResponse
     {
         Gate::authorize('viewAny', Course::class);
+        $filters = $request->validate(['q' => ['nullable', 'string', 'max:120'], 'per_page' => ['nullable', 'integer', 'in:10,25,50,100']]);
+        $query = Course::query()->with('category')->withCount(['sections', 'lessons']);
+        if ($filters['q'] ?? null) {
+            $term = '%'.mb_strtolower(trim($filters['q'])).'%';
+            $query->where(fn ($q) => $q->whereRaw('LOWER(courses.title) LIKE ?', [$term])
+                ->orWhereRaw('LOWER(courses.instructor_name) LIKE ?', [$term])
+                ->orWhereHas('category', fn ($q) => $q->whereRaw('LOWER(name) LIKE ?', [$term])));
+        }
+        if ($asData) return $table->response($request, $query,
+            ['title', 'category', 'price', 'curriculum', 'status', 'actions'], 'admin.courses._cell', 'course',
+            [0 => 'courses.title', 2 => fn ($query, $direction) => $query->orderByRaw('COALESCE(courses.discount_price, courses.price) '.$direction), 4 => 'courses.status'], 'courses.created_at', 'desc', Course::query()->count());
         return view('admin.courses.index', [
-            'courses' => Course::query()->with('category')->withCount(['sections', 'lessons'])->orderByDesc('created_at')->get(),
-            'categories' => Category::query()->orderBy('name')->get(),
+            'courses' => $query->latest('created_at')->orderBy('id')->paginate((int) ($filters['per_page'] ?? 10))->withQueryString(),
+            'categories' => Category::query()->orderBy('name')->get(), 'filters' => $filters,
+            'modalRecords' => $table->modalRecords(Course::query(), old('_record')),
         ]);
+    }
+
+    public function modal(Course $course): View
+    {
+        Gate::authorize('update', $course);
+        return view('admin.courses._edit-modal', ['course' => $course, 'categories' => Category::query()->orderBy('name')->get()]);
     }
 
     public function store(Request $request, DescriptionSanitizer $sanitizer, ActivityLogger $logger, UniqueSlug $uniqueSlug): RedirectResponse

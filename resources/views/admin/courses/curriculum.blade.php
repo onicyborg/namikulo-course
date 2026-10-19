@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Kurikulum · '.$course->title)
 @push('styles')
-<link rel="stylesheet" href="{{ url('css/lexical-editor.css') }}?v=1">
+<link rel="stylesheet" href="{{ url('css/lexical-editor.css') }}?v=6">
 <link rel="stylesheet" href="{{ url('css/content-admin.css') }}">
 <link rel="stylesheet" href="{{ url('css/admin-courses.css') }}">
 <link rel="stylesheet" href="{{ url('css/admin-curriculum.css') }}">@endpush
@@ -34,7 +34,7 @@
 @push('modals')
 @include('admin.courses._curriculum-modals')
 @endpush
-@push('plugin-scripts')<script src="{{ url('vendor/lexical/namikulo-editor.js') }}?v=1" defer></script>@endpush
+@push('plugin-scripts')<script src="{{ url('vendor/lexical/namikulo-editor.js') }}?v=4" defer></script>@endpush
 @push('scripts')
 <script src="{{ url('js/pages/admin-content.js') }}"></script>
 <script src="{{ url('js/pages/admin-curriculum.js') }}"></script>

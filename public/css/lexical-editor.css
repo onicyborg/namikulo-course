@@ -1,10 +1,11 @@
 .nd-app textarea[data-lexical-mounted="1"] { display: none !important; }
-.nd-app .nc-lexical { min-width: 0; overflow: hidden; border: 1px solid var(--nd-border); border-radius: 10px; background: var(--nd-surface); color: var(--nd-text); box-shadow: none; }
+.nd-app .nc-lexical { min-width: 0; overflow: hidden; border: 1px solid var(--nd-border); border-radius: 12px; background: var(--nd-surface); color: var(--nd-text); box-shadow: var(--nd-shadow); }
 .nd-app .nc-lexical:focus-within { border-color: var(--nd-link); box-shadow: 0 0 0 3px var(--nd-active); }
-.nd-app .nc-lexical-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; padding: 9px 10px; border-bottom: 1px solid var(--nd-border); background: var(--nd-subtle); }
-.nd-app .nc-lexical-group { display: inline-flex; align-items: center; gap: 3px; min-height: 36px; padding-right: 8px; border-right: 1px solid var(--nd-border); }
+.nd-app .nc-lexical-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 9px 12px; border-bottom: 1px solid var(--nd-border); background: color-mix(in srgb, var(--nd-subtle) 92%, transparent); }
+.nd-app .nc-lexical-group { display: inline-flex; align-items: center; gap: 2px; min-height: 36px; padding-right: 8px; border-right: 1px solid var(--nd-border); }
 .nd-app .nc-lexical-group:last-child { border: 0; padding-right: 0; }
-.nd-app .nc-lexical-button, .nd-app .nc-lexical-select-label select { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px; padding: 6px 9px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--nd-text); font: inherit; font-size: 12px; line-height: 1.2; cursor: pointer; }
+.nd-app .nc-lexical-button, .nd-app .nc-lexical-select-label select { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 36px; padding: 6px 8px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--nd-text); font: inherit; font-size: 12px; line-height: 1.2; cursor: pointer; }
+.nd-app .nc-lexical-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.85; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .nd-app .nc-lexical-button:hover, .nd-app .nc-lexical-button[aria-pressed="true"], .nd-app .nc-lexical-select-label select:hover { border-color: var(--nd-active-border); background: var(--nd-active); color: var(--nd-link); }
 .nd-app .nc-lexical-button:focus-visible, .nd-app .nc-lexical-select-label select:focus-visible, .nd-app .nc-lexical-link-panel input:focus-visible, .nd-app .nc-lexical-link-actions button:focus-visible { outline: 2px solid var(--nd-link); outline-offset: 2px; }
 .nd-app .nc-lexical-select-label select { padding-right: 21px; border-color: var(--nd-border); background: var(--nd-surface); color: var(--nd-text); }
@@ -14,7 +15,8 @@
 .nd-app .nc-lexical-editable.is-empty::before { position: absolute; top: 18px; left: 20px; content: attr(data-placeholder); color: var(--nd-muted); pointer-events: none; }
 .nd-app .nc-lexical--course .nc-lexical-editable { background: #fff; color: #0f172a; color-scheme: light; }
 .nd-app .nc-lexical--course .nc-lexical-editable.is-empty::before { color: #64748b; }
-.nd-app .nc-lexical--discussion .nc-lexical-editable { min-height: 150px; background: var(--nd-surface); color: var(--nd-text); }
+.nd-app .nc-lexical--discussion .nc-lexical-editable { min-height: 170px; background: #fff; color: #0f172a; color-scheme: light; }
+.nd-app .nc-lexical--discussion .nc-lexical-editable.is-empty::before { color: #64748b; }
 .nd-app .nc-lexical-editable .nc-lexical-paragraph { margin: 0 0 10px; }
 .nd-app .nc-lexical-editable .nc-lexical-h2 { margin: 14px 0 8px; font-size: 1.4em; font-weight: 700; line-height: 1.35; }
 .nd-app .nc-lexical-editable .nc-lexical-h3 { margin: 12px 0 7px; font-size: 1.2em; font-weight: 650; line-height: 1.4; }
@@ -28,12 +30,38 @@
 .nd-app .nc-lexical-editable .nc-lexical-underline { text-decoration: underline; }
 .nd-app .nc-lexical-editable .nc-lexical-strike { text-decoration: line-through; }
 .nd-app .nc-lexical-editable .nc-lexical-code { padding: 2px 5px; border: 1px solid var(--nd-border); border-radius: 4px; background: var(--nd-subtle); font: .92em/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+.nd-app .nc-lexical-editable .nc-lexical-table { width: 100%; margin: 14px 0; border-collapse: collapse; }
+.nd-app .nc-lexical-editable .nc-lexical-table-cell, .nd-app .nc-lexical-editable .nc-lexical-table-header { min-width: 72px; padding: 8px 10px; border: 1px solid #cbd5e1; vertical-align: top; }
+.nd-app .nc-lexical-editable .nc-lexical-table-header { background: #f1f5f9; font-weight: 700; }
 .nd-app .nc-lexical-editable .nc-lexical-link { color: var(--nd-link); text-decoration: underline; text-underline-offset: 2px; }
-.nd-app .nc-lexical--course .nc-lexical-editable .nc-lexical-link { color: #0f766e; }
-.nd-app .nc-lexical--course .nc-lexical-editable .nc-lexical-code { border-color: #cbd5e1; background: #f1f5f9; }
+.nd-app .nc-lexical-editable .nc-lexical-image { display: block; max-width: 100%; max-height: 520px; width: auto; height: auto; margin: 14px 0; border: 1px solid var(--nd-border); border-radius: 9px; object-fit: contain; }
+.nd-app .nc-lexical--course .nc-lexical-editable .nc-lexical-link, .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-link { color: #0f766e; }
+.nd-app .nc-lexical--course .nc-lexical-editable .nc-lexical-code, .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-code { border-color: #cbd5e1; background: #f1f5f9; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable { background: #0b1426; color: #e2e8f0; color-scheme: dark; caret-color: #5eead4; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable.is-empty::before { color: #94a3b8; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-table-cell,
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-table-header { border-color: #334155; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-table-header,
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-code { background: #1e293b; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-code { border-color: #334155; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable .nc-lexical-link { color: #5eead4; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#0f172a"], [style*="rgb(15, 23, 42)"]) { color: #e2e8f0 !important; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#0f766e"], [style*="rgb(15, 118, 110)"]) { color: #5eead4 !important; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#1d4ed8"], [style*="rgb(29, 78, 216)"]) { color: #93c5fd !important; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#b91c1c"], [style*="rgb(185, 28, 28)"]) { color: #fca5a5 !important; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#6d28d9"], [style*="rgb(109, 40, 217)"]) { color: #c4b5fd !important; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#92400e"], [style*="rgb(146, 64, 14)"]) { color: #fcd34d !important; }
+html[data-nc-theme="dark"] .nd-app .nc-lexical--discussion .nc-lexical-editable :is([style*="#fef08a"], [style*="rgb(254, 240, 138)"]) { color: #0f172a !important; }
 .nd-app .nc-lexical-link-panel { padding: 15px; border-bottom: 1px solid var(--nd-border); background: var(--nd-surface); }
+.nd-app .nc-lexical-image-panel { padding: 15px; border-bottom: 1px solid var(--nd-border); background: var(--nd-surface); }
+.nd-app .nc-lexical-image-panel[hidden] { display: none; }
+.nd-app .nc-lexical-image-panel .nc-lexical-link-fields small { color: var(--nd-muted); font-size: 11px; }
 .nd-app .nc-lexical-link-fields { display: grid; gap: 6px; margin-bottom: 11px; }
 .nd-app .nc-lexical-link-fields label, .nd-app .nc-lexical-link-target { margin: 0; color: var(--nd-text); font-size: 12px; font-weight: 600; }
+.nd-app .nc-lexical-image-panel input { width: 100%; min-height: 40px; padding: 8px 11px; border: 1px solid var(--nd-border); border-radius: 7px; background: var(--nd-bg); color: var(--nd-text); font: inherit; }
+.nd-app .nc-lexical-image-panel [data-image-file] { padding: 7px 10px; }
+.nd-app .nc-lexical-image-panel input:focus-visible { outline: 2px solid var(--nd-link); outline-offset: 2px; }
+.nd-app .nc-lexical-image-panel [data-image-save]:disabled { opacity: .65; cursor: wait; }
 .nd-app .nc-lexical-link-fields input { width: 100%; min-height: 40px; padding: 8px 11px; border: 1px solid var(--nd-border); border-radius: 7px; background: var(--nd-bg); color: var(--nd-text); font: inherit; }
 .nd-app .nc-lexical-link-target { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
 .nd-app .nc-lexical-link-target input { width: 17px; height: 17px; margin: 0; accent-color: var(--nd-primary); cursor: pointer; }
@@ -47,5 +75,5 @@
 .nd-app .nc-discussion-editor.has-error .nc-lexical { border-color: var(--nd-bad-text); }
 .nd-app .nc-discussion-editor .nc-editor-count { display: block; margin-top: 8px; color: var(--nd-muted); font-size: 11px; }
 .nd-app .nc-discussion-editor .nc-editor-error { margin: 7px 0 0; color: var(--nd-bad-text); font-size: 12px; }
-@media (max-width: 650px) { .nd-app .nc-lexical-toolbar { gap: 4px; padding: 7px; } .nd-app .nc-lexical-group { padding-right: 5px; } .nd-app .nc-lexical-button { min-width: 40px; min-height: 40px; } .nd-app .nc-lexical-editable { padding: 15px; } }
+@media (max-width: 650px) { .nd-app .nc-lexical-toolbar { flex-wrap: nowrap; gap: 5px; padding: 7px 9px; overflow-x: auto; scrollbar-width: thin; } .nd-app .nc-lexical-group { flex: 0 0 auto; padding-right: 5px; } .nd-app .nc-lexical-button { min-width: 40px; min-height: 40px; } .nd-app .nc-lexical-editable { padding: 15px; overflow-x: auto; } }
 @media (prefers-reduced-motion: reduce) { .nd-app .nc-lexical-button { transition: none; } }

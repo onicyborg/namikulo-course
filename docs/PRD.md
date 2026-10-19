@@ -163,6 +163,7 @@ Prioritas **M (Phase 8/9)** berlaku untuk perluasan ini setelah user mengaktifka
 | F-805 | Pada tiap materi video, member dengan akses course aktif dapat membaca dan membuat pertanyaan serta menanggapi pertanyaan/komentar. Admin dapat membaca dan menjawab tanpa role trainer. Diskusi tetap tersedia bagi member yang masih aktif pada course arsip. | M (Phase 9) |
 | F-806 | Balasan memberi notifikasi dalam aplikasi kepada penulis pertanyaan dan penulis komentar yang ditanggapi, tanpa notifikasi untuk diri sendiri atau duplikasi penerima. Pertanyaan baru memberi notifikasi kepada admin aktif. Notifikasi yang belum dibaca ikut rekap harian. | M (Phase 9) |
 | F-807 | Admin dapat menyembunyikan/mengembalikan konten diskusi bermasalah; penulis dapat menghapus kirimannya sendiri. Konten tersembunyi tidak terlihat oleh member. | M (Phase 9) |
+| F-808 | Balasan dan daftar jawaban dibuka dalam modal dari ruang belajar tanpa meninggalkan video. Tautan notifikasi membuka percakapan pada komentar yang dituju dan memberi sorotan yang terlihat; URL thread tetap tersedia untuk akses langsung. Transisi tema, modal, panel materi, dan popover terasa halus serta mengikuti preferensi reduced motion. | M (Phase 9) |
 
 ## 6. Aturan bisnis
 
@@ -181,7 +182,7 @@ Prioritas **M (Phase 8/9)** berlaku untuk perluasan ini setelah user mengaktifka
 | BR-11 | Harga disimpan dalam Rupiah bulat. Harga diskon, bila ada, harus lebih kecil dari harga normal. |
 | BR-12 | Perubahan akses (beri, perpanjang, cabut) dan perubahan status pesanan dicatat di log sistem. |
 | BR-13 | Membaca/menulis diskusi materi memerlukan login aktif dan akses course yang masih berlaku; admin dapat mengakses untuk moderasi/pratinjau. Akses yang berakhir tidak membuka kembali materi melalui tautan notifikasi. |
-| BR-14 | Pertanyaan dan balasan memakai Lexical ringkas untuk teks berformat (tebal, miring, garis bawah, coret, daftar, kutipan, kode, dan tautan aman), tanpa unggahan gambar atau lampiran. Deskripsi course, bab, dan materi memakai toolbar Lexical yang lebih lengkap. HTML disanitasi di server; konten lama tetap dapat dibuka untuk diubah. Balasan tetap satu tingkat, dengan potongan komentar asal yang dapat diklik untuk menuju dan menyorot komentar tersebut. Kutipan komentar tersembunyi/dihapus tidak dibocorkan. Komentar lama tetap diperlakukan sebagai teks biasa. |
+| BR-14 | Pertanyaan, balasan, dan deskripsi course, bab, serta materi memakai toolbar Lexical lengkap: gaya paragraf, font, ukuran, perataan, warna, sorotan, tabel, penekanan, daftar, kutipan, kode, tautan, gambar lokal, serta undo/redo. Gambar JPG/PNG/WebP dibatasi 3 MB, diberi deskripsi alternatif, dan gambar diskusi/bab/materi hanya dapat dibaca pemilik akses course aktif atau admin. Diskusi tetap dibatasi 10–2.000 karakter teks. HTML disanitasi di server; konten lama tetap dapat dibuka untuk diubah. Balasan tetap satu tingkat, dengan potongan komentar asal yang dapat diklik untuk menuju dan menyorot komentar tersebut. Kutipan komentar tersembunyi/dihapus tidak dibocorkan. Komentar lama tetap diperlakukan sebagai teks biasa. |
 | BR-15 | Notifikasi dibuat sekali untuk setiap peristiwa bisnis yang sah dan hanya untuk penerima terkait. Pembuatan ulang webhook/pemicu tidak menggandakan notifikasi. Notifikasi pembayaran tidak menentukan status bayar atau hak akses. |
 | BR-16 | Rekap email memakai tanggal **Asia/Jakarta**, sedangkan semua timestamp database tetap UTC. Batas rekap hari D adalah notifikasi belum dibaca yang dibuat sebelum 07.00 WIB hari D; notifikasi setelahnya masuk kesempatan hari berikutnya. Jika masih belum dibaca, item dapat muncul kembali pada rekap hari berikutnya. |
 | BR-17 | Rekap tidak dikirim untuk akun nonaktif. Kegagalan/ketidakpastian SMTP tidak menghapus notifikasi dan tidak memicu pengiriman otomatis berulang pada tanggal rekap yang sama. |
@@ -210,6 +211,8 @@ Permintaan "tidak bisa di-screenshot, tidak bisa di-download, dan tidak bisa dia
 **Keputusan MVP:** HLS terenkripsi buatan sendiri + token + watermark + deterrent klien + satu sesi aktif. Teks di UI tidak boleh menjanjikan "tidak bisa direkam".
 
 ## 8. Asumsi dan pertanyaan terbuka
+
+**Urutan belajar:** Pada course yang sudah diakses, member menyelesaikan materi video siap secara berurutan. Materi berikutnya terkunci sampai video materi sebelumnya tercatat selesai; materi yang sudah selesai dapat dibuka kembali. Video yang belum siap tidak menghalangi rangkaian belajar. Admin tetap bisa membuka semua materi dalam mode pratinjau. Jika admin mengubah urutan atau menambahkan video siap di tengah kurikulum, materi yang belum selesai mengikuti urutan terbaru.
 
 Agent memakai asumsi di kolom "Default" sampai user menyatakan lain.
 

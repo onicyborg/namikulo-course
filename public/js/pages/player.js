@@ -75,6 +75,23 @@
                 if (!data || !progressFeedback) return;
                 progressFeedback.textContent = data.completed ? 'Materi selesai.' : 'Posisi belajar tersimpan.';
                 if (currentLessonState) currentLessonState.textContent = data.completed ? 'Selesai' : 'Sedang dipelajari';
+                if (data.next_unlocked_id) {
+                    document.querySelectorAll('[data-locked-lesson]').forEach(function (locked) {
+                        if (locked.dataset.lockedLesson !== data.next_unlocked_id) return;
+                        var link = document.createElement('a');
+                        link.href = locked.dataset.lessonUrl;
+                        link.className = locked.className.replace(/\bnl-unavailable\b|\bnl-next-locked\b/g, '').trim();
+                        while (locked.firstChild) link.appendChild(locked.firstChild);
+                        locked.replaceWith(link);
+                        var state = link.querySelector('[data-lesson-state]');
+                        if (state) state.textContent = 'Belum dimulai';
+                        if (link.classList.contains('nl-next')) {
+                            var hints = link.querySelectorAll('small');
+                            if (hints[0]) hints[0].textContent = 'Materi berikutnya';
+                            if (hints[1]) hints[1].remove();
+                        }
+                    });
+                }
             }).catch(function () {
                 if (!stopped) pendingWatchedSeconds += watched;
                 if (progressFeedback && !stopped) progressFeedback.textContent = 'Progres belum tersimpan. Periksa koneksi sebelum menutup halaman.';

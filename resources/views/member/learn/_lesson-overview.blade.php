@@ -21,9 +21,11 @@
         @if($previous)
             <a href="{{ route('learn.show', $previous) }}" class="nl-previous"><x-dashboard.icon name="arrow-right" /><span><small>Materi sebelumnya</small><strong>{{ $previous->title }}</strong></span></a>
         @endif
-        @if($next)
+        @if($next && isset($unlockedIds[$next->id]))
             <a href="{{ route('learn.show', $next) }}" class="nl-next"><span><small>Materi berikutnya</small><strong>{{ $next->title }}</strong></span><x-dashboard.icon name="arrow-right" /></a>
-        @else
+        @elseif($next)
+            <div class="nl-next nl-next-locked" data-locked-lesson="{{ $next->id }}" data-lesson-url="{{ route('learn.show', $next) }}"><span><small>Materi berikutnya terkunci</small><strong>{{ $next->title }}</strong><small>Selesaikan materi ini untuk membuka.</small></span><x-dashboard.icon name="arrow-right" /></div>
+        @elseif(! $preview)
             <a href="{{ $backUrl }}" class="nl-next"><span><small>Akhir kurikulum</small><strong>Kembali ke course</strong></span><x-dashboard.icon name="arrow-right" /></a>
         @endif
     </nav>

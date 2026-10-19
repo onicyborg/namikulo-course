@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Member;
 use App\Enums\CourseStatus;
 use App\Enums\EnrollmentStatus;
 use App\Enums\OrderStatus;
-use App\Enums\VideoStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\LessonProgress;
 use App\Models\Order;
 use App\Services\MemberLearningSummary;
+use App\Services\LessonSequence;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -40,7 +40,7 @@ class CourseController extends Controller
         return view('member.courses.index', compact('courses', 'progress', 'filters', 'states'));
     }
 
-    public function show(Request $request, Course $course, MemberLearningSummary $summary): View
+    public function show(Request $request, Course $course, MemberLearningSummary $summary, LessonSequence $sequence): View
     {
         $userId = $request->user()->id;
         $enrollments = Enrollment::query()->where('user_id', $userId)->where('course_id', $course->id)
@@ -56,13 +56,17 @@ class CourseController extends Controller
             ->where('course_id', $course->id)->whereIn('lesson_id', $lessonIds)->get()->keyBy('lesson_id');
         $summaryData = $summary->forCourses($request->user(), collect([$course]))->get($course->id,
             ['total' => 0, 'completed' => 0, 'percent' => 0]);
-        $firstReady = $lessons->first(fn ($lesson) => $lesson->videoAsset?->status === VideoStatus::Ready);
+        $ready = $sequence->readyLessons($course);
+        $firstReady = $ready->first();
+        $unlockedIds = $sequence->unlockedIds($ready, $lessonProgress);
+        $continueLesson = $ready->first(fn ($lesson) => isset($unlockedIds[$lesson->id])
+            && ! $lessonProgress->get($lesson->id)?->completed_at) ?? $firstReady;
         $pendingOrder = ! $active ? Order::query()->where('user_id', $userId)->where('course_id', $course->id)
             ->where('status', OrderStatus::Pending->value)->where('expires_at', '>', now())->latest()->first() : null;
         $canBuy = ! $active && ! $pendingOrder && ! $course->trashed()
             && $course->status === CourseStatus::Published;
 
         return view('member.courses.show', compact('course', 'current', 'active', 'lessonProgress',
-            'summaryData', 'firstReady', 'pendingOrder', 'canBuy'));
+            'summaryData', 'firstReady', 'continueLesson', 'unlockedIds', 'pendingOrder', 'canBuy'));
     }
 }

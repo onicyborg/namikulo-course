@@ -2,14 +2,6 @@
     'use strict';
 
     document.addEventListener('DOMContentLoaded', function () {
-        if (window.jQuery && window.jQuery.fn.DataTable) {
-            ['#category-table', '#course-table', '#user-table', '#member-table'].forEach(function (selector) {
-                if (document.querySelector(selector) && !window.jQuery.fn.DataTable.isDataTable(selector)) {
-                    window.jQuery(selector).DataTable({ pageLength: 10, responsive: true, language: { emptyTable: 'Belum ada data', search: 'Cari:', lengthMenu: 'Tampilkan _MENU_ data', info: 'Menampilkan _START_–_END_ dari _TOTAL_ data', paginate: { previous: 'Sebelumnya', next: 'Berikutnya' } } });
-                }
-            });
-        }
-
         if (window.contentModalToOpen && window.jQuery) {
             var modal = document.getElementById(window.contentModalToOpen);
             if (modal) window.jQuery(modal).modal('show');

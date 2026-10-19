@@ -203,7 +203,7 @@ Ada dua jenis asset dengan helper berbeda. Jangan tertukar.
 **A. Asset Otika (di host eksternal)** — CSS/JS/DataTables/ikon/logo/favicon bawaan template:
 
 - Wajib dipanggil dengan `asset()`; mengikuti `ASSET_URL`, default `https://otika.namikulo.com/assets`.
-- Path: `css/app.min.css`, `css/style.css`, `css/components.css`, `css/custom.css`, `js/app.min.js`, `js/scripts.js`, `js/custom.js`, `js/page/*`, `bundles/datatables/*`, `img/*`.
+- Path: `css/app.min.css`, `css/style.css`, `css/components.css`, `css/custom.css`, `js/app.min.js`, `js/scripts.js`, `js/custom.js`, `js/page/*`, `img/*`. Bundle DataTables untuk daftar interaktif memakai salinan lokal di bagian B.
 - Jangan mengedit vendor, `app.min.js`, `scripts.js`, atau `custom.js` milik Otika (file itu berada di host eksternal).
 
 **B. Asset milik aplikasi (di folder `public/` proyek ini)** — wajib dipanggil dengan `url('...')` atau `Storage::url()`, **bukan** `asset()`:
@@ -213,6 +213,7 @@ Ada dua jenis asset dengan helper berbeda. Jangan tertukar.
 - `public/js/app-custom.js` — helper umum (CSRF, error 422, modal hapus).
 - `public/js/pages/*.js` — skrip khusus halaman.
 - `public/vendor/lexical/namikulo-editor.js` dan `public/css/lexical-editor.css` — editor rich text statis untuk admin dan diskusi; muat hanya pada halaman yang memakainya.
+- `public/vendor/datatables/datatables.min.js` dan `.css` — bundle DataTables Bootstrap 4 lokal untuk `x-server-table`; muat hanya pada halaman daftar interaktif. Salinan ini menggantikan pemuatan bundle tabel dari host Otika agar filter dan pagination tidak gagal ketika aset eksternal bermasalah.
 - `public/fonts`, `public/img` milik aplikasi.
 - Upload (thumbnail course, avatar) memakai `url('storage/...')` setelah `storage:link`.
 - **Video dan materi privat tidak boleh berada di `public/` atau `storage/app/public`.** Lihat bagian 11.
@@ -249,7 +250,7 @@ Urutan JS: vendor/global (`app.min.js`) → plugin halaman → konfigurasi page 
 ## 9. Tabel dan DataTables
 
 - Gunakan `table-responsive` dan `table table-striped`.
-- Client-side default: `pageLength: 10`, `responsive: true`. Server-side hanya untuk dataset besar, dan endpoint/query harus didokumentasikan.
+- Seluruh tabel daftar interaktif memakai Yajra DataTables server-side (disetujui user, 19 Oktober 2026), `pageLength: 10`, ukuran 10/25/50/100. Gunakan `x-server-table` dan `App\Services\ServerTable`; tiap tabel memiliki route `/data` JSON terpisah dari route halaman HTML. Pagination, filter, pencarian, dan reset hanya meminta JSON tanpa navigasi halaman. Aksi terdelegasi dan modal dimuat berdasarkan ID. Endpoint dan UAT: `docs/SERVER-SIDE-TABLES.md`. Tabel email, PDF, dan rich text tetap statis.
 - Export mengikuti Buttons Otika: copy, csv, excel, pdf, print. Export hanya untuk data admin, tidak untuk konten materi.
 - Jangan menginisialisasi DataTables dua kali pada elemen yang sama.
 

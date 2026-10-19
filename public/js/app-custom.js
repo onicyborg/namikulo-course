@@ -2,19 +2,14 @@
     'use strict';
 
     function initializeLoadingForms() {
-        document.querySelectorAll('[data-loading-form]').forEach(function (form) {
-            form.addEventListener('submit', function () {
-                var button = form.querySelector('button[type="submit"]');
-
-                if (!button || button.disabled) {
-                    return;
-                }
-
-                button.disabled = true;
-                button.setAttribute('aria-busy', 'true');
-                button.dataset.originalText = button.textContent;
-                button.textContent = button.dataset.loadingText || 'Memproses...';
-            });
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (event.defaultPrevented || !form.matches('[data-loading-form]')) return;
+            var button = event.submitter || form.querySelector('button[type="submit"]');
+            if (!button || button.disabled) return;
+            button.disabled = true;
+            button.setAttribute('aria-busy', 'true');
+            button.textContent = button.dataset.loadingText || 'Memproses…';
         });
     }
 
@@ -43,14 +38,12 @@
             return;
         }
 
-        document.querySelectorAll('[data-delete-url]').forEach(function (trigger) {
-            trigger.addEventListener('click', function () {
-                modal.action = trigger.dataset.deleteUrl;
-                var name = document.querySelector('[data-delete-name]');
-                if (name) {
-                    name.textContent = trigger.dataset.name || 'ini';
-                }
-            });
+        document.addEventListener('click', function (event) {
+            var trigger = event.target.closest('[data-delete-url]');
+            if (!trigger) return;
+            modal.action = trigger.dataset.deleteUrl;
+            var name = document.querySelector('[data-delete-name]');
+            if (name) name.textContent = trigger.dataset.name || 'ini';
         });
     }
 
@@ -64,6 +57,24 @@
         var cancelButton = dialog.querySelector('[data-confirm-dialog-cancel]');
         var approved = new WeakSet();
         var pending = null;
+        var closing = false;
+
+        function closeDialog() {
+            if (closing || !dialog.open) return Promise.resolve();
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !dialog.animate) {
+                dialog.close();
+                return Promise.resolve();
+            }
+            closing = true;
+            dialog.classList.add('is-closing');
+            return dialog.animate([{ opacity: 1, transform: 'translateY(0) scale(1)' },
+                { opacity: 0, transform: 'translateY(8px) scale(.985)' }],
+                { duration: 160, easing: 'ease-in' }).finished.catch(function () {}).then(function () {
+                    dialog.close();
+                    dialog.classList.remove('is-closing');
+                    closing = false;
+                });
+        }
 
         document.addEventListener('submit', function (event) {
             var form = event.target;
@@ -81,13 +92,14 @@
             cancelButton.focus();
         }, true);
 
-        cancelButton.addEventListener('click', function () { dialog.close(); });
+        cancelButton.addEventListener('click', function () { closeDialog(); });
+        dialog.addEventListener('cancel', function (event) { event.preventDefault(); closeDialog(); });
         dialog.addEventListener('close', function () { pending = null; });
-        confirmButton.addEventListener('click', function () {
-            if (!pending) return;
+        confirmButton.addEventListener('click', async function () {
+            if (!pending || closing) return;
             var form = pending.form;
             var submitter = pending.submitter;
-            dialog.close();
+            await closeDialog();
             if (!form.isConnected) return;
             approved.add(form);
             try {
@@ -110,7 +122,8 @@
         new MutationObserver(normalize).observe(sidebar, { attributes: true, attributeFilter: ['tabindex'] });
     }
 
-    function initializeTimezone() {
+    function initializeTimezone(root) {
+        root = root || document;
         var zone = '';
         try {
             zone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
@@ -118,11 +131,11 @@
             return;
         }
 
-        document.querySelectorAll('[data-browser-timezone]').forEach(function (input) {
+        root.querySelectorAll('[data-browser-timezone]').forEach(function (input) {
             input.value = zone;
         });
 
-        document.querySelectorAll('[data-local-datetime]').forEach(function (element) {
+        root.querySelectorAll('[data-local-datetime]').forEach(function (element) {
             var date = new Date(element.dateTime || element.dataset.utc);
             if (isNaN(date.getTime())) return;
             element.textContent = new Intl.DateTimeFormat('id-ID', {
@@ -130,7 +143,7 @@
             }).format(date);
         });
 
-        document.querySelectorAll('[data-local-datetime-input]').forEach(function (input) {
+        root.querySelectorAll('[data-local-datetime-input]').forEach(function (input) {
             if (input.value || !input.dataset.utc) return;
             var date = new Date(input.dataset.utc);
             if (isNaN(date.getTime())) return;
@@ -138,7 +151,9 @@
             input.value = date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + 'T' + pad(date.getHours()) + ':' + pad(date.getMinutes());
         });
 
-        document.querySelectorAll('[data-local-time-form]').forEach(function (form) {
+        root.querySelectorAll('[data-local-time-form]').forEach(function (form) {
+            if (form.dataset.timezoneInitialized) return;
+            form.dataset.timezoneInitialized = 'true';
             form.addEventListener('submit', function (event) {
                 form.querySelectorAll('[data-local-datetime-input]').forEach(function (input) {
                     var utcInput = form.querySelector('[name="' + input.name + '_utc"]');
@@ -160,6 +175,7 @@
             }, true);
         });
 
+        if (root !== document) return;
         var body = document.body;
         var csrf = document.querySelector('meta[name="csrf-token"]');
         if (!zone || !body.dataset.timezoneUrl || body.dataset.savedTimezone === zone || !csrf) return;
@@ -171,6 +187,8 @@
             if (response.ok) body.dataset.savedTimezone = zone;
         }).catch(function () {});
     }
+
+    document.addEventListener('nc:content-ready', function (event) { initializeTimezone(event.detail.root); });
 
     document.addEventListener('DOMContentLoaded', function () {
         initializeLoadingForms();

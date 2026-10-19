@@ -94,7 +94,8 @@ class NotificationService
             if (! $viewer->isAdmin() && ! ($activeCourseIds !== null
                 ? in_array($post->lesson->course_id, $activeCourseIds, true)
                 : (bool) app(EnrollmentService::class)->activeFor($viewer, $post->lesson->course))) return null;
-            return route('learn.discussion.thread', [$post->lesson, $root]).'?focus='.$post->id.'#discussion-post-'.$post->id;
+            if (! app(LessonSequence::class)->isAccessible($viewer, $post->lesson)) return null;
+            return route('learn.show', $post->lesson).'?focus='.$post->id.'#discussion-post-'.$post->id;
         }
         if ($viewer->isAdmin()) {
             return $notification->order ? route('admin.orders.show', $notification->order) : null;
