@@ -24,6 +24,7 @@
     @if(request()->routeIs('admin.lessons.video.prepare'))<link rel="stylesheet" href="{{ url('css/video-workspace.css') }}?v=1">@endif
     <link rel="stylesheet" href="{{ url('css/searchable-select.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url('css/file-upload.css') }}?v=1">
 </head>
 <body class="nd-app na-admin{{ request()->routeIs('admin.dashboard') ? '' : ' nd-legacy' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>
@@ -50,6 +51,7 @@
         <script src="{{ url('js/remote-modal.js') }}?v=20"></script>
     @endif
     <script src="{{ url('js/searchable-select.js') }}?v=1"></script>
+    <script src="{{ url('js/file-upload.js') }}?v=1"></script>
     @stack('scripts')
     @include('partials.global-toast')
 </body>

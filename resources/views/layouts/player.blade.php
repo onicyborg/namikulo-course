@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="{{ url('css/learning-workspace.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/learning-conversation.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url('css/file-upload.css') }}?v=1">
 </head>
 <body class="nd-app nd-legacy player-page nm-player nl-premium" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="nd-skip" href="#main-content">Lewati ke materi</a>
@@ -26,6 +27,7 @@
     <script src="{{ url('js/app-custom.js') }}?v=5"></script>
     <script src="{{ url('js/interaction-motion.js') }}?v=1"></script>
     <script src="{{ url('js/admin-action-tooltip.js') }}"></script>
+    <script src="{{ url('js/file-upload.js') }}?v=1"></script>
     @stack('player-scripts')
     @stack('scripts')
     @include('partials.global-toast')

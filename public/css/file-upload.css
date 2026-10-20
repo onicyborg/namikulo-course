@@ -1,0 +1,23 @@
+.nc-file-upload { position: relative; min-width: 0; max-width: 100%; }
+.nc-file-upload-native { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+.nc-file-upload-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; min-width: 0; padding: 10px; border: 1px solid var(--nd-border, #dbe3ef); border-radius: 10px; background: var(--nd-surface, #fff); color: var(--nd-text, #111c35); transition: border-color .18s, box-shadow .18s, background-color .18s; }
+.nc-file-upload-row:hover { border-color: var(--nd-active-border, #a5b4fc); }
+.nc-file-upload:focus-within .nc-file-upload-row { border-color: var(--nd-primary, #4f46e5); box-shadow: 0 0 0 3px var(--nd-active, rgb(79 70 229 / 12%)); }
+.nc-file-upload.is-invalid .nc-file-upload-row { border-color: var(--nd-bad-text, #be123c); }
+.nc-file-upload.is-disabled .nc-file-upload-row { opacity: .65; background: var(--nd-subtle, #f6f8fc); }
+.nc-file-upload-choose { display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex: 0 0 auto; min-height: 38px; padding: 8px 13px; border: 1px solid var(--nd-primary, #4f46e5); border-radius: 7px; background: var(--nd-primary, #4f46e5); color: #fff; font: inherit; font-size: 12px; font-weight: 700; line-height: 1.3; cursor: pointer; transition: background-color .18s, border-color .18s; }
+.nc-file-upload-choose:hover:not(:disabled) { border-color: var(--nd-primary-hover, #4338ca); background: var(--nd-primary-hover, #4338ca); color: #fff; }
+.nc-file-upload-choose:focus-visible, .nc-file-upload-remove:focus-visible { outline: 2px solid var(--nd-primary, #4f46e5); outline-offset: 3px; }
+.nc-file-upload-choose:disabled, .nc-file-upload-remove:disabled { opacity: .55; cursor: not-allowed; }
+.nc-file-upload-choose svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.nc-file-upload-name { flex: 1 1 150px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--nd-muted, #64748b); font-size: 12px; }
+.nc-file-upload.is-selected .nc-file-upload-name { color: var(--nd-text, #111c35); font-weight: 600; }
+.nc-file-upload-size { flex: 0 0 auto; color: var(--nd-muted, #64748b); font-size: 11px; white-space: nowrap; }
+.nc-file-upload-size[hidden] { display: none !important; }
+.nc-file-upload-remove { flex: 0 0 auto; min-height: 36px; padding: 6px 9px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--nd-bad-text, #be123c); font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; }
+.nc-file-upload-remove:hover:not(:disabled) { border-color: var(--nd-bad-text, #be123c); background: var(--nd-bad-bg, #fff1f2); }
+.nc-file-upload-remove[hidden], .nc-file-upload-preview[hidden] { display: none !important; }
+.nc-file-upload-preview { display: block; width: min(180px, 100%); max-height: 120px; margin-top: 10px; border: 1px solid var(--nd-border, #dbe3ef); border-radius: 8px; background: var(--nd-subtle, #f6f8fc); object-fit: contain; }
+.nc-lexical-image-panel .nc-file-upload { width: 100%; }
+@media (max-width: 575.98px) { .nc-file-upload-row { gap: 8px; } .nc-file-upload-choose, .nc-file-upload-remove { min-height: 44px; } .nc-file-upload-name { flex-basis: calc(100% - 160px); } .nc-file-upload-size { order: 2; } .nc-file-upload-remove { order: 3; } }
+@media (prefers-reduced-motion: reduce) { .nc-file-upload-row, .nc-file-upload-choose { transition: none; } }
