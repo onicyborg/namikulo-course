@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    @php($usesWorkspaceTheme = request()->routeIs('member.dashboard', 'member.courses.*', 'member.orders.index', 'member.notifications.*', 'member.profile.*'))
     @php($usesServerTable = request()->routeIs('member.orders.index'))
     @include('partials.head')
     <link rel="stylesheet" href="{{ asset('css/app.min.css') }}">
@@ -17,8 +18,13 @@
     <link rel="stylesheet" href="{{ url('css/member-area.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/table-actions.css') }}?v=1">
+    @if($usesWorkspaceTheme)
+        <link rel="stylesheet" href="{{ url('css/admin-workspace.css') }}?v=2">
+        <link rel="stylesheet" href="{{ url('css/admin-workspace-data.css') }}?v=4">
+        <link rel="stylesheet" href="{{ url('css/member-workspace.css') }}?v=2">
+    @endif
 </head>
-<body class="nd-app nd-legacy nm-app" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
+<body class="nd-app nd-legacy nm-app{{ $usesWorkspaceTheme ? ' nm-workspace' : '' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>
     @include('member.partials.sidebar')
     <button class="nd-backdrop" type="button" data-sidebar-close aria-label="Tutup navigasi" hidden></button>

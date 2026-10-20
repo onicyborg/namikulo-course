@@ -1,4 +1,4 @@
-@props(['rows', 'columns', 'cells', 'record', 'source', 'filters' => [], 'sortable' => '', 'orderColumn' => '', 'direction' => 'desc', 'statuses' => [], 'roles' => [], 'extraFilters' => [], 'cellData' => []])
+@props(['rows', 'columns', 'cells', 'record', 'source', 'filters' => [], 'sortable' => '', 'orderColumn' => '', 'direction' => 'desc', 'statuses' => [], 'roles' => [], 'extraFilters' => [], 'cellData' => [], 'adaptive' => null])
 @php($tableId = 'table-'.str_replace('.', '-', $cells))
 <div class="nc-server-table nc-data-table-area" data-admin-table-area>
     <div class="nc-server-filters" data-admin-table-filters role="search">
@@ -12,7 +12,7 @@
     <noscript><p role="status">Aktifkan JavaScript untuk mencari dan berpindah halaman tabel.</p></noscript>
     <p role="status" data-admin-table-feedback hidden></p>
     <div class="nc-server-table-stage" data-server-table-stage>
-        <div class="table-responsive" data-server-table-scroll><table id="{{ $tableId }}" class="table table-striped nc-admin-table nd-table" data-admin-data-table data-nc-source-url="{{ $source }}" data-nc-columns="{{ implode(',', array_keys($columns)) }}" data-nc-sortable="{{ $sortable }}" data-nc-order-column="{{ $orderColumn }}" data-nc-order-direction="{{ $direction }}" data-nc-display-start="{{ ($rows->currentPage()-1)*$rows->perPage() }}"><thead><tr>@foreach($columns as $label)<th scope="col">{{ $label }}</th>@endforeach</tr></thead><tbody>
+        <div class="table-responsive" data-server-table-scroll><table id="{{ $tableId }}" class="table table-striped nc-admin-table nd-table" data-admin-data-table @if($adaptive) data-nc-adaptive="{{ $adaptive }}" @endif data-nc-source-url="{{ $source }}" data-nc-columns="{{ implode(',', array_keys($columns)) }}" data-nc-sortable="{{ $sortable }}" data-nc-order-column="{{ $orderColumn }}" data-nc-order-direction="{{ $direction }}" data-nc-display-start="{{ ($rows->currentPage()-1)*$rows->perPage() }}"><thead><tr>@foreach($columns as $label)<th scope="col">{{ $label }}</th>@endforeach</tr></thead><tbody>
     @foreach($rows as $row)<tr>@foreach($columns as $column => $label)<td>@include($cells, array_merge($cellData, [$record => $row, 'column' => $column]))</td>@endforeach</tr>@endforeach
         </tbody></table></div>
         <div class="nc-server-table-loader" data-server-table-loader role="status" aria-live="polite" aria-label="Memuat data tabel" hidden>

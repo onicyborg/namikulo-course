@@ -1,4 +1,4 @@
-@extends('layouts.login')
+@extends('layouts.premium-auth')
 
 @section('title', 'Daftar')
 @section('form_title_id', 'register-title')

@@ -52,7 +52,7 @@
             </div>
         </div>
         <div class="card-body">
-            <x-server-table :rows="$logs"
+            <x-server-table adaptive="audit" :rows="$logs"
                 :columns="['created' => 'Waktu', 'action' => 'Aksi', 'actor' => 'Pelaku', 'source' => 'Sumber / ID record', 'description' => 'Keterangan']"
                 cells="admin.operations._log-cell" record="log" :source="route('admin.operations.data')"
                 :filters="$filters" sortable="0,1,3" order-column="0" direction="desc"

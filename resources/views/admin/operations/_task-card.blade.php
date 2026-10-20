@@ -3,7 +3,7 @@
     $tone = $state?->last_error ? 'danger' : (! $state?->last_succeeded_at || $late ? 'warning' : 'success');
     $status = $state?->last_error ? 'Gagal' : (! $state?->last_succeeded_at ? 'Belum selesai' : ($late ? 'Periksa jadwal' : 'Berjalan'));
 @endphp
-<article class="nc-task-card" aria-labelledby="task-{{ $index }}">
+<article class="nc-task-card" data-task-tone="{{ $tone }}" aria-labelledby="task-{{ $index }}">
     <div class="nc-task-heading">
         <div>
             <h3 id="task-{{ $index }}">{{ $item['name'] }}</h3>

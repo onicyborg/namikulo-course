@@ -6,6 +6,7 @@
         </a>
         <button type="button" class="nd-icon-button nd-sidebar-close" data-sidebar-close aria-label="Tutup navigasi"><x-dashboard.icon name="x" /></button>
     </div>
+    @if($usesWorkspaceTheme ?? false)<div class="na-workspace-label"><span>Ruang member</span><x-dashboard.icon name="graduation-cap" /></div>@endif
     <nav class="nd-navigation">
         @foreach([
             'Belajar' => [['Dashboard', 'member.dashboard', 'layout-dashboard'], ['Course saya', 'member.courses.index', 'book-open']],

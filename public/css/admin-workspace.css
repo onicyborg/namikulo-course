@@ -1,0 +1,93 @@
+@font-face{font-family:'Namikulo Admin';src:url('../fonts/manrope/manrope-variable.ttf') format('truetype');font-weight:200 800;font-display:swap}
+/* Workspace tokens are shared only by explicitly opted-in admin and member pages. */
+body:is(.na-admin,.nm-workspace){--nd-bg:#f1f4f9;--nd-surface:#fff;--nd-text:#17243b;--nd-muted:#607089;--nd-border:#dfe6ef;--nd-subtle:#f5f7fb;--nd-primary:#4f46d9;--nd-primary-hover:#4038bd;--nd-link:#4941c7;--nd-active:#eeedfc;--nd-active-border:#ccc8f5;--nd-good-bg:#e8f5ef;--nd-good-text:#17634c;--nd-warn-bg:#fff3dc;--nd-warn-text:#86550c;--nd-bad-bg:#fcecef;--nd-bad-text:#a8334f;--nd-shadow:0 2px 3px rgb(22 38 68 / 2%),0 8px 24px rgb(22 38 68 / 3%);--na-row:#fafbfd;--na-focus:0 0 0 3px rgb(99 91 225 / 16%);--na-danger:#ba3552;--nd-sidebar-width:244px;font-family:'Namikulo Admin',system-ui,sans-serif;font-size:13px;line-height:1.6;background:var(--nd-bg);color:var(--nd-text)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace){--nd-bg:#101a2c;--nd-surface:#172338;--nd-text:#e8edf7;--nd-muted:#a3b1c8;--nd-border:#2b3950;--nd-subtle:#1c2a41;--nd-primary:#6259df;--nd-primary-hover:#7168ea;--nd-link:#b5b1ff;--nd-active:#282d50;--nd-active-border:#494878;--nd-good-bg:#183c38;--nd-good-text:#82d7b8;--nd-warn-bg:#3d3323;--nd-warn-text:#efc47c;--nd-bad-bg:#412b3a;--nd-bad-text:#f1a6b8;--nd-shadow:0 2px 3px rgb(3 9 22 / 8%),0 10px 30px rgb(3 9 22 / 10%);--na-row:#19263c;--nc-action-view:#a5bfff;--nc-action-view-bg:#263653;--nc-action-edit:#c6b5f5;--nc-action-edit-bg:#342d4d;--nc-action-download:#87d9dc;--nc-action-download-bg:#203b47;color-scheme:dark}
+body:is(.na-admin,.nm-workspace) .nd-sidebar{background:var(--nd-surface);border-right:1px solid var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .nd-brand-row{min-height:78px;padding:19px 22px;border-bottom:1px solid var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .nd-brand{font-size:13px;letter-spacing:.06em;gap:11px}
+body:is(.na-admin,.nm-workspace) .nd-brand-mark{width:37px;height:39px;border-radius:11px;background:var(--nd-primary);box-shadow:0 3px 9px rgb(79 70 217 / 18%)}
+body:is(.na-admin,.nm-workspace) .nd-brand-subtitle{font-size:9px;letter-spacing:.24em;color:var(--nd-muted);margin-top:3px}
+body:is(.na-admin,.nm-workspace) .na-workspace-label{display:flex;align-items:center;justify-content:space-between;margin:18px 16px 0;padding:10px 12px;border:1px solid var(--nd-border);border-radius:8px;background:var(--nd-subtle);font-size:11px;font-weight:700;color:var(--nd-muted)}
+body:is(.na-admin,.nm-workspace) .na-workspace-label .nd-icon{width:15px;height:15px}
+body:is(.na-admin,.nm-workspace) .nd-navigation{padding:20px 13px}
+body:is(.na-admin,.nm-workspace) .nd-nav-group{margin-bottom:22px}
+body:is(.na-admin,.nm-workspace) .nd-nav-label{font-size:9px;letter-spacing:.13em;font-weight:800;padding-left:13px;margin-bottom:7px}
+body:is(.na-admin,.nm-workspace) .nd-nav-link{min-height:42px;padding:9px 12px;gap:11px;border:1px solid transparent;border-radius:8px;font-size:12px;font-weight:600;margin:3px 0}
+body:is(.na-admin,.nm-workspace) .nd-nav-link .nd-icon{width:18px;height:18px;stroke-width:1.7}
+body:is(.na-admin,.nm-workspace) .nd-nav-link:hover{background:var(--nd-subtle);color:var(--nd-text)}
+body:is(.na-admin,.nm-workspace) .nd-nav-link.is-active{background:var(--nd-active);border-color:var(--nd-active-border);color:var(--nd-link);box-shadow:inset 3px 0 var(--nd-primary)}
+body:is(.na-admin,.nm-workspace) .nd-sidebar-footer{font-size:10px;padding:18px 25px;background:var(--nd-subtle)}
+body:is(.na-admin,.nm-workspace) .nd-topbar{min-height:70px;padding:12px 32px;background:var(--nd-surface);border-bottom:1px solid var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .nd-topbar-context{font-size:12px;font-weight:650;color:var(--nd-muted)}
+body:is(.na-admin,.nm-workspace) .nd-topbar-context>.nd-icon{padding:6px;box-sizing:content-box;background:var(--nd-subtle);border:1px solid var(--nd-border);border-radius:8px;width:16px;height:16px}
+body:is(.na-admin,.nm-workspace) .nd-icon-button{border-radius:9px;color:var(--nd-muted)}
+body:is(.na-admin,.nm-workspace) .nd-icon-button:hover{background:var(--nd-subtle);color:var(--nd-link)}
+body:is(.na-admin,.nm-workspace) .nd-avatar{border-radius:11px;background:var(--nd-active);color:var(--nd-link);border-color:var(--nd-active-border)}
+body:is(.na-admin,.nm-workspace) .nd-profile-name{font-size:12px}body:is(.na-admin,.nm-workspace) .nd-profile-name small{font-size:10px}
+body:is(.na-admin,.nm-workspace) .nd-profile-dropdown,body:is(.na-admin,.nm-workspace) .nd-notification-popover{border-radius:12px;box-shadow:0 16px 48px rgb(6 17 38 / 22%)}
+body:is(.na-admin,.nm-workspace) .nd-main{padding:30px 32px 40px;max-width:1800px;width:100%;margin-inline:auto;box-sizing:border-box}
+body:is(.na-admin,.nm-workspace) .nd-page-header{margin-bottom:26px;padding-bottom:24px;border-bottom:1px solid var(--nd-border);gap:20px}
+body:is(.na-admin,.nm-workspace) .nd-page-header h1{font-size:clamp(25px,2.3vw,32px);font-weight:800;letter-spacing:-.045em;line-height:1.25}
+body:is(.na-admin,.nm-workspace) .nd-page-header p{font-size:13px;line-height:1.7;margin:9px 0 0;color:var(--nd-muted);max-width:75ch}
+body:is(.na-admin,.nm-workspace) .nd-breadcrumb{font-size:10px;margin-bottom:12px;gap:7px;flex-wrap:wrap}
+body:is(.na-admin,.nm-workspace) .nd-breadcrumb [aria-current=page]{color:var(--nd-text)}
+body:is(.na-admin,.nm-workspace) .nd-footer{background:transparent;font-size:10px;padding:18px 32px}
+body:is(.na-admin,.nm-workspace) :is(.card,.nd-panel,.nc-curriculum .nc-panel){border:1px solid var(--nd-border);border-radius:13px;background:var(--nd-surface);box-shadow:var(--nd-shadow)}
+body:is(.na-admin,.nm-workspace) .card{margin-bottom:24px}
+body:is(.na-admin,.nm-workspace) :is(.card-header,.nd-panel-heading){padding:21px 24px;border-bottom:1px solid var(--nd-border);gap:16px;min-height:82px;background:transparent}
+body:is(.na-admin,.nm-workspace) :is(.card-header h2,.nd-panel-heading h2){font-size:15px;font-weight:800;letter-spacing:-.02em}
+body:is(.na-admin,.nm-workspace) :is(.card-header p,.nd-panel-heading p){font-size:12px;color:var(--nd-muted);line-height:1.6;margin-top:5px}
+body:is(.na-admin,.nm-workspace) .card-body{padding:22px 24px}
+body:is(.na-admin,.nm-workspace) .card-footer{border-top:1px solid var(--nd-border);background:var(--nd-subtle);padding:16px 24px}
+body:is(.na-admin,.nm-workspace) :is(.btn,.nd-button,.nc-curriculum .nc-button){border-radius:8px;font-size:12px;font-weight:750;min-height:40px;padding:9px 15px;box-shadow:none;line-height:1.5}
+body:is(.na-admin,.nm-workspace) :is(.btn-primary,.nd-button-primary,.nc-curriculum .nc-primary){background:var(--nd-primary);border-color:var(--nd-primary);color:#fff;box-shadow:0 2px 4px rgb(40 32 120 / 13%)}
+body:is(.na-admin,.nm-workspace) :is(.btn-primary,.nd-button-primary,.nc-curriculum .nc-primary):hover{background:var(--nd-primary-hover);border-color:var(--nd-primary-hover);color:#fff}
+body:is(.na-admin,.nm-workspace) .btn-danger{background:var(--na-danger);border-color:var(--na-danger);color:white}
+body:is(.na-admin,.nm-workspace) .btn-outline-danger{color:var(--nd-bad-text);border-color:var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .btn-outline-danger:hover{background:var(--nd-bad-bg);border-color:var(--nd-bad-text)}
+body:is(.na-admin,.nm-workspace) :is(.btn-secondary,.btn-light){background:var(--nd-subtle);border-color:var(--nd-border);color:var(--nd-text)}
+body:is(.na-admin,.nm-workspace) .btn:disabled{opacity:.5;cursor:not-allowed}
+body:is(.na-admin,.nm-workspace) :is(.form-group label,.nc-field label){font-size:12px;font-weight:700;letter-spacing:0;color:var(--nd-text);margin-bottom:7px}
+body:is(.na-admin,.nm-workspace) :is(.form-control,.custom-select,.nc-field input,.nc-field select){min-height:42px;border:1px solid var(--nd-border);border-radius:8px;background:var(--nd-surface);color:var(--nd-text);font-size:13px;line-height:1.5;box-shadow:inset 0 1px 2px rgb(14 27 49 / 2%)}
+body:is(.na-admin,.nm-workspace) textarea.form-control{min-height:100px}
+body:is(.na-admin,.nm-workspace) :is(.form-control,.custom-select,.nc-field input,.nc-field select):focus{border-color:var(--nd-primary);box-shadow:var(--na-focus);outline:none;background:var(--nd-surface);color:var(--nd-text)}
+body:is(.na-admin,.nm-workspace) .form-control.is-invalid{border-color:var(--nd-bad-text)}
+body:is(.na-admin,.nm-workspace) .form-control:disabled{background:var(--nd-subtle);color:var(--nd-muted)}
+body:is(.na-admin,.nm-workspace) .form-control::placeholder{color:var(--nd-muted);opacity:.8}
+body:is(.na-admin,.nm-workspace) :is(.form-text,.text-muted){color:var(--nd-muted)!important;font-size:11px;line-height:1.65}
+body:is(.na-admin,.nm-workspace) input[type=checkbox]{accent-color:var(--nd-primary)}
+body:is(.na-admin,.nm-workspace) :is(.badge,.nd-badge,.nc-curriculum .nc-badge){font-size:10px;font-weight:750;line-height:1.4;letter-spacing:.01em;padding:5px 9px;border-radius:6px;box-shadow:none}
+body:is(.na-admin,.nm-workspace) .badge-info{background:var(--nc-action-view-bg);color:var(--nc-action-view)}
+body:is(.na-admin,.nm-workspace) .badge-light{background:var(--nd-subtle);color:var(--nd-muted)}
+body:is(.na-admin,.nm-workspace) .modal-content{border-radius:14px;border-color:var(--nd-border);box-shadow:0 28px 90px rgb(3 10 25 / 32%)}
+body:is(.na-admin,.nm-workspace) .modal-header{padding:20px 24px;background:var(--nd-subtle)}
+body:is(.na-admin,.nm-workspace) .modal-title{font-size:17px;font-weight:800}
+body:is(.na-admin,.nm-workspace) .modal-body{padding:24px}
+body:is(.na-admin,.nm-workspace) .modal-footer{padding:16px 24px;background:var(--nd-subtle)}
+body:is(.na-admin,.nm-workspace) .select2-container--default .select2-selection--single{border-radius:8px;border-color:var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .select2-dropdown{box-shadow:var(--nd-shadow);border-radius:8px;overflow:hidden}
+body:is(.na-admin,.nm-workspace) .select2-container--default .select2-results__option--highlighted[aria-selected]{background:var(--nd-active);color:var(--nd-link)}
+body:is(.na-admin,.nm-workspace) .select2-search__field{border:1px solid var(--nd-border);border-radius:6px;padding:8px}
+@media(max-width:1023px){body:is(.na-admin,.nm-workspace) .nd-main{padding:24px}body:is(.na-admin,.nm-workspace) .nd-topbar{padding:10px 24px}}
+@media(max-width:639px){body:is(.na-admin,.nm-workspace) .nd-main{padding:22px 16px 32px}body:is(.na-admin,.nm-workspace) .nd-topbar{padding:10px 16px}body:is(.na-admin,.nm-workspace) .nd-page-header{padding-bottom:20px;margin-bottom:20px}body:is(.na-admin,.nm-workspace) :is(.card-header,.card-body,.card-footer,.nd-panel-heading,.modal-body){padding:18px}body:is(.na-admin,.nm-workspace) .nd-footer{padding:16px}}
+body:is(.na-admin,.nm-workspace) .nc-lexical{border-radius:9px;box-shadow:none}
+body:is(.na-admin,.nm-workspace) .nc-lexical-toolbar{padding:10px;background:var(--nd-subtle)}
+body:is(.na-admin,.nm-workspace) .nc-lexical-editable{font-family:'Namikulo Admin',system-ui,sans-serif}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable{background:var(--nd-surface);color:var(--nd-text);color-scheme:dark;caret-color:var(--nd-link)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable.is-empty::before{color:var(--nd-muted)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is(.nc-lexical-table-cell,.nc-lexical-table-header,.nc-lexical-code){border-color:var(--nd-border)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is(.nc-lexical-table-header,.nc-lexical-code){background:var(--nd-subtle)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable .nc-lexical-link{color:var(--nd-link)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="color: #0f172a"],[style*="color: rgb(15, 23, 42)"]){color:var(--nd-text)!important}
+body:is(.na-admin,.nm-workspace) .alert-warning{background:var(--nd-warn-bg);color:var(--nd-warn-text);border-color:var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .alert-info{background:var(--nc-action-view-bg);color:var(--nc-action-view);border-color:var(--nd-border)}
+body:is(.na-admin,.nm-workspace) .text-success{color:var(--nd-good-text)!important}
+body:is(.na-admin,.nm-workspace) .text-warning{color:var(--nd-warn-text)!important}
+body:is(.na-admin,.nm-workspace) .nd-badge--expired{background:var(--nd-subtle);color:var(--nd-muted)}
+body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable.is-empty::before{color:var(--nd-muted)}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="color: #0f766e"],[style*="color: rgb(15, 118, 110)"]){color:#82d7b8!important}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="color: #1d4ed8"],[style*="color: rgb(29, 78, 216)"]){color:#a5bfff!important}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="color: #b91c1c"],[style*="color: rgb(185, 28, 28)"]){color:#f1a6b8!important}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="color: #6d28d9"],[style*="color: rgb(109, 40, 217)"]){color:#c6b5f5!important}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="color: #92400e"],[style*="color: rgb(146, 64, 14)"]){color:#efc47c!important}
+html[data-nc-theme=dark] body:is(.na-admin,.nm-workspace) .nc-lexical--course .nc-lexical-editable :is([style*="background-color: #fef08a"],[style*="background-color: rgb(254, 240, 138)"]){color:#17243b!important}

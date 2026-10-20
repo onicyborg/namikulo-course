@@ -6,6 +6,7 @@
         </a>
         <button type="button" class="nd-icon-button nd-sidebar-close" data-sidebar-close aria-label="Tutup navigasi"><x-dashboard.icon name="x" /></button>
     </div>
+    <div class="na-workspace-label"><span>Panel administrasi</span><x-dashboard.icon name="layout-dashboard" /></div>
     <nav class="nd-navigation">
         @foreach([
             'Admin' => [['Dashboard', 'admin.dashboard', 'layout-dashboard']],

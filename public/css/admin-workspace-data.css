@@ -1,0 +1,136 @@
+/* Shared workspace filters and data grids; audit rules remain scoped to admin operations. */
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters{padding:16px;margin:0 0 18px;gap:12px;border:1px solid var(--nd-border);border-radius:10px;background:var(--nd-subtle)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters label{font-size:10px;font-weight:750;color:var(--nd-muted);margin-bottom:6px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters>div{flex:1 1 130px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters>.nc-server-search{flex:3 1 230px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters .form-control{height:40px;min-height:40px;font-size:12px;border-color:var(--nd-border);background:var(--nd-surface)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters .form-control:focus{outline:none;border-color:var(--nd-primary);box-shadow:var(--na-focus)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters [data-admin-table-reset]{border:1px solid var(--nd-border);background:var(--nd-surface);color:var(--nd-muted)}
+/* DataTables Bootstrap adds container-fluid padding; only the scroll viewport owns the frame. */
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table [data-server-table-scroll]{width:100%;padding:0;border:1px solid var(--nd-border);border-radius:9px;background:var(--nd-surface);overflow:auto;isolation:isolate;scrollbar-width:thin;scrollbar-color:var(--nd-border) var(--nd-surface)}
+body.nd-app:is(.na-admin,.nm-workspace) [data-server-table-scroll]>.dataTables_wrapper{width:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent}
+body.nd-app:is(.na-admin,.nm-workspace) [data-server-table-scroll]>.dataTables_wrapper::after{display:block;clear:both;content:""}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table :is(thead,tbody,tr,th,td){border-radius:0}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table thead{background:var(--nd-subtle)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table{border-collapse:separate!important;border-spacing:0!important;margin:0!important;border:0;border-radius:0;background:var(--nd-surface);min-width:620px;font-size:12px;line-height:1.6}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table thead th{padding:13px 30px 13px 16px;background:var(--nd-subtle);border:0;border-bottom:1px solid var(--nd-border);font-size:10px;font-weight:800;color:var(--nd-muted);letter-spacing:.035em;white-space:nowrap}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table tbody td{padding:15px 16px;border:0;border-bottom:1px solid var(--nd-border);vertical-align:middle;background:var(--nd-surface);color:var(--nd-text);font-variant-numeric:tabular-nums;transition:background-color .16s ease}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table tbody tr:last-child td{border-bottom:0}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table tbody tr:nth-child(even)>td{background:var(--na-row)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table tbody tr:hover>td{background:var(--nd-active)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table td strong{font-weight:750}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table :is(small,.nc-table-summary){color:var(--nd-muted);line-height:1.65;overflow-wrap:anywhere}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table code{color:var(--nd-muted);font-size:10px;overflow-wrap:anywhere}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table .dataTables_empty{padding:48px 20px;color:var(--nd-muted)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .dataTables_info{font-size:11px;color:var(--nd-muted);padding-top:18px;line-height:1.6}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .dataTables_paginate{padding-top:14px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .pagination{gap:5px;flex-wrap:wrap;margin:0}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .dataTables_paginate .paginate_button{padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;margin:0}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .page-link{display:flex;align-items:center;justify-content:center;min-width:34px;min-height:34px;padding:6px 10px;margin:0;border:1px solid var(--nd-border);border-radius:7px;background:var(--nd-surface);color:var(--nd-text);font-size:11px;box-shadow:none;line-height:1.5}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .page-link:hover{background:var(--nd-active);border-color:var(--nd-active-border);color:var(--nd-link)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .page-item.active .page-link{background:var(--nd-primary);border-color:var(--nd-primary);color:white}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .page-item.disabled .page-link{background:var(--nd-subtle);color:var(--nd-muted);opacity:.65}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-table-action{width:35px;height:35px;border-radius:7px;border:1px solid var(--nd-border);background:var(--nd-surface)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-table-action .nd-icon{width:16px;height:16px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-data-table-actions{gap:5px;flex-wrap:wrap}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-table-action:hover{border-color:currentColor}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-panel>.nc-server-table{padding:20px 22px 22px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table-loader-card{border-radius:12px;box-shadow:var(--nd-shadow)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table-loader-mark{background:var(--nd-primary)}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-section-heading{margin-bottom:16px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-section-heading h2{font-size:13px;font-weight:800}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-period{font-size:10px;padding:5px 10px;border:1px solid var(--nd-border);border-radius:6px;background:var(--nd-surface)}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-overview-grid{grid-template-columns:minmax(260px,1fr) minmax(0,2fr);gap:18px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue{position:relative;min-height:240px;padding:25px;border:1px solid #514cab;border-radius:13px;background:linear-gradient(120deg,#303b73,#443b85);box-shadow:var(--nd-shadow);overflow:hidden}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue-heading{position:relative;z-index:1}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue h3{font-size:12px;color:#e2e5ff;font-weight:650}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue-value{font-size:clamp(26px,2.4vw,38px);letter-spacing:-.05em;font-weight:800;line-height:1.3;overflow-wrap:anywhere}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue-note{font-size:11px;line-height:1.7;color:#d4d8f1;max-width:35ch}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue a{font-size:11px;color:white;border-top:1px solid rgb(255 255 255 / 18%);padding-top:15px;margin-top:20px;width:100%;justify-content:space-between}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue-icon{border-radius:10px;background:rgb(255 255 255 / 10%);color:#d9dcff}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stats{gap:14px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat{position:relative;padding:20px 22px;border-radius:12px;box-shadow:var(--nd-shadow);border:1px solid var(--nd-border);background:var(--nd-surface)}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat h3{font-size:11px;font-weight:700;padding-right:35px;color:var(--nd-muted)}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat-value{font-size:29px;font-weight:800;letter-spacing:-.04em;margin-top:8px;line-height:1.3;font-variant-numeric:tabular-nums}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat-note{font-size:10px;margin-top:5px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat-icon{top:17px;right:18px;width:32px;height:32px;border-radius:9px;background:var(--nd-active);color:var(--nd-link);display:grid;place-items:center}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat-icon .nd-icon{width:17px;height:17px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat:nth-child(2) .nd-stat-icon{background:var(--nd-good-bg);color:var(--nd-good-text)}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-stat:nth-child(4) .nd-stat-icon{background:var(--nd-warn-bg);color:var(--nd-warn-text)}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-bottom-grid{grid-template-columns:minmax(0,2.3fr) minmax(270px,1fr);gap:20px;margin-top:28px;align-items:start}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-video-empty{padding:44px 24px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-empty-icon{border-radius:18px}
+body.nd-app:is(.na-admin,.nm-workspace) .nd-panel-footer{min-height:52px;background:var(--nd-subtle);border-radius:0 0 13px 13px;font-size:11px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-card{padding:22px;background:var(--nd-subtle);box-shadow:none;border-top:3px solid var(--nd-border)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-card[data-task-tone=success]{border-top-color:var(--nd-good-text)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-card[data-task-tone=warning]{border-top-color:var(--nd-warn-text)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-card[data-task-tone=danger]{border-top-color:var(--nd-bad-text)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-heading h3{font-size:14px;font-weight:800}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-metrics>div:first-child{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid var(--nd-border);background:var(--nd-surface);border-radius:8px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-metrics>div:first-child dt{margin:0}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-task-key{font-size:10px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-digest-summary{background:var(--nd-surface);padding:22px;border-radius:10px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-digest-grid>div{background:var(--nd-subtle);border:0;border-left:3px solid var(--nd-border);border-radius:6px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-digest-grid>div:first-child{border-left-color:var(--nd-good-text)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-digest-grid strong{font-size:26px;font-variant-numeric:tabular-nums}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-log-device dl{background:var(--nd-surface)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-grid{gap:24px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-intro{padding:0 0 22px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-intro h2{font-size:22px;letter-spacing:-.025em}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-chapter-header{background:var(--nd-subtle);border-radius:12px 12px 0 0;padding:20px 18px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-eyebrow{font-size:9px;letter-spacing:.12em}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-chapter-header h3{font-size:15px;font-weight:800}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-lesson{padding:17px 18px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-video-icon{width:34px;height:34px;border-radius:9px;background:var(--nd-subtle);color:var(--nd-link)}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-lesson-info h4{font-size:13px;font-weight:700}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-chapter-footer{background:var(--nd-subtle);border-radius:0 0 12px 12px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-curriculum .nc-setting{padding:22px}
+body.nd-app:is(.na-admin,.nm-workspace) .video-admin-steps{gap:0;border:1px solid var(--nd-border);border-radius:9px;overflow:hidden;background:var(--nd-subtle)}
+body.nd-app:is(.na-admin,.nm-workspace) .video-admin-steps li{flex:1 1 130px;border:0;border-right:1px solid var(--nd-border);border-radius:0;padding:12px;font-size:11px;text-align:center}
+body.nd-app:is(.na-admin,.nm-workspace) .video-admin-kicker{color:var(--nd-link);font-size:10px}
+body.nd-app:is(.na-admin,.nm-workspace) .video-admin-heading h2{font-size:24px;font-weight:800;letter-spacing:-.03em}
+body.nd-app:is(.na-admin,.nm-workspace) .video-admin-message{border-radius:8px;font-size:13px;line-height:1.7}
+body.nd-app:is(.na-admin,.nm-workspace) .progress{border-radius:20px;overflow:hidden;box-shadow:none}
+@media(max-width:1279px){body.nd-app:is(.na-admin,.nm-workspace) .nd-bottom-grid{grid-template-columns:minmax(0,1fr)}body.nd-app:is(.na-admin,.nm-workspace) .nd-overview-grid{grid-template-columns:minmax(240px,1fr) minmax(0,1.6fr)}body.nd-app:is(.na-admin,.nm-workspace) .nd-stat{padding:18px}body.nd-app:is(.na-admin,.nm-workspace) .nd-stat h3{max-width:16ch}}
+@media(max-width:767px){body.nd-app:is(.na-admin,.nm-workspace) .nd-overview-grid{grid-template-columns:minmax(0,1fr)}body.nd-app:is(.na-admin,.nm-workspace) .nd-revenue{min-height:220px}body.nd-app:is(.na-admin,.nm-workspace) .nc-server-filters{padding:12px}body.nd-app:is(.na-admin,.nm-workspace) .nc-table-action{width:44px;height:44px}body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table .page-link{min-height:40px;min-width:40px}body.nd-app:is(.na-admin,.nm-workspace) .nd-panel>.nc-server-table{padding:16px}}
+@media(max-width:639px){body.nd-app:is(.na-admin,.nm-workspace) .nd-stats{grid-template-columns:repeat(2,minmax(0,1fr))}body.nd-app:is(.na-admin,.nm-workspace) .nd-stat{padding:16px}body.nd-app:is(.na-admin,.nm-workspace) .nd-stat-icon{position:static;margin-bottom:12px}body.nd-app:is(.na-admin,.nm-workspace) .nd-stat h3{padding:0;max-width:none}body.nd-app:is(.na-admin,.nm-workspace) .nd-stat-value{font-size:26px}body.nd-app:is(.na-admin,.nm-workspace) .nc-task-metrics{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){body.nd-app:is(.na-admin,.nm-workspace) .nc-server-table table tbody tr>td{transition:none}}
+body.nd-app:is(.na-admin,.nm-workspace) .na-overview-side{display:grid;gap:20px;min-width:0}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links>a{display:flex;align-items:center;gap:12px;padding:16px 20px;text-decoration:none;border-top:1px solid var(--nd-border)}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links>a:first-of-type{border-top:0}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links>a:hover{background:var(--nd-subtle)}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links>a>span:nth-child(2){flex:1;min-width:0}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links strong{display:block;font-size:12px;font-weight:750}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links small{display:block;font-size:10px;color:var(--nd-muted);margin-top:3px}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-links>a>.nd-icon{width:15px;height:15px;color:var(--nd-muted)}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-link-icon{display:grid;place-items:center;width:34px;height:36px;flex:none;border:1px solid var(--nd-border);border-radius:8px;color:var(--nd-link);background:var(--nd-subtle)}
+body.nd-app:is(.na-admin,.nm-workspace) .na-workspace-link-icon .nd-icon{width:17px;height:17px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-data-table-pagination{padding-top:16px;border-top:1px solid var(--nd-border);font-size:11px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-data-table-page-buttons button{min-height:36px;font-size:11px;border-radius:7px}
+body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail dl.row{margin:0 0 24px}
+body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail dl.row>dt,body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail dl.row>dd{padding:14px 0;border-bottom:1px solid var(--nd-border);margin-bottom:0;font-size:12px;overflow-wrap:anywhere}
+body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail dl.row>dt{color:var(--nd-muted);font-weight:600;padding-right:16px}
+body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail .border-bottom{border-color:var(--nd-border)!important}
+body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail small{overflow-wrap:anywhere}
+@media(max-width:575px){body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail dl.row>dt{padding-bottom:0;border-bottom:0}body.nd-app:is(.na-admin,.nm-workspace) .na-order-detail dl.row>dd{padding-top:6px}}
+/* Audit columns adapt to the available table width, independently of device details. */
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit]{min-width:0;table-layout:fixed}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] th:nth-child(1){width:17%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] th:nth-child(2){width:15%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] th:nth-child(3){width:15%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] th:nth-child(4){width:25%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] th:nth-child(5){width:28%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] :is(th,td){white-space:normal;overflow-wrap:anywhere}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] time{min-width:0;max-width:none;font-size:11px}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table[data-nc-adaptive=audit] .badge{white-space:normal}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table.nc-audit-compact th:nth-child(1){width:39%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table.nc-audit-compact th:nth-child(2){width:29%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table.nc-audit-compact th:nth-child(3){width:32%!important}
+body.nd-app:is(.na-admin,.nm-workspace) .admin-operations table.nc-audit-compact :is(th,td){padding:12px 9px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-audit-expand{display:inline-grid;place-items:center;width:30px;height:30px;margin-bottom:6px;border:1px solid var(--nd-active-border);border-radius:6px;background:var(--nd-active);color:var(--nd-link);font-size:18px;cursor:pointer}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-audit-details{display:grid;gap:16px;animation:nc-audit-reveal .18s ease-out;background:var(--nd-subtle);padding:16px;border-radius:6px}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-audit-details>div{min-width:0}
+body.nd-app:is(.na-admin,.nm-workspace) .nc-audit-details>div>strong{display:block;margin-bottom:5px;color:var(--nd-muted);font-size:10px}
+@keyframes nc-audit-reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){body.nd-app:is(.na-admin,.nm-workspace) .nc-audit-details{animation:none}}

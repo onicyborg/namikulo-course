@@ -13,8 +13,10 @@
     <link rel="stylesheet" href="{{ url('css/discussion-editor.css') }}?v=5">
     <link rel="stylesheet" href="{{ url('css/lexical-editor.css') }}?v=6">
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/learning-workspace.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/learning-conversation.css') }}?v=1">
 </head>
-<body class="nd-app nd-legacy player-page nm-player" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
+<body class="nd-app nd-legacy player-page nm-player nl-premium" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="nd-skip" href="#main-content">Lewati ke materi</a>
     <main id="main-content" tabindex="-1">@yield('content')</main>
     @stack('modals')

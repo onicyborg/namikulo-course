@@ -1,73 +1,49 @@
 @extends('layouts.public')
-
 @section('title', 'Belajar dengan arah yang jelas')
 @section('meta_description', 'Temukan course video dengan kurikulum terstruktur. Pelajari materi, ikuti progres Anda, dan berdiskusi bersama peserta lainnya di Namikulo Course.')
-
-@push('styles')
-    <link rel="stylesheet" href="{{ url('css/landing-minimal.css') }}?v=1">
-@endpush
-
 @section('content')
-<section class="site-hero" aria-labelledby="hero-title">
-    <div class="container site-hero-grid">
-        <div class="np-hero-copy">
-            <p class="site-eyebrow">RUANG UNTUK BELAJAR DAN BERTUMBUH</p>
-            <h1 id="hero-title">Keahlian baru.<br><span>Langkah yang jelas.</span></h1>
-            <p class="site-lead">Bangun pemahaman dari satu materi ke materi berikutnya. Belajar lewat video, ulangi bagian yang belum dipahami, dan ajukan pertanyaan di ruang diskusi.</p>
-            <div class="site-hero-actions">
-                <a class="btn btn-primary btn-lg" href="{{ route('site.courses.index') }}">Jelajahi course<x-dashboard.icon name="arrow-right" /></a>
-                <a class="btn np-secondary btn-lg" href="#cara-belajar">Cara belajar</a>
-            </div>
-            <p class="np-hero-note"><x-dashboard.icon name="book-open" />Lihat kurikulum sebelum memilih course.</p>
+@php($spotlight = $featured->first())
+<section class="nm-hero" aria-labelledby="hero-title">
+    <div class="container nm-hero-grid">
+        <div class="nm-hero-copy">
+            <p class="nm-eyebrow"><span aria-hidden="true"></span>RASA INGIN TAHU, PUNYA ARAH.</p>
+            <h1 id="hero-title">Keahlian baru.<br>Dimulai dari<br><em>satu langkah.</em></h1>
+            <p class="nm-lead">Dari menonton hingga memahami. Pelajari materi secara bertahap, ikuti progres Anda, dan temukan jawaban bersama di ruang diskusi.</p>
+            <div class="nm-hero-actions"><a class="btn btn-primary btn-lg" href="{{ route('site.courses.index') }}">Temukan course Anda<x-dashboard.icon name="arrow-right" /></a><a class="nm-quiet-link" href="#cara-belajar">Lihat cara belajarnya<x-dashboard.icon name="chevron-down" /></a></div>
+            <div class="nm-hero-assurance"><x-dashboard.icon name="layers" /><span>Kurikulum terbuka.<br><strong>Kenali materinya sebelum memilih.</strong></span></div>
         </div>
-        <aside class="np-spotlight" aria-label="Sorotan course">
-            @if($spotlight = $featured->first())
-                <div class="np-spotlight-top"><span>COURSE PILIHAN</span><x-dashboard.icon name="arrow-up-right" /></div>
-                <a href="{{ route('site.courses.show', $spotlight->slug) }}" class="np-spotlight-link">
-                    <div class="site-course-image">
-                        @if($spotlight->thumbnail_path)<img src="{{ url('storage/'.$spotlight->thumbnail_path) }}" alt="{{ $spotlight->title }}" width="640" height="360" fetchpriority="high">@else<div class="site-course-placeholder"><x-dashboard.icon name="book-open" /></div>@endif
-                    </div>
-                    <div class="np-spotlight-copy">
-                        <span class="site-category">{{ $spotlight->category?->name ?? 'Course' }}</span>
-                        <h2>{{ $spotlight->title }}</h2>
-                        <p>{{ $spotlight->sections_count }} bab <span aria-hidden="true">·</span> {{ $spotlight->lessons_count }} video <span aria-hidden="true">·</span> Akses {{ $spotlight->access_months }} bulan</p>
-                        <span class="np-spotlight-action">Lihat kurikulum<x-dashboard.icon name="arrow-right" /></span>
-                    </div>
-                </a>
-            @else
-                <div class="np-spotlight-copy np-spotlight-empty"><x-dashboard.icon name="book-open" /><h2>Mulai dari rasa ingin tahu.</h2><p>Lihat topik yang tersedia dan temukan course untuk tujuan belajar Anda.</p><a class="btn btn-primary" href="{{ route('site.courses.index') }}">Buka katalog</a></div>
-            @endif
-        </aside>
+        @include('site.partials.landing-showcase')
     </div>
+    <div class="container"><div class="nm-stats" aria-label="Platform dalam angka"><p>Ruang belajar.<br><strong>Kesempatan bertumbuh.</strong></p><div><strong>{{ number_format($stats['courses'], 0, ',', '.') }}</strong><span>course tersedia</span></div><div><strong>{{ number_format($stats['videos'], 0, ',', '.') }}</strong><span>video siap dipelajari</span></div><div><strong>{{ number_format($stats['members'], 0, ',', '.') }}</strong><span>peserta dengan akses aktif</span></div></div></div>
 </section>
-
-<section class="site-stats" aria-label="Platform dalam angka"><div class="container site-stats-grid">
-    <div><strong>{{ number_format($stats['courses'], 0, ',', '.') }}</strong><span>course tersedia</span></div>
-    <div><strong>{{ number_format($stats['videos'], 0, ',', '.') }}</strong><span>video siap dipelajari</span></div>
-    <div><strong>{{ number_format($stats['members'], 0, ',', '.') }}</strong><span>peserta dengan akses aktif</span></div>
-</div></section>
-
-<section class="site-section" aria-labelledby="featured-title"><div class="container">
-    <div class="site-section-heading"><div><p class="site-eyebrow">PILIHAN BELAJAR</p><h2 id="featured-title">Temukan fokus berikutnya.</h2><p>Course unggulan dengan materi yang bisa Anda pelajari bertahap.</p></div><a class="site-text-link" href="{{ route('site.courses.index') }}">Semua course<x-dashboard.icon name="arrow-right" /></a></div>
+<section class="nm-section nm-featured" id="course-unggulan" aria-labelledby="featured-title"><div class="container">
+    <div class="nm-section-heading"><div><p class="nm-eyebrow">01 / PILIHAN BELAJAR</p><h2 id="featured-title">Fokus baru.<br><span>Kemungkinan baru.</span></h2></div><div class="nm-heading-aside"><p>Temukan topik yang ingin Anda kuasai.<br>Mulai dengan kurikulum yang jelas.</p><a class="nm-text-link" href="{{ route('site.courses.index') }}">Lihat seluruh course<x-dashboard.icon name="arrow-right" /></a></div></div>
     @if($featured->isEmpty())
-        <div class="site-empty"><x-dashboard.icon name="book-open" /><h3>Belum ada course unggulan</h3><p>Course lainnya dapat Anda temukan di katalog.</p><a class="btn btn-outline-primary" href="{{ route('site.courses.index') }}">Buka katalog</a></div>
+        <div class="nm-empty"><x-dashboard.icon name="book-open" /><div><h3>Temukan pilihan belajar di katalog.</h3><p>Course unggulan belum tersedia. Lihat course lain yang dapat Anda pelajari.</p></div><a class="btn btn-primary" href="{{ route('site.courses.index') }}">Buka katalog</a></div>
     @else
-        <div class="site-course-grid">@foreach($featured as $course)<x-course-card :course="$course" :is-active="in_array($course->id, $activeCourseIds, true)" />@endforeach</div>
+        <div class="nm-course-grid {{ $featured->count() === 1 ? 'nm-course-grid--single' : '' }}">@foreach($featured as $course)@include('site.partials.landing-course')@endforeach</div>
     @endif
 </div></section>
-
-<section class="site-section site-section-tint" id="cara-belajar" aria-labelledby="steps-title"><div class="container">
-    <div class="site-section-heading"><div><p class="site-eyebrow">CARA BELAJAR</p><h2 id="steps-title">Dari memilih hingga memahami.</h2><p>Satu tempat untuk materi, progres, dan pertanyaan Anda.</p></div></div>
-    <ol class="site-steps">
-        <li><span>01 / PILIH</span><h3>Kenali materinya</h3><p>Periksa kurikulum, pengajar, dan harga sebelum menentukan course.</p></li>
-        <li><span>02 / AKSES</span><h3>Selesaikan pembayaran</h3><p>Daftar atau masuk. Akses tersedia setelah pembayaran terkonfirmasi.</p></li>
-        <li><span>03 / PELAJARI</span><h3>Bangun ritme belajar</h3><p>Putar materi dan lanjutkan dari posisi terakhir selama akses aktif.</p></li>
-        <li><span>04 / DISKUSIKAN</span><h3>Tanyakan yang belum jelas</h3><p>Ajukan pertanyaan di materi dan berbagi pemahaman dengan peserta lain.</p></li>
+<section class="nm-section nm-benefits" id="pengalaman" aria-labelledby="benefits-title"><div class="container">
+    <div class="nm-section-heading"><div><p class="nm-eyebrow">02 / PENGALAMAN BELAJAR</p><h2 id="benefits-title">Satu ruang belajar.<br><span>Banyak cara memahami.</span></h2></div><p class="nm-heading-aside">Materi yang terarah, progres yang tercatat,<br>dan tempat untuk bertanya.</p></div>
+    <div class="nm-bento">
+        <article class="nm-benefit nm-benefit--curriculum"><div class="nm-benefit-copy"><span class="nm-feature-icon"><x-dashboard.icon name="layers" /></span><h3>Langkah kecil.<br>Pemahaman yang utuh.</h3><p>Ikuti bab dan materi secara berurutan. Bangun fondasi sebelum melangkah ke pembahasan berikutnya.</p></div><div class="nm-outline-demo" aria-hidden="true"><div><span>01</span><strong>Mulai dari dasar</strong><x-dashboard.icon name="circle-check" /></div><div><span>02</span><strong>Perdalam pemahaman</strong><x-dashboard.icon name="circle-check" /></div><div><span>03</span><strong>Lanjut ke materi berikutnya</strong><x-dashboard.icon name="arrow-right" /></div></div></article>
+        <article class="nm-benefit nm-benefit--discussion"><span class="nm-feature-icon"><x-dashboard.icon name="message-circle" /></span><h3>Pertanyaan Anda<br>punya tempat.</h3><p>Tanyakan bagian yang belum jelas. Berdiskusi dengan peserta lain dan admin, tepat di bawah materi.</p><div class="nm-discussion-demo" aria-hidden="true"><x-dashboard.icon name="message-square" /><span>Materi dipelajari.<br><strong>Pemahaman dibagikan.</strong></span><span class="nm-discussion-dot"></span></div></article>
+        <article class="nm-benefit nm-benefit--progress"><div class="nm-progress-art" aria-hidden="true"><x-dashboard.icon name="activity" /></div><div><h3>Setiap progres berarti.</h3><p>Lanjutkan dari posisi terakhir. Materi yang sudah selesai tetap tercatat dalam perjalanan belajar Anda.</p></div></article>
+        <article class="nm-benefit nm-benefit--pace"><span class="nm-feature-icon"><x-dashboard.icon name="clock-3" /></span><div><h3>Ritme belajar milik Anda.</h3><p>Jeda, ulangi, dan pelajari kembali video selama masa akses course masih aktif.</p></div></article>
+    </div>
+</div></section>
+<section class="nm-section nm-journey" id="cara-belajar" aria-labelledby="steps-title"><div class="container">
+    <div class="nm-section-heading"><div><p class="nm-eyebrow">03 / LANGKAH PERTAMA</p><h2 id="steps-title">Dari penasaran,<br><span>menjadi paham.</span></h2></div><p class="nm-heading-aside">Satu alur sederhana.<br>Mulai dari tujuan belajar Anda.</p></div>
+    <ol class="nm-steps">
+        <li><div class="nm-step-top"><span>01</span><x-dashboard.icon name="book-open" /></div><h3>Temukan topiknya</h3><p>Lihat kurikulum, pengajar, dan harga. Pilih course yang sesuai dengan tujuan Anda.</p></li>
+        <li><div class="nm-step-top"><span>02</span><x-dashboard.icon name="credit-card" /></div><h3>Aktifkan aksesnya</h3><p>Buat akun dan selesaikan pembayaran. Akses aktif setelah pembayaran terkonfirmasi.</p></li>
+        <li><div class="nm-step-top"><span>03</span><x-dashboard.icon name="file-video" /></div><h3>Bangun pemahaman</h3><p>Pelajari video secara bertahap. Ulangi bagian yang dibutuhkan dan ikuti progres Anda.</p></li>
+        <li><div class="nm-step-top"><span>04</span><x-dashboard.icon name="message-circle" /></div><h3>Buka percakapan</h3><p>Ajukan pertanyaan di materi dan berbagi pemahaman dengan peserta lainnya.</p></li>
     </ol>
 </div></section>
-
-<section class="site-section" aria-labelledby="access-title"><div class="container"><div class="site-access-panel">
-    <div><p class="site-eyebrow">BELAJAR SESUAI RITME ANDA</p><h2 id="access-title">Pilih satu topik.<br>Mulai dari materi pertama.</h2><p>Lihat masa akses pada setiap course dan temukan kurikulum yang sesuai dengan kebutuhan Anda.</p></div>
-    <a class="btn btn-primary btn-lg" href="{{ route('site.courses.index') }}">Temukan course<x-dashboard.icon name="arrow-right" /></a>
+<section class="nm-final-section" aria-labelledby="cta-title"><div class="container"><div class="nm-final">
+    <div><p class="nm-eyebrow">LANGKAH SELANJUTNYA MILIK ANDA</p><h2 id="cta-title">Ada banyak yang bisa dipelajari.<br><span>Mulai dari satu course.</span></h2><p>Temukan kurikulum yang sesuai. Beri ruang untuk keahlian baru.</p><a class="btn btn-lg nm-final-button" href="{{ route('site.courses.index') }}">Jelajahi katalog course<x-dashboard.icon name="arrow-right" /></a></div>
+    <div class="nm-final-art" aria-hidden="true"><span></span><span></span><span><x-dashboard.icon name="book-open" /></span></div>
 </div></div></section>
 @endsection

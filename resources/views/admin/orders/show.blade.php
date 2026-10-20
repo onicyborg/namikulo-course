@@ -2,12 +2,12 @@
 @section('title', 'Detail pesanan')
 @section('content')
 <x-page-header title="Detail pesanan" parent="Pesanan" :parentUrl="route('admin.orders.index')" />
-<div class="section-body"><x-flash-message />@if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+<div class="section-body na-order-detail"><x-flash-message />@if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
     <div class="row"><div class="col-12 col-lg-7"><div class="card"><div class="card-header"><h2>{{ $order->order_number }}</h2></div><div class="card-body"><dl class="row">
         <dt class="col-sm-4">Member</dt><dd class="col-sm-8">{{ $order->user->name }} · {{ $order->user->email }}</dd>
         <dt class="col-sm-4">Course</dt><dd class="col-sm-8">{{ $order->course_title }}</dd>
         <dt class="col-sm-4">Nominal</dt><dd class="col-sm-8">Rp {{ number_format($order->amount, 0, ',', '.') }}</dd>
-        <dt class="col-sm-4">Status</dt><dd class="col-sm-8">{{ ['pending' => 'Menunggu', 'paid' => 'Lunas', 'expired' => 'Kedaluwarsa', 'cancelled' => 'Dibatalkan', 'failed' => 'Gagal', 'refunded' => 'Perlu tinjauan'][$order->status->value] }}</dd>
+        <dt class="col-sm-4">Status</dt><dd class="col-sm-8"><span class="nd-badge nd-badge--{{ $order->status->value }}">{{ ['pending' => 'Menunggu', 'paid' => 'Lunas', 'expired' => 'Kedaluwarsa', 'cancelled' => 'Dibatalkan', 'failed' => 'Gagal', 'refunded' => 'Perlu tinjauan'][$order->status->value] }}</span></dd>
         @if($order->paid_at)<dt class="col-sm-4">Dibayar</dt><dd class="col-sm-8"><time datetime="{{ $order->paid_at->copy()->utc()->toIso8601String() }}" data-local-datetime>{{ $order->paid_at->copy()->utc()->format('d M Y H:i') }} UTC</time></dd>@endif
         @if($order->enrollment)<dt class="col-sm-4">Akses berakhir</dt><dd class="col-sm-8"><time datetime="{{ $order->enrollment->expires_at->copy()->utc()->toIso8601String() }}" data-local-datetime>{{ $order->enrollment->expires_at->copy()->utc()->format('d M Y H:i') }} UTC</time></dd>@endif
         <dt class="col-sm-4">Email konfirmasi</dt><dd class="col-sm-8">{{ $order->payment_email_sent_at ? 'Terkirim' : ($order->payment_email_last_attempt_at ? 'Pernah dicoba; perlu ditinjau' : 'Belum dicoba') }}</dd>

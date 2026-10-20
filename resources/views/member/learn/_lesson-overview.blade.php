@@ -4,11 +4,7 @@
     <a href="#discussion"><x-dashboard.icon name="message-square" />Diskusi<span>{{ $discussionThreads->total() }}</span></a>
 </nav>
 <section class="learn-body nl-lesson-overview" id="lesson-overview" aria-labelledby="lesson-title">
-    <div class="nl-lesson-meta">
-        <span>{{ $lesson->section->title }}</span>
-        @if($lessonNumber)<span>Materi {{ $lessonNumber }} dari {{ $readyCount }}</span>@endif
-    </div>
-    <h1 id="lesson-title">{{ $lesson->title }}</h1>
+    <h2 class="nl-overview-title">Tentang materi ini</h2>
     @if(! $preview)
         <div class="nl-save-status"><x-dashboard.icon name="circle-check" /><span class="learn-progress-feedback" data-progress-feedback role="status" aria-live="polite">{{ $progress->get($lesson->id)?->completed_at ? 'Materi selesai.' : ($progress->get($lesson->id)?->last_position_seconds ? 'Posisi terakhir akan dipulihkan.' : 'Progres akan tersimpan saat video diputar.') }}</span></div>
     @endif

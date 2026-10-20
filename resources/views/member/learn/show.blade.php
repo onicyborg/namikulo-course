@@ -13,6 +13,7 @@
     </header>
     <div class="learn-layout learn-workspace">
         <div class="learn-main">
+            @include('member.learn._workspace-heading')
             @include('member.learn._player')
             @include('member.learn._lesson-overview')
         </div>

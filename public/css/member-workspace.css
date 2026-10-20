@@ -1,0 +1,42 @@
+/* Member content uses the workspace tokens without changing learning or payment flows. */
+body.nm-workspace .member-dashboard .card.member-dashboard-intro{color:#fff;background:linear-gradient(120deg,#303b73,#443b85);border:1px solid #514cab!important;border-radius:13px}
+body.nm-workspace .member-dashboard-intro .card-body{padding:28px 30px;gap:24px}
+body.nm-workspace .member-dashboard-intro h2{color:#fff;font-size:clamp(24px,2.8vw,32px);font-weight:800;letter-spacing:-.04em}
+body.nm-workspace :is(.member-dashboard-eyebrow,.member-dashboard-count,.member-dashboard-intro p:last-child){color:#d4d8f1}
+body.nm-workspace .member-dashboard-count strong{color:#fff;font-size:40px;font-weight:800}
+body.nm-workspace .member-course-row{gap:22px;padding:24px 0;border-color:var(--nd-border)}
+body.nm-workspace .member-course-row:first-child{padding-top:0}
+body.nm-workspace .member-course-row:last-child{padding-bottom:0}
+body.nm-workspace :is(.member-course-heading h3,.member-learning-title h3){font-size:17px;font-weight:800;line-height:1.5;letter-spacing:-.02em}
+body.nm-workspace :is(.member-course-summary,.member-course-expiry,.member-learning-copy>p){color:var(--nd-muted)}
+body.nm-workspace .member-course-image{flex-basis:210px;width:210px;border:1px solid var(--nd-border)}
+body.nm-workspace .member-learning-filters{display:flex;flex-wrap:wrap;padding:6px;margin-bottom:22px;gap:5px;border:1px solid var(--nd-border);border-radius:9px;background:var(--nd-subtle);width:fit-content;max-width:100%}
+body.nm-workspace .member-learning-filters .btn{min-height:36px;padding:7px 14px;border-color:transparent;font-size:12px}
+body.nm-workspace .member-learning-filters .btn[aria-current=page]{box-shadow:0 2px 5px rgb(28 24 92 / 12%)}
+body.nm-workspace .nm-course-grid{gap:20px}
+body.nm-workspace .nm-course-grid .member-learning-row{background:var(--nd-surface);border-color:var(--nd-border);box-shadow:var(--nd-shadow);transition:border-color .2s,box-shadow .2s}
+body.nm-workspace .nm-course-grid .member-learning-row:hover{border-color:var(--nd-active-border);box-shadow:0 7px 22px rgb(28 34 73 / 8%)}
+body.nm-workspace .nm-course-grid .member-learning-thumb{border-bottom:1px solid var(--nd-border);aspect-ratio:16/9;overflow:hidden}
+body.nm-workspace .nm-course-grid .member-learning-thumb img{width:100%;height:100%;object-fit:cover}
+body.nm-workspace .nm-course-grid .member-learning-copy{padding:22px;flex:1}
+body.nm-workspace .progress{height:6px;background:var(--nd-subtle);border-radius:10px;box-shadow:none}
+body.nm-workspace .progress-bar{background:var(--nd-primary)}
+body.nm-workspace .member-recommendation{background:var(--nd-subtle);border-radius:10px;padding:20px}
+body.nm-workspace .member-recommendation h3{font-size:15px;font-weight:800;line-height:1.5}
+body.nm-workspace .member-dashboard-small-row{border-color:var(--nd-border);gap:16px}
+body.nm-workspace .member-learning-section{border-color:var(--nd-border)}
+body.nm-workspace .notification-card .notification-list{padding:0}
+body.nm-workspace .notification-item{padding:22px 24px;border-color:var(--nd-border);background:var(--nd-surface);transition:background-color .18s}
+body.nm-workspace .notification-item-unread{padding-left:21px;background:var(--nd-active);border-left:3px solid var(--nd-primary)}
+body.nm-workspace .notification-item:hover{background:var(--nd-subtle)}
+body.nm-workspace .notification-item-heading h3{font-size:14px;font-weight:800}
+body.nm-workspace .notification-item :is(p,time){color:var(--nd-muted)}
+body.nm-workspace .notification-item time{font-size:11px;font-variant-numeric:tabular-nums}
+body.nm-workspace .notification-item-actions .btn{min-height:40px}
+body.nm-workspace .member-profile-avatar{padding:18px;margin-bottom:24px;background:var(--nd-subtle);border:1px solid var(--nd-border);border-radius:10px;gap:18px}
+body.nm-workspace .member-profile-avatar img{border:3px solid var(--nd-surface);box-shadow:var(--nd-shadow)}
+body.nm-workspace .form-control-file{max-width:100%}
+body.nm-workspace .card-footer .page-link{border-radius:7px;margin:0 3px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+@media(max-width:767px){body.nm-workspace .member-course-image{width:100%;flex-basis:auto}body.nm-workspace .member-dashboard-intro .card-body{padding:24px}body.nm-workspace .member-learning-filters .btn{min-height:44px}body.nm-workspace .notification-item-actions .btn{min-height:44px}}
+@media(max-width:575px){body.nm-workspace .member-profile-avatar{flex-wrap:wrap}body.nm-workspace .notification-item{padding:18px}body.nm-workspace .notification-item-unread{padding-left:15px}}
+@media(prefers-reduced-motion:reduce){body.nm-workspace :is(.member-learning-row,.notification-item){transition:none}}

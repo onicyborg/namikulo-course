@@ -1,0 +1,13 @@
+@font-face{font-family:Manrope;src:url('../fonts/manrope/manrope-variable.ttf') format('truetype');font-weight:200 800;font-style:normal;font-display:swap}
+body.nd-app.nm-premium{
+    --nm-bg:#f6f8fc;--nm-surface:#fff;--nm-raised:#edf1f9;--nm-text:#111c35;--nm-muted:#5b6780;--nm-border:#dfe5f0;
+    --nm-brand:#4f46e5;--nm-brand-hover:#4038c8;--nm-link:#4f46e5;--nm-aqua:#087f73;--nm-aqua-soft:#e0f5ef;--nm-gold:#f1b86b;--nm-brand-soft:#eeedfd;
+    --nm-header:rgba(246,248,252,.94);--nm-shadow:0 22px 65px -28px rgba(30,46,88,.28);
+    --nd-bg:var(--nm-bg);--nd-text:var(--nm-text);--nd-surface:var(--nm-surface);--nd-muted:var(--nm-muted);--nd-border:var(--nm-border);--nd-link:var(--nm-link);--nd-subtle:var(--nm-raised);--nd-primary:var(--nm-brand);--nd-primary-hover:var(--nm-brand-hover);--nd-active:var(--nm-brand-soft);--nd-active-border:var(--nm-border);
+    color:var(--nm-text);background:var(--nm-bg);font-family:Manrope,system-ui,sans-serif;font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;
+}
+html[data-nc-theme="dark"] body.nd-app.nm-premium{
+    --nm-bg:#111c35;--nm-surface:#182540;--nm-raised:#202f4d;--nm-text:#f3f5fc;--nm-muted:#afbbd3;--nm-border:#2c3b58;
+    --nm-brand:#655cf0;--nm-brand-hover:#766df6;--nm-link:#aaa5ff;--nm-aqua:#61dac6;--nm-aqua-soft:#173e46;--nm-brand-soft:#252c52;
+    --nm-header:rgba(17,28,53,.94);--nm-shadow:0 24px 70px -26px rgba(4,12,31,.65);
+}

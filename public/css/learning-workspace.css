@@ -1,0 +1,71 @@
+@font-face{font-family:'Namikulo Learning';src:url('../fonts/manrope/manrope-variable.ttf') format('truetype');font-weight:200 800;font-display:swap}
+body.nl-premium{--nd-bg:#f3f5fa;--nd-surface:#fff;--nd-text:#1b2940;--nd-muted:#62718a;--nd-border:#dfe5ef;--nd-subtle:#edf1f7;--nd-primary:#5046cf;--nd-primary-hover:#4037b3;--nd-link:#4941bd;--nd-active:#eeedfc;--nd-active-border:#d1cdf2;--nd-good-bg:#e7f4ef;--nd-good-text:#25664f;--nd-warn-bg:#fff3df;--nd-warn-text:#865a19;--nd-bad-bg:#fcebf0;--nd-bad-text:#ac3656;--nd-shadow:0 4px 18px rgb(24 39 69 / 4%);font-family:'Namikulo Learning',system-ui,sans-serif;background:var(--nd-bg);color:var(--nd-text);line-height:1.65}
+html[data-nc-theme=dark] body.nl-premium{--nd-bg:#111c2e;--nd-surface:#18263b;--nd-text:#e6edf8;--nd-muted:#a4b2ca;--nd-border:#2c3c53;--nd-subtle:#1e2e45;--nd-primary:#655cdd;--nd-primary-hover:#766ce8;--nd-link:#b8b3ff;--nd-active:#292e50;--nd-active-border:#484b77;--nd-good-bg:#193d39;--nd-good-text:#88d8bd;--nd-warn-bg:#3e3426;--nd-warn-text:#e8c281;--nd-bad-bg:#422c3b;--nd-bad-text:#f3a6bc;--nd-shadow:0 6px 24px rgb(4 12 25 / 12%);color-scheme:dark}
+body.nl-premium .learn-header.learn-header--course{position:sticky;top:0;min-height:70px;padding:12px clamp(16px,3vw,46px);background:var(--nd-surface);border-bottom:1px solid var(--nd-border);gap:16px}
+body.nl-premium .learn-header--course .nm-learn-context small{font-size:9px;letter-spacing:.16em;color:var(--nd-muted)}
+body.nl-premium .learn-header--course .nm-learn-context strong{font-size:13px;font-weight:750;line-height:1.6}
+body.nl-premium .learn-header .nd-icon-button{border:1px solid var(--nd-border);background:var(--nd-surface);border-radius:10px;width:40px;height:40px;color:var(--nd-muted)}
+body.nl-premium .learn-header .nd-icon-button:hover{color:var(--nd-link);background:var(--nd-active);border-color:var(--nd-active-border)}
+body.nl-premium .learn-preview{font-size:10px;padding:5px 9px;border-radius:6px;white-space:nowrap}
+body.nl-premium .learn-layout.learn-workspace{max-width:1640px;margin:auto;padding:30px clamp(20px,3vw,46px) 64px;grid-template-columns:minmax(0,1fr) minmax(290px,330px);gap:30px;align-items:start}
+body.nl-premium .nl-workspace-heading{margin-bottom:22px;min-width:0}
+body.nl-premium .nl-workspace-heading h1{font-size:clamp(23px,2.4vw,33px);line-height:1.35;font-weight:800;letter-spacing:-.035em;max-width:38ch;overflow-wrap:anywhere;margin:0}
+body.nl-premium .nl-lesson-meta{font-size:11px;gap:8px 16px;margin-bottom:10px;align-items:center}
+body.nl-premium .nl-lesson-meta>span:last-child{font-variant-numeric:tabular-nums}
+body.nl-premium .nl-jump-curriculum{display:none}
+body.nl-premium .nl-video-frame{border:1px solid var(--nd-border);border-radius:14px;background:var(--nd-surface);box-shadow:0 8px 30px rgb(9 20 42 / 10%)}
+body.nl-premium .nl-video-frame .learn-stage{border:0;border-radius:13px 13px 0 0;background:#080f1c}
+body.nl-premium .nl-video-frame .learn-controls{border:0;border-top:1px solid var(--nd-border);padding:8px 18px 14px;background:var(--nd-surface);border-radius:0 0 13px 13px}
+body.nl-premium .nl-video-timeline{margin-bottom:6px;min-height:24px}
+body.nl-premium .learn-controls input[type=range]{accent-color:var(--nd-primary)}
+body.nl-premium .learn-controls :is(button,select){border:1px solid var(--nd-border);border-radius:8px;background:var(--nd-subtle);color:var(--nd-text);font-family:inherit;font-size:11px;min-height:38px;padding:8px 12px}
+body.nl-premium .learn-controls [data-play]{min-width:76px;background:var(--nd-primary);border-color:var(--nd-primary);color:white;font-weight:750}
+body.nl-premium .learn-controls [data-play]:hover:not(:disabled){background:var(--nd-primary-hover)}
+body.nl-premium .learn-controls :disabled{opacity:.55;cursor:not-allowed}
+body.nl-premium .nl-video-volume{gap:8px}
+body.nl-premium .nl-video-volume label{font-size:10px}
+body.nl-premium .nl-video-frame [data-time]{font-size:11px;font-variant-numeric:tabular-nums}
+body.nl-premium .learn-screen-message{background:rgb(17 28 46 / 93%);border:1px solid rgb(255 255 255 / 14%);border-radius:10px;font-size:13px;line-height:1.7;padding:16px 20px}
+body.nl-premium .nl-video-frame:fullscreen{border:0;border-radius:0}
+body.nl-premium .nl-lesson-nav{display:flex;gap:6px;padding:6px;margin:20px 0 0;width:fit-content;max-width:100%;border:1px solid var(--nd-border);border-radius:10px;background:var(--nd-surface)}
+body.nl-premium .nl-lesson-nav a{min-height:40px;padding:9px 14px;border:0;border-radius:7px;font-size:12px;gap:7px;color:var(--nd-muted)}
+body.nl-premium .nl-lesson-nav a:hover,body.nl-premium .nl-lesson-nav a:focus-visible{background:var(--nd-active);color:var(--nd-link)}
+body.nl-premium .learn-workspace .nl-lesson-overview{padding:26px 0 0;scroll-margin-top:94px}
+body.nl-premium .nl-overview-title{font-size:16px;font-weight:800;margin:0 0 12px}
+body.nl-premium .nl-save-status{align-items:center;font-size:11px;margin-bottom:20px;color:var(--nd-good-text)}
+body.nl-premium .nl-save-status .learn-progress-feedback{font-size:11px;color:var(--nd-muted)}
+body.nl-premium .nl-lesson-description{margin-top:20px;font-size:15px;max-width:78ch;line-height:1.85}
+body.nl-premium .nc-description-details{margin-top:22px;padding:14px 0;border-top:1px solid var(--nd-border);border-bottom:1px solid var(--nd-border);border-radius:0;background:transparent}
+body.nl-premium .nc-description-details>summary{font-size:12px;color:var(--nd-link);cursor:pointer;font-weight:700}
+body.nl-premium .nc-description-details .nc-rich-description{margin-top:16px}
+body.nl-premium .nl-lesson-overview .learn-neighbors{gap:14px;margin-top:24px}
+body.nl-premium .nl-lesson-overview .learn-neighbors :is(a,.nl-next-locked){padding:18px 20px;min-height:88px;border-radius:10px;border:1px solid var(--nd-border);background:var(--nd-surface);gap:14px}
+body.nl-premium .learn-neighbors .nl-next:not(.nl-next-locked){background:var(--nd-active);border-color:var(--nd-active-border)}
+body.nl-premium .learn-neighbors a:hover{border-color:var(--nd-link)}
+body.nl-premium .learn-neighbors strong{font-size:12px;line-height:1.65}
+body.nl-premium .learn-neighbors small{font-size:10px}
+body.nl-premium .learn-workspace .nl-curriculum{top:94px;max-height:calc(100dvh - 118px);border:1px solid var(--nd-border);border-radius:12px;background:var(--nd-surface);box-shadow:var(--nd-shadow);scroll-margin-top:90px}
+body.nl-premium .nl-curriculum-heading{padding:21px 20px;background:var(--nd-surface)}
+body.nl-premium .nl-curriculum .nl-curriculum-heading h2{font-size:15px;font-weight:800;margin-bottom:6px}
+body.nl-premium .nl-curriculum-heading p{font-size:11px}
+body.nl-premium .nl-curriculum-heading>.nd-icon{width:18px;height:18px;padding:8px;box-sizing:content-box;border-radius:9px;background:var(--nd-active)}
+body.nl-premium .nl-chapter>summary{padding:17px 20px;gap:10px}
+body.nl-premium .nl-chapter>summary small{font-size:9px;letter-spacing:.12em;color:var(--nd-muted)}
+body.nl-premium .nl-chapter>summary strong{font-size:12px;font-weight:750;line-height:1.7}
+body.nl-premium .nl-chapter>summary>.nd-icon{transition:transform .2s}
+body.nl-premium .nl-chapter-list{scrollbar-gutter:stable}
+body.nl-premium .nl-lesson-list{padding:0 9px 12px}
+body.nl-premium .nl-lesson-list li>a,body.nl-premium .nl-unavailable{padding:12px 10px;min-height:62px;border-radius:8px;gap:10px;border:0}
+body.nl-premium .nl-lesson-list .is-current>a{background:var(--nd-active);box-shadow:inset 3px 0 var(--nd-primary)}
+body.nl-premium .nl-lesson-number{display:grid;place-items:center;flex:0 0 25px;height:25px;padding:0;margin-top:1px;background:var(--nd-subtle);border-radius:7px;font-size:10px;color:var(--nd-muted)}
+body.nl-premium .is-current .nl-lesson-number{background:var(--nd-primary);color:white}
+body.nl-premium .nl-lesson-list-copy>strong{font-size:12px;font-weight:600;line-height:1.65}
+body.nl-premium .learn-lesson-state{display:block;font-size:10px;margin-top:5px;color:var(--nd-muted)}
+body.nl-premium .nl-current-label{margin-top:5px;font-size:9px;letter-spacing:.02em}
+body.nl-premium .nl-unavailable[data-locked-lesson]{background:transparent;opacity:.8}
+body.nl-premium .nl-curriculum-footer{padding:14px 20px;background:var(--nd-subtle)}
+body.nl-premium .nl-curriculum-footer a{font-size:11px;min-height:30px}
+@media(max-width:1199px){body.nl-premium .learn-layout.learn-workspace{grid-template-columns:minmax(0,1fr) 290px;padding:24px;gap:24px}}
+@media(max-width:991px){body.nl-premium .learn-layout.learn-workspace{grid-template-columns:minmax(0,1fr);grid-template-areas:'main' 'curriculum' 'discussion';max-width:900px}body.nl-premium .learn-workspace .nl-curriculum{position:static;max-height:none}body.nl-premium .nl-chapter-list{max-height:420px}body.nl-premium .nl-jump-curriculum{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:5px 0;color:var(--nd-link);font-size:12px;font-weight:700;min-height:36px}body.nl-premium .nl-jump-curriculum .nd-icon{width:16px;height:16px}}
+@media(max-width:575px){body.nl-premium .learn-header.learn-header--course{padding:10px 14px;gap:10px;min-height:66px}body.nl-premium .learn-header--course .nm-learn-context strong{font-size:11px}body.nl-premium .learn-header .nm-learn-actions{gap:3px}body.nl-premium .learn-preview{position:absolute;top:100%;right:14px;border:1px solid var(--nd-active-border)}body.nl-premium .learn-layout.learn-workspace{padding:22px 14px 40px;gap:24px}body.nl-premium .nl-workspace-heading h1{font-size:24px}body.nl-premium .nl-lesson-nav{width:100%;gap:3px;flex-wrap:nowrap}body.nl-premium .nl-lesson-nav a{flex:1;justify-content:center;padding:8px 5px;font-size:11px;min-height:44px}body.nl-premium .nl-video-options{width:100%}body.nl-premium .learn-controls :is(button,select){min-height:44px}body.nl-premium .nl-video-frame .learn-controls{padding:8px 12px 12px}body.nl-premium .nl-lesson-overview .learn-neighbors{grid-template-columns:minmax(0,1fr)}body.nl-premium .learn-neighbors .nl-next{grid-column:auto}body.nl-premium :is(.nl-lesson-overview,.learn-discussion,.nl-curriculum){scroll-margin-top:88px}}
+@media(prefers-reduced-motion:reduce){body.nl-premium .nl-chapter>summary>.nd-icon{transition:none}}

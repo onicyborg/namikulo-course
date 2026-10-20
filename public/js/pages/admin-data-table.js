@@ -142,7 +142,8 @@
                 orderMulti: false,
                 processing: true,
                 serverSide: true,
-                responsive: true,
+                responsive: tableElement.dataset.ncAdaptive !== 'audit',
+                autoWidth: tableElement.dataset.ncAdaptive !== 'audit',
                 pageLength: Number(size.value),
                 displayStart: Number(tableElement.dataset.ncDisplayStart) || 0,
                 lengthMenu: [10, 25, 50, 100],
@@ -184,6 +185,8 @@
                 }
             });
         }
+
+        if (tableElement.dataset.ncAdaptive === 'audit' && window.ncAdaptiveAudit) window.ncAdaptiveAudit(table, tableElement, scroll);
 
         pagination.addEventListener('click', function (event) {
             if (!table) return;

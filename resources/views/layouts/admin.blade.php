@@ -19,8 +19,10 @@
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/table-actions.css') }}?v=1">
     @if(request()->routeIs('admin.dashboard'))<link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">@endif
+    <link rel="stylesheet" href="{{ url('css/admin-workspace.css') }}?v=2">
+    <link rel="stylesheet" href="{{ url('css/admin-workspace-data.css') }}?v=4">
 </head>
-<body class="nd-app{{ request()->routeIs('admin.dashboard') ? '' : ' nd-legacy' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
+<body class="nd-app na-admin{{ request()->routeIs('admin.dashboard') ? '' : ' nd-legacy' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>
     @include('admin.dashboard.sidebar')
     <button class="nd-backdrop" type="button" data-sidebar-close aria-label="Tutup navigasi" hidden></button>
@@ -40,7 +42,8 @@
     @if(request()->routeIs('admin.dashboard'))<script src="{{ url('js/admin-action-tooltip.js') }}"></script>@endif
     @unless(request()->routeIs('admin.dashboard'))<script src="{{ url('js/pages/admin-legacy.js') }}"></script>@endunless
     @if($usesServerTable)
-        <script src="{{ url('js/pages/admin-data-table.js') }}?v=10"></script>
+        @if(request()->routeIs('admin.operations.index'))<script src="{{ url('js/pages/admin-audit-table.js') }}?v=1"></script>@endif
+        <script src="{{ url('js/pages/admin-data-table.js') }}?v=11"></script>
         <script src="{{ url('js/remote-modal.js') }}?v=1"></script>
     @endif
     @stack('scripts')

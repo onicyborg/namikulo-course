@@ -15,6 +15,9 @@
     @include('admin.dashboard.metrics')
     <div class="nd-bottom-grid">
         @include('admin.dashboard.orders')
-        @include('admin.dashboard.videos')
+        <div class="na-overview-side">
+            @include('admin.dashboard.videos')
+            @include('admin.dashboard.workspace-links')
+        </div>
     </div>
 @endsection

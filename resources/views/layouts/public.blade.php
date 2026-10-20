@@ -1,4 +1,5 @@
 @php($redesignedSite = request()->routeIs('site.home', 'site.courses.*', 'admin.courses.preview'))
+@php($premiumSite = $redesignedSite)
 <!DOCTYPE html>
 <html lang="id" @if(request()->routeIs('site.home')) data-nc-default-theme="dark" @endif>
 <head>
@@ -16,11 +17,19 @@
     @endif
     <link rel="stylesheet" href="{{ url('css/site.css') }}">
     @if($redesignedSite)<link rel="stylesheet" href="{{ url('css/public-site.css') }}?v=1">@endif
+    @if($premiumSite)
+        <link rel="stylesheet" href="{{ url('css/premium-theme.css') }}?v=1">
+        <link rel="stylesheet" href="{{ url('css/landing-minimal.css') }}?v=3">
+        @if(!request()->routeIs('site.home'))<link rel="stylesheet" href="{{ url('css/premium-courses.css') }}?v=1">@endif
+    @endif
     @stack('styles')
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
 </head>
-<body class="public-page {{ $redesignedSite ? 'nd-app np-page' : '' }} {{ request()->routeIs('site.home') ? 'nm-home' : '' }}" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
+<body class="public-page {{ $redesignedSite ? 'nd-app np-page' : '' }} {{ $premiumSite ? 'nm-premium nm-public' : '' }} {{ request()->routeIs('site.home') ? 'nm-home' : '' }}" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
+    @if($premiumSite)
+        @include('site.partials.landing-nav')
+    @else
     <header class="public-header">
         <nav class="container public-nav" aria-label="Navigasi utama">
             <a class="public-brand" href="{{ route('site.home') }}">
@@ -40,14 +49,20 @@
             </div>
         </nav>
     </header>
+    @endif
     <main id="main-content" tabindex="-1">@yield('content')</main>
+    @if($premiumSite)
+        @include('site.partials.landing-footer')
+    @else
     <footer class="public-footer">
         <div class="container site-footer-inner"><div><strong>{{ config('app.name') }}</strong><p>Belajar sesuai ritme Anda, dengan kurikulum yang dapat dilihat sejak awal.</p></div><nav aria-label="Tautan footer"><a href="{{ route('site.courses.index') }}">Katalog</a><a href="{{ route('site.home') }}#cara-belajar">Cara belajar</a>@guest<a href="{{ route('register') }}">Daftar</a>@endguest</nav><small>&copy; {{ date('Y') }} {{ config('app.name') }}</small></div>
     </footer>
+    @endif
     <script src="{{ asset('js/app.min.js') }}"></script>
     <script src="{{ url('js/app-custom.js') }}?v=5"></script>
     <script src="{{ url('js/interaction-motion.js') }}?v=1"></script>
     <script src="{{ url('js/pages/site.js') }}"></script>
+    @if($premiumSite)<script src="{{ url('js/pages/landing.js') }}?v=2" defer></script>@endif
     @stack('scripts')
 </body>
 </html>

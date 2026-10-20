@@ -1,0 +1,81 @@
+body.nl-premium .learn-workspace .learn-discussion{width:100%;max-width:none;min-width:0;margin-top:0;scroll-margin-top:94px}
+body.nl-premium .learn-workspace .discussion-heading{padding-top:28px;margin-bottom:22px;gap:18px;align-items:center}
+body.nl-premium .learn-workspace .discussion-heading h2{font-size:21px;font-weight:800;letter-spacing:-.025em;margin-bottom:6px}
+body.nl-premium .discussion-heading p{font-size:12px;line-height:1.7;max-width:55ch;color:var(--nd-muted)}
+body.nl-premium .learn-workspace .discussion-heading>span{font-size:10px;border-radius:6px;padding:5px 9px;color:var(--nd-muted);background:var(--nd-surface)}
+body.nl-premium .discussion-thread{border:1px solid var(--nd-border);border-radius:12px;background:var(--nd-surface);box-shadow:var(--nd-shadow);margin-bottom:20px;overflow:hidden}
+body.nl-premium .discussion-post{padding:24px;min-width:0;background:transparent;scroll-margin-top:92px}
+body.nl-premium .discussion-post-meta{gap:8px;align-items:center;min-width:0}
+body.nl-premium .nc-discussion-avatar{width:32px;height:32px;flex:0 0 32px;border-radius:10px;background:var(--nd-subtle);border:1px solid var(--nd-border);color:var(--nd-muted);font-size:11px;font-weight:800}
+body.nl-premium .discussion-post-meta>strong{font-size:12px;font-weight:800;color:var(--nd-text)}
+body.nl-premium .discussion-post-meta time{font-size:10px;line-height:1.6;color:var(--nd-muted);font-variant-numeric:tabular-nums}
+body.nl-premium .discussion-admin-label,body.nl-premium .discussion-hidden-label{font-size:9px;padding:3px 7px;border-radius:5px;font-weight:700}
+body.nl-premium .nl-instructor-post .nc-discussion-avatar{background:var(--nd-active);color:var(--nd-link);border-color:var(--nd-active-border)}
+body.nl-premium .discussion-body{margin:16px 0 12px;white-space:normal;font-size:14px;line-height:1.85;color:var(--nd-text);min-width:0;max-width:100%}
+body.nl-premium .discussion-body>.nc-rich-description{border:0;border-radius:0;box-shadow:none;padding:0;background:transparent;max-width:100%;overflow-x:auto;overflow-wrap:anywhere;font-size:14px;line-height:1.85;scrollbar-width:thin;scrollbar-color:var(--nd-border) transparent}
+body.nl-premium .discussion-body .nc-rich-description p{margin:0 0 12px;line-height:1.85}
+body.nl-premium .discussion-body .nc-rich-description :is(h1,h2,h3,h4){line-height:1.5;font-size:1.15em;margin:20px 0 10px;letter-spacing:-.02em}
+body.nl-premium .discussion-body .nc-rich-description :is(ul,ol){padding-left:24px;margin:10px 0 14px}
+body.nl-premium .discussion-body .nc-rich-description li{margin:5px 0}
+body.nl-premium .discussion-body .nc-rich-description img{display:block;max-width:min(100%,480px)!important;max-height:300px!important;width:auto!important;height:auto!important;object-fit:contain;border-radius:8px;margin:14px 0;border:1px solid var(--nd-border)}
+body.nl-premium .discussion-body .nc-rich-description table{width:100%;max-width:100%;table-layout:auto;margin:16px 0;font-size:12px;border-collapse:collapse}
+body.nl-premium .discussion-body .nc-rich-description :is(td,th){padding:9px 12px;border-color:var(--nd-border);min-width:80px;overflow-wrap:anywhere}
+body.nl-premium .discussion-body .nc-rich-description blockquote{border:0;border-left:3px solid var(--nd-active-border);padding:8px 16px;margin:14px 0;background:var(--nd-subtle);border-radius:0 7px 7px 0;color:var(--nd-muted)}
+body.nl-premium .discussion-body .nc-rich-description pre{max-width:100%;overflow-x:auto;white-space:pre;padding:16px;border:1px solid var(--nd-border);border-radius:8px;background:var(--nd-subtle);color:var(--nd-text);font-size:12px;line-height:1.75}
+body.nl-premium .discussion-post-actions{gap:8px;padding-top:0;margin-top:10px}
+body.nl-premium .discussion-post-actions :is(a,button){display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:6px 9px;border:0;border-radius:6px;color:var(--nd-muted);font-size:11px;font-weight:700;background:transparent;text-decoration:none}
+body.nl-premium .discussion-post-actions .nd-icon{width:14px;height:14px}
+body.nl-premium .discussion-post-actions a:hover{color:var(--nd-link);background:var(--nd-active)}
+body.nl-premium .discussion-post-actions .discussion-text-button:hover{color:var(--nd-bad-text);background:var(--nd-bad-bg)}
+body.nl-premium .discussion-reply{margin-left:24px;margin-right:24px;padding:20px 0 20px 18px;border-left:2px solid var(--nd-border);border-top:1px solid var(--nd-border)}
+body.nl-premium .discussion-reply .nc-discussion-avatar{width:28px;height:28px;flex-basis:28px;border-radius:9px}
+body.nl-premium .discussion-reply .discussion-body{font-size:13px;margin-top:12px}
+body.nl-premium .nc-reply-quote{margin:12px 0;padding:9px 12px;border:0;border-left:2px solid var(--nd-active-border);border-radius:0 6px 6px 0;background:var(--nd-subtle)}
+body.nl-premium .nc-reply-quote>span{font-size:10px;line-height:1.6}
+body.nl-premium .nc-reply-quote q{font-size:12px;line-height:1.6;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+body.nl-premium .nc-reply-quote:hover{background:var(--nd-active);border-left-color:var(--nd-link)}
+body.nl-premium .discussion-thread-footer{padding:12px 24px;background:var(--nd-subtle);border-top:1px solid var(--nd-border);gap:10px 20px;align-items:center}
+body.nl-premium .discussion-thread-footer a{font-size:11px;line-height:1.6;font-weight:750;color:var(--nd-link);text-decoration:none;min-height:32px;display:inline-flex;align-items:center}
+body.nl-premium .discussion-thread-footer a:hover{text-decoration:underline;text-underline-offset:4px}
+body.nl-premium .discussion-empty{border:1px dashed var(--nd-border);padding:30px 24px;background:var(--nd-surface);border-radius:10px;font-size:13px;text-align:center;color:var(--nd-muted)}
+body.nl-premium .discussion-form{margin:26px 0 0;padding:24px;border:1px solid var(--nd-border);border-radius:12px;box-shadow:var(--nd-shadow);background:var(--nd-surface)}
+body.nl-premium .discussion-form :is(h2,h3){font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+body.nl-premium .discussion-form label{font-size:12px;font-weight:700;color:var(--nd-text);margin-bottom:8px}
+body.nl-premium .discussion-form .form-group{margin-bottom:18px}
+body.nl-premium .discussion-form :is(small,.form-text){font-size:11px;line-height:1.65;color:var(--nd-muted)}
+body.nl-premium .btn-primary{background:var(--nd-primary);border-color:var(--nd-primary);color:white;box-shadow:none;border-radius:8px;min-height:42px;font-size:12px;font-weight:750;padding:10px 16px}
+body.nl-premium .btn-primary:hover{background:var(--nd-primary-hover);border-color:var(--nd-primary-hover)}
+body.nl-premium .nc-lexical{border:1px solid var(--nd-border);border-radius:9px;background:var(--nd-surface);box-shadow:none;overflow:hidden}
+body.nl-premium .nc-lexical:focus-within{border-color:var(--nd-link);box-shadow:0 0 0 3px var(--nd-active)}
+body.nl-premium .nc-lexical-toolbar{padding:8px;gap:5px;background:var(--nd-subtle);border-color:var(--nd-border)}
+body.nl-premium .nc-lexical-group{gap:1px;padding-right:5px;min-height:34px}
+body.nl-premium .nc-lexical-button,body.nl-premium .nc-lexical-select-label select{min-height:34px;min-width:32px;padding:6px;border-radius:6px;font-size:11px}
+body.nl-premium .nc-lexical-select-label select{padding-right:20px;max-width:150px}
+body.nl-premium .nc-lexical-button svg{width:16px;height:16px;stroke-width:1.7}
+body.nl-premium .nc-lexical-editable{font-family:'Namikulo Learning',system-ui,sans-serif;line-height:1.85;padding:18px;min-height:180px;max-height:none}
+body.nl-premium .nc-lexical--discussion .nc-lexical-editable{background:var(--nd-surface);color:var(--nd-text)}
+html[data-nc-theme=dark] body.nl-premium .nc-lexical--discussion .nc-lexical-editable{background:var(--nd-surface);color:var(--nd-text);caret-color:var(--nd-link)}
+body.nl-premium .nc-lexical-editable .nc-lexical-image{max-height:260px;max-width:100%;object-fit:contain}
+body.nl-premium .nc-lexical-editable.is-empty::before{left:18px;top:18px;color:var(--nd-muted)}
+body.nl-premium .nc-lexical-link-panel,body.nl-premium .nc-lexical-image-panel{background:var(--nd-subtle)}
+body.nl-premium .nc-discussion-modal .modal-dialog{width:min(960px,calc(100vw - 40px));max-width:960px;margin:20px auto;min-height:calc(100% - 40px)}
+body.nl-premium .nc-discussion-modal .modal-content{max-height:calc(100dvh - 40px);border:1px solid var(--nd-border);border-radius:14px;background:var(--nd-bg);box-shadow:0 24px 80px rgb(3 10 25 / 30%);overflow:hidden}
+body.nl-premium .nc-discussion-modal .modal-header{flex:none;padding:18px 24px;background:var(--nd-surface);border-bottom:1px solid var(--nd-border);align-items:center}
+body.nl-premium .nc-discussion-modal .modal-title{font-size:19px;font-weight:800;letter-spacing:-.025em}
+body.nl-premium .nc-discussion-modal .modal-header .close{width:36px;height:36px;display:grid;place-items:center;padding:0;margin:0;border:1px solid var(--nd-border);border-radius:8px;font-size:23px;color:var(--nd-muted)}
+body.nl-premium .nc-discussion-modal .modal-header .close:hover{background:var(--nd-subtle);color:var(--nd-text)}
+body.nl-premium .nc-discussion-modal .modal-body{max-height:none;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;padding:24px;scrollbar-width:thin;scrollbar-color:var(--nd-border) transparent;scroll-padding-block:20px}
+body.nl-premium .nc-discussion-modal .discussion-thread{border:0;box-shadow:none;background:var(--nd-surface);border-radius:10px}
+body.nl-premium .nc-discussion-modal .discussion-form{margin-top:20px;box-shadow:none}
+body.nl-premium .nc-discussion-modal .discussion-post{scroll-margin-top:20px}
+body.nl-premium .nc-discussion-modal .nc-lexical-editable{min-height:150px}
+body.nl-premium .discussion-pagination .pagination{gap:5px;flex-wrap:wrap}
+body.nl-premium .discussion-pagination .page-link{border-radius:7px;min-width:36px;min-height:36px;display:grid;place-items:center;font-size:12px;margin:0}
+@media(max-width:575px){body.nl-premium .discussion-post{padding:18px}body.nl-premium .discussion-post-meta{gap:6px}body.nl-premium .discussion-post-meta time{margin-left:38px;flex-basis:100%;font-size:9px}body.nl-premium .discussion-reply{margin-inline:14px;padding:18px 0 18px 12px}body.nl-premium .discussion-body>.nc-rich-description{font-size:13px}body.nl-premium .discussion-body .nc-rich-description img{max-height:230px!important}body.nl-premium .discussion-post-actions :is(a,button){min-height:44px}body.nl-premium .discussion-form{padding:18px}body.nl-premium .discussion-thread-footer{padding:10px 18px;gap:8px}body.nl-premium .nc-lexical-toolbar{gap:4px;padding:6px}body.nl-premium .nc-lexical-group{border:0;flex-wrap:wrap;max-width:100%}body.nl-premium .nc-lexical-button,body.nl-premium .nc-lexical-select-label select{min-height:40px;min-width:36px}body.nl-premium .nc-lexical-editable{padding:14px;min-height:160px}body.nl-premium .nc-lexical-editable.is-empty::before{left:14px;top:14px}body.nl-premium .nc-discussion-modal .modal-dialog{width:calc(100vw - 16px);margin:8px auto;min-height:calc(100% - 16px)}body.nl-premium .nc-discussion-modal .modal-content{max-height:calc(100dvh - 16px);border-radius:12px}body.nl-premium .nc-discussion-modal .modal-header{padding:15px 18px}body.nl-premium .nc-discussion-modal .modal-body{padding:12px}body.nl-premium .nc-discussion-modal .discussion-post{padding:16px}body.nl-premium .nc-discussion-modal .discussion-reply{padding-left:12px}body.nl-premium .learn-workspace .discussion-heading{align-items:flex-start}}
+body.nl-premium .nc-lexical-editable pre{max-width:100%;overflow-x:auto}
+body.nl-premium .nc-lexical-editable .nc-lexical-table{max-width:100%;table-layout:fixed}
+body.nl-premium .nc-lexical-editable :is(.nc-lexical-table-cell,.nc-lexical-table-header){min-width:0;overflow-wrap:anywhere}
+body.nl-premium .nl-lesson-description .nc-rich-description{max-width:100%;overflow-x:auto;scrollbar-width:thin}
+body.nl-premium .nl-lesson-description .nc-rich-description img{max-width:100%;height:auto;object-fit:contain}
+body.nl-premium .discussion-form textarea{background:var(--nd-surface);color:var(--nd-text);border-color:var(--nd-border);border-radius:8px;min-height:160px}
+body.nl-premium .discussion-form textarea:focus{background:var(--nd-surface);color:var(--nd-text);border-color:var(--nd-link);box-shadow:0 0 0 3px var(--nd-active)}
