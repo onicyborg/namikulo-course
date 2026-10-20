@@ -24,7 +24,7 @@
                 @php($itemProgress = $progress->get($course->id, ['total' => 0, 'completed' => 0, 'percent' => 0]))
                 <article class="member-learning-row">
                     <div class="member-learning-thumb">
-                        @if($course->thumbnail_path)<img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail {{ $course->title }}" width="240" height="135" loading="lazy">@else<x-dashboard.icon name="book-open" />@endif
+                        @if($course->thumbnail_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail {{ $course->title }}" width="240" height="135" loading="lazy">@else<x-dashboard.icon name="book-open" />@endif
                     </div>
                     <div class="member-learning-copy">
                         <div class="member-learning-title"><h3><a href="{{ route('member.courses.show', $course->slug) }}">{{ $course->title }}</a></h3><span class="badge {{ $state['active'] ? 'badge-success' : 'badge-secondary' }}">{{ $state['active'] ? 'Akses aktif' : ($state['enrollment']->status === \App\Enums\EnrollmentStatus::Revoked ? 'Akses dicabut' : 'Akses berakhir') }}</span></div>

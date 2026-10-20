@@ -3,7 +3,7 @@
 @section('title', $course->title)
 @section('meta_description', \Illuminate\Support\Str::limit($course->summary ?: strip_tags($safeDescription ?: $course->title), 155))
 @section('og_type', 'product')
-@if($course->thumbnail_path)@section('og_image', url('storage/'.$course->thumbnail_path))@endif
+@if($course->thumbnail_path)@section('og_image', url(\Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path)))@endif
 
 @section('content')
 <div class="container site-page site-detail nm-detail">
@@ -21,7 +21,7 @@
         </div>
     </header>
     <div class="site-detail-grid">
-        <div class="site-detail-image">@if($course->thumbnail_path)<img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="960" height="540">@else<div class="nm-course-art" aria-hidden="true"><x-dashboard.icon name="book-open" /><span>NAMIKULO / COURSE</span></div>@endif</div>
+        <div class="site-detail-image">@if($course->thumbnail_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="960" height="540">@else<div class="nm-course-art" aria-hidden="true"><x-dashboard.icon name="book-open" /><span>NAMIKULO / COURSE</span></div>@endif</div>
         <aside class="site-purchase-card" aria-label="Harga dan akses"><div class="nm-purchase-kicker"><span>AKSES COURSE</span><x-dashboard.icon name="graduation-cap" /></div><div class="site-price">@if($course->discount_price !== null)<del>Rp {{ number_format($course->price, 0, ',', '.') }}</del>@endif<strong>{{ ($course->discount_price ?? $course->price) === 0 ? 'Gratis' : 'Rp '.number_format($course->discount_price ?? $course->price, 0, ',', '.') }}</strong></div><p>Satu pembelian memberi akses {{ $course->access_months }} bulan sejak pembayaran terkonfirmasi.</p>
             @if($preview)
                 <span class="site-state-tag">Mode pratinjau</span>@if($firstReadyLesson)<a class="btn btn-primary btn-block mt-2" href="{{ route('learn.show', $firstReadyLesson) }}" target="_blank" rel="noopener noreferrer">Pratinjau video di tab baru</a>@endif

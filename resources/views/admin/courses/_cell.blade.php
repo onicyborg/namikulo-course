@@ -1,6 +1,6 @@
 @switch($column)
     @case('title')
-        <div class="content-course-title">@if($course->thumbnail_path)<img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail {{ $course->title }}">@endif<div><strong>{{ $course->title }}</strong><small>{{ $course->instructor_name ?: 'Pengajar belum diisi' }}</small></div></div>
+        <div class="content-course-title">@if($course->thumbnail_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail {{ $course->title }}">@endif<div><strong>{{ $course->title }}</strong><small>{{ $course->instructor_name ?: 'Pengajar belum diisi' }}</small></div></div>
         @break
     @case('category')
         {{ $course->category?->name ?? 'Tanpa kategori' }}

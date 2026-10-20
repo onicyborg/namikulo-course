@@ -2,6 +2,8 @@
 
 Panduan ini untuk instalasi **setelah UAT staging MySQL lulus dan user menyetujui deployment**. Deployment production tidak dilakukan oleh agent. Aplikasi memakai Laravel 12, PHP 8.2+, MySQL 8, Blade, queue `sync`, dan cron-job.org. Tidak diperlukan FFmpeg server, worker queue, atau Laravel Scheduler.
 
+Untuk menyimpan media di R2, gunakan [panduan cutover R2](R2-STORAGE.md) setelah menyiapkan aplikasi. Pada mode R2, `public`, `video_private`, dan `editor_private` memakai bucket privat; aturan path lokal di bawah tetap berlaku untuk sumber migrasi, backup, dan mode lokal. Jangan mengganti driver sebelum file lama terverifikasi.
+
 ## 1. Prasyarat hosting
 
 - Domain HTTPS dengan document root mengarah hanya ke `public/`. Simpan root proyek, `.env`, `storage/`, dan `vendor/` di luar document root. Jika panel tidak mengizinkan document root ini, siapkan pemetaan direktori yang setara tanpa mengekspos root proyek.

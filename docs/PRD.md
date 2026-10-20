@@ -272,3 +272,7 @@ Admin memakai halaman persiapan video di browser Windows/macOS/Linux yang kompat
 Satu kualitas mengikuti sumber yang memenuhi profil (maksimum 1080p), tanpa transcoding otomatis atau pilihan kualitas ganda. Input tidak sesuai ditolak dengan petunjuk ekspor ulang. Pengepakan HLS memakai stream copy untuk mengurangi beban perangkat. Browser tetap perlu terbuka; dukungan AES-128 build ffmpeg.wasm terpilih harus dibuktikan sebelum implementasi penuh Phase 4 diluluskan.
 
 Seluruh MVP tidak membutuhkan worker server: email sinkron dengan timeout, pekerjaan berkala melalui cron-job.org dalam batch. Migrasi ke VPS/encoding server dan queue adalah peningkatan setelah MVP, bukan implementasi dua sistem sekaligus.
+
+### Penyimpanan media Cloudflare R2
+
+Atas persetujuan user, video dan gambar dapat disimpan di bucket R2 privat untuk mengurangi penggunaan disk hosting cPanel. Akses konten tetap mengikuti hak admin/member yang sudah ada. File lama dipertahankan saat migrasi dan harus diverifikasi sebelum cutover. Streaming tetap melalui aplikasi; penghematan disk tidak menghilangkan beban koneksi/bandwidth hosting. Implementasi dan UAT mengikuti [panduan R2](R2-STORAGE.md).

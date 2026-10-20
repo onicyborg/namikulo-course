@@ -42,7 +42,7 @@
                 <article class="member-course-row" aria-labelledby="member-course-{{ $course->id }}">
                     <div class="member-course-image">
                         @if($course->thumbnail_path)
-                            <img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="320" height="180" loading="lazy">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="320" height="180" loading="lazy">
                         @else
                             <div class="member-course-image-placeholder" aria-hidden="true"><x-dashboard.icon name="book-open" /></div>
                         @endif

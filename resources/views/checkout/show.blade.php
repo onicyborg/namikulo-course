@@ -9,7 +9,7 @@
     @if($pending)<div class="alert alert-info" role="status">Anda memiliki <a href="{{ route('orders.pay', $pending) }}">pesanan yang belum selesai</a>. Memilih metode lain akan membatalkan percobaan pembayaran sebelumnya pada pesanan yang sama.</div>@endif
     <div class="checkout-grid">
         <section class="checkout-panel" aria-labelledby="checkout-course-title">
-            @if($course->thumbnail_path)<img class="checkout-course-image" src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="640" height="360">@endif
+            @if($course->thumbnail_path)<img class="checkout-course-image" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="640" height="360">@endif
             <div class="checkout-panel-body"><p class="checkout-kicker">COURSE</p><h2 id="checkout-course-title">{{ $course->title }}</h2>
                 @if($course->summary)<p>{{ $course->summary }}</p>@endif
                 <div class="checkout-summary-line"><span>Akses</span><strong>{{ $course->access_months }} bulan sejak pembayaran terkonfirmasi</strong></div>

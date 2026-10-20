@@ -1,7 +1,7 @@
 <article class="nm-course">
     <a class="nm-course-link" href="{{ route('site.courses.show', $course->slug) }}">
         <div class="nm-course-cover">
-            @if($course->thumbnail_path)<img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail {{ $course->title }}" width="640" height="360" loading="lazy">@else<div class="nm-course-art" aria-hidden="true"><x-dashboard.icon name="book-open" /><span>NAMIKULO / COURSE</span></div>@endif
+            @if($course->thumbnail_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail {{ $course->title }}" width="640" height="360" loading="lazy">@else<div class="nm-course-art" aria-hidden="true"><x-dashboard.icon name="book-open" /><span>NAMIKULO / COURSE</span></div>@endif
             @if(in_array($course->id, $activeCourseIds, true))<span class="nm-enrolled"><x-dashboard.icon name="circle-check" />Sedang diikuti</span>@endif
         </div>
         <div class="nm-course-body">

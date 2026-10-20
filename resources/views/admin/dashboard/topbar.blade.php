@@ -37,7 +37,7 @@
         <details class="nd-profile" data-profile-menu>
             <summary aria-label="Menu akun {{ auth()->user()->name }}">
                 @if(auth()->user()->avatar_path)
-                    <img class="nd-avatar" src="{{ url('storage/'.auth()->user()->avatar_path) }}" alt="" width="36" height="36">
+                    <img class="nd-avatar" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(auth()->user()->avatar_path) }}" alt="" width="36" height="36">
                 @else
                     <span class="nd-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
                 @endif

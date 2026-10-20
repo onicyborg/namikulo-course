@@ -4,7 +4,7 @@
         <div class="nm-window-bar"><span><x-dashboard.icon name="book-open" />Ruang belajar</span><span class="nm-window-caption">PRATINJAU TAMPILAN</span></div>
         <div class="nm-window-body">
             <div class="nm-preview-cover">
-                @if($spotlight?->thumbnail_path)<img src="{{ url('storage/'.$spotlight->thumbnail_path) }}" alt="{{ $spotlight->title }}" width="640" height="360" fetchpriority="high">@else<div class="nm-cover-art" aria-hidden="true"><x-dashboard.icon name="book-open" /><span>Setiap keahlian dimulai<br>dari rasa ingin tahu.</span></div>@endif
+                @if($spotlight?->thumbnail_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($spotlight->thumbnail_path) }}" alt="{{ $spotlight->title }}" width="640" height="360" fetchpriority="high">@else<div class="nm-cover-art" aria-hidden="true"><x-dashboard.icon name="book-open" /><span>Setiap keahlian dimulai<br>dari rasa ingin tahu.</span></div>@endif
                 <span class="nm-cover-label"><x-dashboard.icon name="file-video" />Belajar lewat video</span>
             </div>
             <div class="nm-preview-heading"><span class="nm-overline">{{ $spotlight?->category?->name ?? 'PENGALAMAN NAMIKULO' }}</span><h2>{{ $spotlight?->title ?? 'Satu ruang. Banyak pemahaman baru.' }}</h2></div>

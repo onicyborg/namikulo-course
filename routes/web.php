@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Member\LessonDiscussionController;
 use App\Http\Controllers\Admin\DiscussionController;
 use App\Http\Controllers\EditorImageController;
+use App\Http\Controllers\PublicMediaController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -32,6 +33,8 @@ use App\Http\Controllers\Checkout\CheckoutController;
 use App\Http\Controllers\Checkout\OrderPaymentController;
 use App\Http\Controllers\Webhook\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/media/public/{path}', [PublicMediaController::class, 'show'])->where('path', '.*')->name('media.public');
 
 Route::get('/', [CoursePageController::class, 'home'])->name('site.home');
 Route::get('/courses', [CoursePageController::class, 'index'])->name('site.courses.index');

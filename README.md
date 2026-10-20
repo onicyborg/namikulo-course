@@ -91,6 +91,10 @@ Setiap baris adalah **job terpisah** dengan URL `https://DOMAIN-ANDA/operations/
 
 Aktifkan notifikasi kegagalan untuk tiap job. Respons HTTP 200 dengan `status=completed`, `partial`, atau `busy` dibedakan saat pemantauan; `partial` dilanjutkan oleh pemicu berikutnya. Lihat [panduan cron-job.org](docs/operations-cron.md) untuk isian lengkap dan penanganan 401/404/429/503.
 
+## Storage Cloudflare R2
+
+Media dapat menggunakan bucket R2 privat dengan `MEDIA_STORAGE=r2`. Video, thumbnail/avatar, dan gambar editor memakai prefix terpisah; pemeriksaan akses tetap melalui Laravel. Ikuti [setup dan migrasi R2](docs/R2-STORAGE.md) sebelum mengganti driver. `storage:migrate-r2` menyediakan inventaris, copy, serta verifikasi SHA-256 tanpa menghapus file lokal. `FILESYSTEM_DISK=local` dan `VIDEO_DISK=video_private` tetap dipakai; log/cache/file temporer tetap lokal. Tidak ada migration database baru.
+
 ## Operasi dan rilis
 
 Kontrak endpoint, daftar task, interval, token, serta batas batch tercantum di [SRS bagian 5.10](docs/SRS.md#510-pemicu-berkala-melalui-cron-joborg). MVP tidak membutuhkan worker server/FFmpeg hosting. Web Worker ffmpeg.wasm hanya berjalan di browser admin. Respons completed/partial dan checkpoint batch harus dipantau.

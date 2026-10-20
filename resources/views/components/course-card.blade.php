@@ -3,7 +3,7 @@
     <a class="site-course-card-link" href="{{ route('site.courses.show', $course->slug) }}" aria-label="Lihat course {{ $course->title }}">
         <div class="site-course-image">
             @if($course->thumbnail_path)
-                <img src="{{ url('storage/'.$course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="640" height="360" loading="lazy">
+                <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($course->thumbnail_path) }}" alt="Thumbnail course {{ $course->title }}" width="640" height="360" loading="lazy">
             @else
                 <div class="site-course-placeholder" aria-hidden="true"><span>N</span></div>
             @endif

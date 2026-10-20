@@ -192,7 +192,7 @@ class VideoImportService
 
     private function locked(VideoUpload $upload, callable $callback): mixed
     {
-        $lock = Cache::store('database')->lock('video-upload:'.$upload->id, 20);
+        $lock = Cache::store('database')->lock('video-upload:'.$upload->id, 300);
         if (! $lock->get()) abort(409, 'Sesi impor sedang diproses. Coba lagi sebentar.');
         try { return $callback(); } finally { $lock->release(); }
     }
@@ -202,8 +202,8 @@ class VideoImportService
         $disk = Storage::disk(config('video.disk'));
         $name = $segment['name'];
         $path = $upload->storage_path.'/'.$name;
-        $disk->makeDirectory($upload->storage_path);
-        $out = fopen($disk->path($path), 'wb');
+        // Only one bounded segment is staged locally; durable media lives on the configured disk.
+        $out = tmpfile();
         if ($out === false) $this->rejectSegments();
         $hash = hash_init('sha256');
         $size = 0;
@@ -212,12 +212,12 @@ class VideoImportService
             for ($index = 0; $index < $chunkCount; $index++) {
                 $part = $upload->storage_path.'/chunks/'.$name.'.'.$index;
                 if (! $disk->exists($part)) $this->rejectSegments();
-                $input = fopen($disk->path($part), 'rb');
+                $input = $disk->readStream($part);
                 if ($input === false) $this->rejectSegments();
                 try {
                     while (! feof($input)) {
                         $bytes = fread($input, 65536);
-                        if ($bytes === false) $this->rejectSegments();
+                        if ($bytes === false || ($bytes === '' && ! feof($input))) $this->rejectSegments();
                         $size += strlen($bytes);
                         if ($size > $segment['size']) $this->rejectSegments();
                         hash_update($hash, $bytes);
@@ -225,16 +225,21 @@ class VideoImportService
                     }
                 } finally { fclose($input); }
             }
+            if ($size !== $segment['size'] || ! hash_equals($segment['sha256'], hash_final($hash))) $this->rejectSegments();
+            if (! rewind($out)) $this->rejectSegments();
+            $ciphertext = stream_get_contents($out);
+            if ($ciphertext === false || strlen($ciphertext) % 16 !== 0) $this->rejectSegments();
+            $key = base64_decode($upload->encryption_key, true);
+            $plain = openssl_decrypt($ciphertext, 'aes-128-cbc', $key, OPENSSL_RAW_DATA, hex2bin($upload->iv_hex));
+            if ($plain === false || strlen($plain) < 188 || strlen($plain) % 188 !== 0) $this->rejectSegments();
+            for ($offset = 0, $length = strlen($plain); $offset < $length; $offset += 188) {
+                if ($plain[$offset] !== "\x47") $this->rejectSegments();
+            }
+            unset($ciphertext, $plain);
+            if (! rewind($out) || ! $disk->writeStream($path, $out)) {
+                throw ValidationException::withMessages(['segments' => 'Segmen video gagal disimpan. Coba lagi.']);
+            }
         } finally { fclose($out); }
-        if ($size !== $segment['size'] || ! hash_equals($segment['sha256'], hash_final($hash))) $this->rejectSegments();
-        $ciphertext = $disk->get($path);
-        if (strlen($ciphertext) % 16 !== 0) $this->rejectSegments();
-        $key = base64_decode($upload->encryption_key, true);
-        $plain = openssl_decrypt($ciphertext, 'aes-128-cbc', $key, OPENSSL_RAW_DATA, hex2bin($upload->iv_hex));
-        if ($plain === false || strlen($plain) < 188 || strlen($plain) % 188 !== 0) $this->rejectSegments();
-        for ($offset = 0, $length = strlen($plain); $offset < $length; $offset += 188) {
-            if ($plain[$offset] !== "\x47") $this->rejectSegments();
-        }
     }
 
     private function rejectSegments(): never

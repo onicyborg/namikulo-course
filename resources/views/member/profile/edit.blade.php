@@ -14,7 +14,7 @@
                 <form method="POST" action="{{ route('member.profile.update') }}" enctype="multipart/form-data" data-loading-form>
                     @csrf @method('PUT')<input type="hidden" name="section" value="profile">
                     <div class="member-profile-avatar">
-                        @if($member->avatar_path)<img src="{{ url('storage/'.$member->avatar_path) }}" alt="Avatar {{ $member->name }}" width="72" height="72">@else<span aria-hidden="true">{{ mb_strtoupper(mb_substr($member->name, 0, 1)) }}</span>@endif
+                        @if($member->avatar_path)<img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($member->avatar_path) }}" alt="Avatar {{ $member->name }}" width="72" height="72">@else<span aria-hidden="true">{{ mb_strtoupper(mb_substr($member->name, 0, 1)) }}</span>@endif
                         <div><label for="profile-avatar">Foto profil</label><input id="profile-avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="form-control-file {{ $errors->has('avatar') ? 'is-invalid' : '' }}" aria-describedby="profile-avatar-help"><small id="profile-avatar-help" class="form-text text-muted">JPG, PNG, atau WebP. Maksimal 2 MB.</small>@error('avatar')<span class="invalid-feedback d-block">{{ $message }}</span>@enderror</div>
                     </div>
                     <div class="form-group"><label for="profile-name">Nama</label><input id="profile-name" name="name" type="text" value="{{ old('name', $member->name) }}" maxlength="120" required autocomplete="name" class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}">@error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror</div>

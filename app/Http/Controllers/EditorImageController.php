@@ -97,13 +97,13 @@ class EditorImageController extends Controller
         ]);
         $image->id = (string) Str::uuid7();
         $image->path = 'editor-images/'.$image->id.'.'.$extension;
-        if (! Storage::disk('local')->put($image->path, $bytes)) {
+        if (! Storage::disk('editor_private')->put($image->path, $bytes)) {
             throw ValidationException::withMessages(['image' => 'Gagal menyimpan gambar. Coba lagi.']);
         }
         try {
             $image->save();
         } catch (\Throwable $exception) {
-            Storage::disk('local')->delete($image->path);
+            Storage::disk('editor_private')->delete($image->path);
             throw $exception;
         }
 
@@ -129,8 +129,8 @@ class EditorImageController extends Controller
                 abort_unless($viewer->isAdmin() || $enrollments->activeFor($viewer, $course), 403);
             }
         }
-        abort_unless(Storage::disk('local')->exists($image->path), 404);
-        return Storage::disk('local')->response($image->path, null, [
+        abort_unless(Storage::disk('editor_private')->exists($image->path), 404);
+        return Storage::disk('editor_private')->response($image->path, null, [
             'Content-Type' => $image->mime_type,
             'Content-Disposition' => 'inline',
             'Cache-Control' => $image->scope === 'public' ? 'public, max-age=86400' : 'private, no-store',

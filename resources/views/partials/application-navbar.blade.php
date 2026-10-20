@@ -26,7 +26,7 @@
         <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user" aria-haspopup="true" aria-expanded="false">
                 @if(auth()->user()->avatar_path)
-                    <img class="nav-user-avatar nav-user-avatar-image" src="{{ url('storage/'.auth()->user()->avatar_path) }}" alt="" width="32" height="32">
+                    <img class="nav-user-avatar nav-user-avatar-image" src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(auth()->user()->avatar_path) }}" alt="" width="32" height="32">
                 @else
                     <span class="nav-user-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
                 @endif
