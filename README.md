@@ -47,8 +47,8 @@ Untuk persiapan staging/production, baca [deployment](docs/DEPLOYMENT.md), [oper
 
 Langkah ini dijalankan **operator setelah UAT staging MySQL dan persetujuan rilis**. Gunakan [panduan deployment lengkap](docs/DEPLOYMENT.md) dan [checklist rilis](docs/RELEASE-CHECKLIST.md) untuk backup, pemulihan, dan pemeriksaan akhir.
 
-1. Siapkan domain **HTTPS**, PHP 8.2+ beserta ekstensi Laravel/Dompdf, MySQL 8, Composer, dan akses terminal. Arahkan document root domain ke direktori `public/`; tempatkan root proyek, `.env`, `vendor/`, dan `storage/` di luar document root. Pastikan PHP dapat menulis `storage/` dan `bootstrap/cache/`. Video pada `storage/app/video-private/` tidak boleh dibuat publik atau di-symlink.
-2. Sebelum memperbarui instalasi yang sudah berisi data, cadangkan **satu set** database, `.env`/`APP_KEY`, `storage/app/public/`, dan `storage/app/video-private/`. Pertahankan `APP_KEY` lama. Lakukan penyesuaian timestamp lama lewat [panduan cutover UTC](docs/timezone-cutover.md) bila instalasi sebelumnya menyimpan waktu dalam Asia/Jakarta.
+1. Siapkan domain **HTTPS**, PHP 8.2+ beserta ekstensi Laravel/Dompdf dan SimpleXML untuk R2, MySQL 8, Composer, dan akses terminal. Arahkan document root domain ke direktori `public/`; tempatkan root proyek, `.env`, `vendor/`, dan `storage/` di luar document root. Pastikan PHP dapat menulis `storage/` dan `bootstrap/cache/`. Video privat tidak boleh dibuat publik atau di-symlink.
+2. Sebelum memperbarui instalasi yang sudah berisi data, cadangkan **satu set** database, `.env`/`APP_KEY`, `storage/app/public/`, `storage/app/video-private/`, dan `storage/app/private/`. Jika sudah memakai R2, sertakan objek bucket dalam rencana backup dan pemulihan. Jeda cron, aktifkan maintenance, dan tunggu request aktif selesai sebelum mengganti kode/dependency pada instalasi yang sedang melayani trafik. Pertahankan `APP_KEY` lama. Lakukan penyesuaian timestamp lama lewat [panduan cutover UTC](docs/timezone-cutover.md) bila instalasi sebelumnya menyimpan waktu dalam Asia/Jakarta.
 3. Upload/checkout kode sesuai `composer.lock`, lalu jalankan dari root proyek:
 
    ```bash
@@ -56,24 +56,40 @@ Langkah ini dijalankan **operator setelah UAT staging MySQL dan persetujuan rili
    cp -n .env.example .env  # hanya instalasi baru; tidak menimpa .env lama
    ```
 
-4. Isi `.env` di server: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://DOMAIN-ANDA`, `APP_TIMEZONE=UTC`, `DB_CONNECTION=mysql` dan `DB_*`, `CACHE_STORE=database`, `SESSION_DRIVER=database`, `QUEUE_CONNECTION=sync`, `VIDEO_DISK=video_private`, `MAIL_*` SMTP, `MIDTRANS_*`, identitas `INVOICE_SELLER_*`, serta `OPERATIONS_CRON_TOKEN`. Gunakan `SESSION_SECURE_COOKIE=true` pada domain HTTPS. Sesuaikan batas PHP/upload video dengan [panduan video](docs/video-operations.md). Secret hanya di `.env`, tidak di repository.
-5. **Instalasi baru saja:** jika `APP_KEY` kosong, jalankan `php artisan key:generate`. Pada pembaruan, lewati langkah ini. Setelah backup dan staging siap, jalankan perintah berikut sebagai operator:
+4. Isi `.env` di server: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://DOMAIN-ANDA` (alamat yang benar, termasuk port bila ada), `APP_TIMEZONE=UTC`, `DB_CONNECTION=mysql` dan `DB_*`, `CACHE_STORE=database`, `SESSION_DRIVER=database`, `QUEUE_CONNECTION=sync`, `FILESYSTEM_DISK=local`, `VIDEO_DISK=video_private`, `MAIL_*` SMTP, `MIDTRANS_*`, identitas `INVOICE_SELLER_*`, serta `OPERATIONS_CRON_TOKEN`. Gunakan `SESSION_SECURE_COOKIE=true` pada domain HTTPS. Sesuaikan batas PHP/upload video dengan [panduan video](docs/video-operations.md). Secret hanya di `.env`, tidak di repository. Untuk R2, isi `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION=auto`, `AWS_BUCKET=namikulo-course`, `AWS_ENDPOINT` dari dashboard R2, dan `AWS_USE_PATH_STYLE_ENDPOINT=true`; gunakan token Object Read & Write yang dibatasi ke bucket privat tersebut. Jangan isi `AWS_BUCKET` dengan nama lain atau menambahkan bucket ke `AWS_ENDPOINT`.
+5. **Instalasi baru saja:** jika `APP_KEY` kosong, jalankan `php artisan key:generate`. Pada pembaruan, lewati langkah ini. Setelah mengisi `.env`, jalankan `php artisan config:cache` **sebelum migration** agar koneksi database memakai konfigurasi baru. Setelah backup dan staging siap, jalankan migration sebagai operator:
 
    ```bash
    php artisan migrate --force
-   php artisan storage:link
    ```
 
-   `storage:link` hanya untuk thumbnail/avatar publik. Pada instalasi pertama, isi `SEED_ADMIN_*`, jalankan `php artisan db:seed --class=AdminUserSeeder --force`, lalu hapus password seed dari `.env`. Jangan seed ulang pada pembaruan. Terakhir, setelah semua nilai `.env` final, jalankan:
+   Pada instalasi pertama, isi `SEED_ADMIN_*`, jalankan `php artisan db:seed --class=AdminUserSeeder --force`, lalu hapus password seed dari `.env`. Jangan seed ulang pada pembaruan. Jalankan `php artisan storage:link` hanya bila media publik masih memakai disk lokal; link ini tidak digunakan oleh URL thumbnail/avatar setelah `MEDIA_STORAGE=r2`.
+6. Pilih alur media sesuai kondisi server:
+
+   - **Instalasi baru tanpa media lama:** set `MEDIA_STORAGE=r2` setelah kredensial R2 siap. Tidak perlu `storage:migrate-r2`.
+   - **Migrasi dari media lokal:** pertahankan `MEDIA_STORAGE=local`, jalankan `php artisan config:cache` dan `php artisan storage:migrate-r2` untuk inventaris. Jeda cron dan upload, lalu jalankan:
+
+     ```bash
+     php artisan down
+     php artisan storage:migrate-r2 --copy
+     php artisan storage:migrate-r2 --verify
+     ```
+
+     Pastikan grup `public`, `video`, dan `private` selesai tanpa error. Baru ubah `MEDIA_STORAGE=r2`. Ikuti ketentuan backup dan pemulihan pada [panduan R2](docs/R2-STORAGE.md); file lokal jangan dihapus setelah cutover.
+   - **Server yang sudah memakai R2:** pertahankan `MEDIA_STORAGE=r2` dan kredensial bucket yang sama. Jangan ulangi migrasi atau mengganti `APP_KEY`.
+
+   Setelah `.env` final, jalankan:
 
    ```bash
    php artisan config:cache
    php artisan route:cache
    php artisan view:cache
    ```
-6. Atur notification URL Midtrans ke `https://DOMAIN-ANDA/webhooks/midtrans`. Mulai dengan sandbox sampai alur pembayaran diverifikasi; aktifkan kredensial production hanya setelah merchant dan kanal siap. Ikuti [panduan pembayaran](docs/payment-operations.md).
-7. Buat task eksternal di **cron-job.org** sesuai [setup cron-job.org](docs/operations-cron.md). Endpoint menggunakan POST HTTPS dan header Bearer; tidak memakai cron cPanel, `schedule:run`, atau `queue:work`.
-8. Periksa login, email, pembayaran, invoice, video, penyimpanan, webhook, serta **Admin → Tugas & log**. Aktifkan trafik production setelah checklist rilis dan UAT disetujui. Setiap perubahan `.env` setelah `config:cache` perlu diikuti `php artisan config:cache` lagi.
+
+   Jika maintenance aktif, jalankan `php artisan up` setelah cache siap untuk UAT. Muat ulang proses PHP-FPM/OPcache melalui panel hosting bila proses lama masih memuat kelas dependency sebelum pembaruan Composer. Setiap perubahan `.env` berikutnya perlu diikuti `php artisan config:cache` lagi.
+7. Atur notification URL Midtrans ke `https://DOMAIN-ANDA/webhooks/midtrans`. Mulai dengan sandbox sampai alur pembayaran diverifikasi; aktifkan kredensial production hanya setelah merchant dan kanal siap. Ikuti [panduan pembayaran](docs/payment-operations.md).
+8. Periksa login, email, pembayaran, invoice, thumbnail/avatar lama, gambar editor, video lama dan unggahan baru, webhook, serta **Admin → Tugas & log**. Pada mode R2, pastikan gambar dimuat dari `/media/public/...` pada host aplikasi dan video tidak memiliki URL bucket publik. Aktifkan trafik production setelah checklist rilis dan UAT disetujui.
+9. Buat atau aktifkan kembali task eksternal di **cron-job.org** setelah UAT sesuai [setup cron-job.org](docs/operations-cron.md). Endpoint menggunakan POST HTTPS dan header Bearer; tidak memakai cron cPanel, `schedule:run`, atau `queue:work`.
 
 ### Ringkasan cron-job.org
 
