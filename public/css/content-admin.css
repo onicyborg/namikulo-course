@@ -20,5 +20,4 @@
 .content-admin .btn-sm, body > .modal .btn-sm { min-height: 40px; }
 .content-order-controls .btn, .content-lesson .btn { min-width: 40px; }
 .content-admin .btn:focus-visible, .content-admin a:focus-visible { outline: 3px solid rgba(37, 56, 199, .35); outline-offset: 2px; }
-body > .modal .modal-body { max-height: 65vh; overflow-y: auto; }
 @media (max-width: 575.98px) { .content-card-header, .content-lesson { align-items: flex-start; flex-direction: column; } .content-actions { min-width: 0; } .content-admin .card-body { padding: 18px; } }

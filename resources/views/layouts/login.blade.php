@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url('css/admin-pages.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/login.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
-    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=2">
 </head>
 <body class="nd-app nd-legacy nl-page">
     <a class="nd-skip" href="#main-content">Lewati ke formulir akun</a>

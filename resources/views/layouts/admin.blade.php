@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="{{ url('css/admin-workspace-data.css') }}?v=4">
     @if(request()->routeIs('admin.lessons.video.prepare'))<link rel="stylesheet" href="{{ url('css/video-workspace.css') }}?v=1">@endif
     <link rel="stylesheet" href="{{ url('css/searchable-select.css') }}?v=1">
-    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=2">
 </head>
 <body class="nd-app na-admin{{ request()->routeIs('admin.dashboard') ? '' : ' nd-legacy' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>

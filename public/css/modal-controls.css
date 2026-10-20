@@ -1,4 +1,57 @@
 /* Shared close control for static and dynamically loaded Bootstrap modals. */
+body .modal .modal-dialog {
+    --nc-modal-gutter: 16px;
+    max-height: calc(100vh - 2 * var(--nc-modal-gutter));
+    max-height: calc(100dvh - 2 * var(--nc-modal-gutter));
+    margin-top: var(--nc-modal-gutter);
+    margin-bottom: var(--nc-modal-gutter);
+}
+body .modal .modal-dialog.modal-dialog-centered {
+    min-height: calc(100vh - 2 * var(--nc-modal-gutter));
+    min-height: calc(100dvh - 2 * var(--nc-modal-gutter));
+}
+body .modal .modal-dialog .modal-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: calc(100vh - 2 * var(--nc-modal-gutter));
+    max-height: calc(100dvh - 2 * var(--nc-modal-gutter));
+    overflow: hidden;
+}
+body .modal .modal-dialog .modal-content > form {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: inherit;
+}
+body .modal .modal-dialog .modal-content .modal-header,
+body .modal .modal-dialog .modal-content .modal-footer {
+    flex: 0 0 auto;
+}
+body .modal .modal-dialog .modal-content .modal-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scroll-padding-block: 16px;
+}
+@media (max-width: 575.98px) {
+    body .modal .modal-dialog {
+        --nc-modal-gutter: 8px;
+        max-height: calc(100dvh - 2 * var(--nc-modal-gutter) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        margin-top: calc(var(--nc-modal-gutter) + env(safe-area-inset-top));
+        margin-bottom: calc(var(--nc-modal-gutter) + env(safe-area-inset-bottom));
+    }
+    body .modal .modal-dialog.modal-dialog-centered {
+        min-height: calc(100dvh - 2 * var(--nc-modal-gutter) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+    body .modal .modal-dialog .modal-content {
+        max-height: calc(100dvh - 2 * var(--nc-modal-gutter) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    }
+}
 body .modal .modal-dialog .modal-content .modal-header button.close {
     position: relative;
     display: inline-flex;

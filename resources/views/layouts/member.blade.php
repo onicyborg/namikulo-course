@@ -24,7 +24,7 @@
         <link rel="stylesheet" href="{{ url('css/member-workspace.css') }}?v=2">
     @endif
     <link rel="stylesheet" href="{{ url('css/searchable-select.css') }}?v=1">
-    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=2">
 </head>
 <body class="nd-app nd-legacy nm-app{{ $usesWorkspaceTheme ? ' nm-workspace' : '' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>

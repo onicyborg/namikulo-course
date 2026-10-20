@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url('css/site.css') }}">
     @stack('styles')
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
-    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=2">
 </head>
 <body class="auth-page">
     <a class="skip-link" href="#main-content">Lewati ke formulir</a>
