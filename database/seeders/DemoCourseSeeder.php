@@ -8,15 +8,15 @@ use App\Models\Course;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use RuntimeException;
+// use RuntimeException;
 
 class DemoCourseSeeder extends Seeder
 {
     public function run(): void
     {
-        if (! app()->environment('local')) {
-            throw new RuntimeException('DemoCourseSeeder hanya boleh dijalankan pada APP_ENV=local.');
-        }
+        // if (! app()->environment('local')) {
+        //     throw new RuntimeException('DemoCourseSeeder hanya boleh dijalankan pada APP_ENV=local.');
+        // }
 
         $catalog = [
             ['Basis Data', 'dasar-postgresql-skema-tabel-dan-query', 'Dasar PostgreSQL: Skema, Tabel, dan Query', 'Menyusun tabel, relasi, dan query SQL untuk kebutuhan aplikasi sehari-hari.', 149000],
