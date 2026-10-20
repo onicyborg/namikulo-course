@@ -17,7 +17,7 @@
     </form>
     <div class="site-results-heading"><h2><strong>{{ number_format($courses->total(), 0, ',', '.') }}</strong> course ditemukan</h2>@if(request()->hasAny(['q', 'category', 'sort']))<a href="{{ route('site.courses.index') }}">Hapus filter</a>@endif</div>
     @if($courses->isEmpty())
-        <div class="site-empty"><svg class="nd-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><h3>Belum ada course yang cocok</h3><p>Coba kata kunci lain atau lihat semua kategori.</p><a class="btn btn-outline-primary" href="{{ route('site.courses.index') }}">Lihat semua course</a></div>
+        <x-empty-state title="Belum ada course yang cocok" description="Coba kata kunci lain atau lihat semua kategori." icon="book-open" :action-url="route('site.courses.index')" action-label="Lihat semua course" />
     @else
         <div class="nm-course-grid {{ $courses->count() === 1 ? 'nm-course-grid--single' : '' }}">@foreach($courses as $course)@include('site.partials.landing-course')@endforeach</div>
         <div class="site-pagination">{{ $courses->links('pagination::bootstrap-4') }}</div>

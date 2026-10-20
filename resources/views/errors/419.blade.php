@@ -1,7 +1,5 @@
-@extends('layouts.public')
-
-@section('title', 'Sesi telah berakhir')
-
+@extends('layouts.error')
+@section('title', 'Sesi halaman telah berakhir')
 @section('content')
-    <x-error-page code="419" title="Sesi telah berakhir" message="Muat ulang halaman lalu kirim kembali formulir Anda." />
+    <x-error-page code="419" title="Sesi halaman telah berakhir" message="Sesi formulir tidak lagi berlaku. Masuk kembali, lalu buka ulang formulir yang ingin Anda kirim." icon="clock-3" primary-label="Masuk kembali" primary-path="/login" hint="Isian yang belum dikirim mungkin perlu diisi kembali." :retry="false" />
 @endsection

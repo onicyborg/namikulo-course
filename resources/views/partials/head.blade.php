@@ -4,6 +4,7 @@
 <title>{{ $__env->yieldContent('title', config('app.name')) }} | {{ config('app.name') }}</title>
 <link rel="icon" type="image/x-icon" href="{{ url('favicon.ico') }}?v=1">
 <link rel="icon" type="image/svg+xml" sizes="any" href="{{ url('favicon.svg') }}?v=1">
+<link rel="stylesheet" href="{{ url('css/empty-state.css') }}?v=1">
 
 <link rel="stylesheet" href="{{ url('css/global-toast.css') }}?v=2">
 <script src="{{ url('js/global-toast.js') }}?v=1"></script>

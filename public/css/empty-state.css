@@ -1,0 +1,9 @@
+body .nc-empty-state.app-empty-state{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:clamp(32px,5vw,60px) 24px;text-align:center;color:var(--nd-text,#111c35);animation:nc-empty-enter .35s ease-out both}
+body .nc-empty-state.app-empty-state .empty-state-icon{position:relative;display:grid;place-items:center;flex:none;width:68px;height:68px;margin:0 auto 24px;border:1px solid var(--nd-active-border,#d9d6fa);border-radius:20px;background:var(--nd-active,#eeedfd);color:var(--nd-link,#4f46e5);box-shadow:0 8px 20px -14px #4f46e566}
+body .nc-empty-state.app-empty-state .empty-state-icon:before{content:"";position:absolute;inset:-7px;border:1px solid var(--nd-border,#e2e8f0);border-radius:25px;transform:rotate(-8deg);pointer-events:none}
+body .nc-empty-state.app-empty-state .empty-state-icon svg{width:27px;height:27px}
+body .nc-empty-state.app-empty-state h2{max-width:35ch;margin:0 0 9px;color:var(--nd-text,#111c35);font-size:clamp(19px,2vw,23px);font-weight:750;letter-spacing:-.025em;line-height:1.35;overflow-wrap:anywhere}
+body .nc-empty-state.app-empty-state .lead{max-width:46ch;margin:0;color:var(--nd-muted,#64748b);font-size:14px;font-weight:400;line-height:1.75}
+body .nc-empty-state.app-empty-state .btn{margin-top:23px;min-height:44px;max-width:100%;white-space:normal}
+@keyframes nc-empty-enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){body .nc-empty-state.app-empty-state{animation:none}}

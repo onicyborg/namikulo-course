@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    @php($usesWorkspaceTheme = request()->routeIs('member.dashboard', 'member.courses.*', 'member.orders.index', 'member.notifications.*', 'member.profile.*'))
+    @php($usesWorkspaceTheme = request()->routeIs('member.dashboard', 'member.courses.*', 'member.orders.index', 'member.notifications.*', 'member.profile.*', 'checkout.show', 'orders.pay'))
     @php($usesServerTable = request()->routeIs('member.orders.index'))
     @include('partials.head')
     <link rel="stylesheet" href="{{ asset('css/app.min.css') }}">

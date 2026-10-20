@@ -1,5 +1,6 @@
 @extends('layouts.member')
 @section('title', 'Checkout '.$course->title)
+@section('topbar_title', 'Checkout')
 @push('styles')<link rel="stylesheet" href="{{ url('css/checkout.css') }}?v=2">@endpush
 @section('content')
 <div class="checkout-page nc-checkout nc-checkout-select">
@@ -34,7 +35,9 @@
                 @else
                     <form method="POST" action="{{ route('checkout.store', $course->slug) }}" data-loading-form>@csrf
                         <fieldset class="checkout-methods"><legend class="sr-only">Pilih metode pembayaran</legend>
-                            @php($previousGroup = null)
+                            @php
+                                $previousGroup = null;
+                            @endphp
                             @foreach($channels as $channel)
                                 @php
                                     $label = ['bca' => 'BCA Virtual Account', 'bni' => 'BNI Virtual Account', 'bri' => 'BRI Virtual Account', 'permata' => 'Permata Virtual Account', 'cimb' => 'CIMB Virtual Account', 'qris' => 'QRIS', 'gopay' => 'GoPay', 'shopeepay' => 'ShopeePay'][$channel] ?? strtoupper($channel);

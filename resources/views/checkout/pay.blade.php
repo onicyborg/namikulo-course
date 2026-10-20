@@ -1,5 +1,6 @@
 @extends('layouts.member')
 @section('title', 'Pembayaran '.$order->order_number)
+@section('topbar_title', 'Pembayaran')
 @push('styles')<link rel="stylesheet" href="{{ url('css/checkout.css') }}?v=2">@endpush
 @section('content')
 @php

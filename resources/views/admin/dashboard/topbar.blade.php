@@ -2,7 +2,13 @@
 <header class="nd-topbar">
     <div class="nd-topbar-start">
         <button class="nd-icon-button nd-menu-toggle" type="button" data-sidebar-toggle aria-controls="dashboard-sidebar" aria-expanded="false" aria-label="Buka navigasi"><x-dashboard.icon name="menu" /></button>
-        <span class="nd-topbar-context"><x-dashboard.icon name="layout-dashboard" /><span>@yield('title', 'Area admin')</span></span>
+        <span class="nd-topbar-context"><x-dashboard.icon name="layout-dashboard" /><span>
+            @hasSection('topbar_title')
+                @yield('topbar_title')
+            @else
+                @yield('title', 'Area admin')
+            @endif
+        </span></span>
     </div>
     <div class="nd-topbar-actions">
         <x-theme-toggle />
