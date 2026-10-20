@@ -31,6 +31,7 @@
         var lastPlaybackPosition = null;
         var pendingWatchedSeconds = 0;
 
+        var completionNotified = false;
         function showMessage(text) { screenMessage.textContent = text; screenMessage.hidden = false; }
         function hideMessage() { screenMessage.hidden = true; }
         function duration(seconds) {
@@ -74,6 +75,10 @@
             }).then(function (data) {
                 if (!data || !progressFeedback) return;
                 progressFeedback.textContent = data.completed ? 'Materi selesai.' : 'Posisi belajar tersimpan.';
+                if (data.completed && !completionNotified) {
+                    completionNotified = true;
+                    window.ncToast.success('Materi selesai.');
+                }
                 if (currentLessonState) currentLessonState.textContent = data.completed ? 'Selesai' : 'Sedang dipelajari';
                 if (data.next_unlocked_id) {
                     document.querySelectorAll('[data-locked-lesson]').forEach(function (locked) {

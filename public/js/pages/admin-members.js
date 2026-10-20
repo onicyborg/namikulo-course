@@ -18,13 +18,25 @@
             var pad = function (number) { return String(number).padStart(2, '0'); };
             startsInput.value = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
         }
-        if (!window.jQuery.fn.select2 || select.dataset.searchInitialized === 'true') return;
+        if (!window.ncSearchableSelect || !window.jQuery.fn.select2 || select.dataset.searchInitialized === 'true') return;
         var $select = window.jQuery(select);
-        if ($select.hasClass('select2-hidden-accessible')) $select.select2('destroy');
-        $select.select2({
-            width: '100%',
-            dropdownParent: window.jQuery(modal),
+        window.ncSearchableSelect.init(select, {
             minimumInputLength: 0,
+            templateResult: function (item) {
+                if (!item.id || item.loading) return item.text;
+                var parts = (item.text || '').split(' · ');
+                var wrapper = document.createElement('span');
+                wrapper.className = 'nc-select-person';
+                var name = document.createElement('strong');
+                name.textContent = parts.shift();
+                wrapper.appendChild(name);
+                if (parts.length) {
+                    var email = document.createElement('small');
+                    email.textContent = parts.join(' · ');
+                    wrapper.appendChild(email);
+                }
+                return window.jQuery(wrapper);
+            },
             placeholder: 'Pilih atau cari member',
             language: {
                 searching: function () { return 'Mencari user...'; },
@@ -39,7 +51,7 @@
                 processResults: function (data) { return { results: data.results || [] }; }
             }
         });
-        $select.on('select2:select', function (event) {
+        $select.off('select2:select.ncMemberTimezone').on('select2:select.ncMemberTimezone', function (event) {
             showMemberTimezone(event.params.data.timezone || '');
         });
         var selected = select.options[select.selectedIndex];

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/learning-workspace.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/learning-conversation.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
 </head>
 <body class="nd-app nd-legacy player-page nm-player nl-premium" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="nd-skip" href="#main-content">Lewati ke materi</a>
@@ -27,5 +28,6 @@
     <script src="{{ url('js/admin-action-tooltip.js') }}"></script>
     @stack('player-scripts')
     @stack('scripts')
+    @include('partials.global-toast')
 </body>
 </html>

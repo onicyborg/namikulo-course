@@ -37,6 +37,6 @@
 @push('plugin-scripts')<script src="{{ url('vendor/lexical/namikulo-editor.js') }}?v=4" defer></script>@endpush
 @push('scripts')
 <script src="{{ url('js/pages/admin-content.js') }}"></script>
-<script src="{{ url('js/pages/admin-curriculum.js') }}"></script>
+<script src="{{ url('js/pages/admin-curriculum.js') }}?v=20"></script>
 @if($errors->any() && old('_modal'))<script>window.contentModalToOpen = @json(old('_modal'));</script>@endif
 @endpush

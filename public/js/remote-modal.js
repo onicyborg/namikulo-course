@@ -25,6 +25,7 @@
             document.body.appendChild(container);
             document.dispatchEvent(new CustomEvent('nc:content-ready', { detail: { root: container } }));
             $(modal).one('hidden.bs.modal', function () {
+                document.dispatchEvent(new CustomEvent('nc:content-dispose', { detail: { root: container } }));
                 $(modal).modal('dispose');
                 container.remove();
                 if (trigger.isConnected) trigger.focus();
@@ -32,10 +33,7 @@
             if (feedback) feedback.hidden = true;
         } catch (error) {
             if (container) container.remove();
-            if (feedback) {
-                feedback.hidden = false;
-                feedback.textContent = 'Form gagal dimuat. Coba klik kembali, atau muat ulang halaman jika sesi berakhir atau data telah berubah.';
-            }
+            window.ncToast.error('Form gagal dimuat. Coba klik kembali, atau muat ulang halaman jika sesi berakhir atau data telah berubah.');
         } finally {
             loading = false;
             trigger.disabled = false;

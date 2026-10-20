@@ -61,4 +61,4 @@
     @if($order->status === \App\Enums\OrderStatus::Pending)<p class="checkout-live-message" data-payment-live role="status" aria-live="polite"></p>@endif
 </div>
 @endsection
-@push('scripts')<script src="{{ url('js/pages/checkout.js') }}"></script>@endpush
+@push('scripts')<script src="{{ url('js/pages/checkout.js') }}?v=20"></script>@endpush

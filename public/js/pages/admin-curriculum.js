@@ -41,7 +41,8 @@
             if (!response.ok || response.redirected) throw new Error('save');
             const result = await response.json();
             if (!result.message) throw new Error('response');
-            status.textContent = result.message;
+            status.textContent = '';
+            window.ncToast.success(result.message);
             busy = false;
         } catch (error) {
             before.forEach(item => list.appendChild(item));
@@ -52,6 +53,7 @@
                 ? 'Sesi berakhir. Muat ulang halaman sebelum mengurutkan kembali.'
                 : 'Penyimpanan urutan belum dapat dipastikan. Muat ulang halaman untuk mengambil urutan terbaru.';
             root.querySelector('[data-order-reload]').hidden = false;
+            window.ncToast.error(status.textContent);
         }
         refresh();
         if (!busy && focus?.isConnected) focus.focus({ preventScroll: true });

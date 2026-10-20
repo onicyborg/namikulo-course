@@ -24,6 +24,7 @@
     @endif
     @stack('styles')
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
 </head>
 <body class="public-page {{ $redesignedSite ? 'nd-app np-page' : '' }} {{ $premiumSite ? 'nm-premium nm-public' : '' }} {{ request()->routeIs('site.home') ? 'nm-home' : '' }}" @auth data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}" @endauth>
     <a class="skip-link" href="#main-content">Lewati ke konten utama</a>
@@ -64,5 +65,6 @@
     <script src="{{ url('js/pages/site.js') }}"></script>
     @if($premiumSite)<script src="{{ url('js/pages/landing.js') }}?v=2" defer></script>@endif
     @stack('scripts')
+    @include('partials.global-toast')
 </body>
 </html>

@@ -28,19 +28,66 @@
         var stage = 'browser';
         var processingStep = 'engine';
 
+        var dropzone = root.querySelector('[data-video-dropzone]');
+        var selected = root.querySelector('[data-video-selected]');
+        var empty = root.querySelector('[data-video-empty]');
+        var fileCheck = root.querySelector('[data-video-file-check]');
+        var liveStatus = root.querySelector('[data-video-live-status]');
+        var liveHint = root.querySelector('[data-video-live-hint]');
+        var changeButton = root.querySelector('[data-video-change]');
+        var clearButton = root.querySelector('[data-video-clear]');
+        var lastError = false;
+        var stageLabels = { browser: 'Periksa browser', processing: 'Sedang diproses', uploading: 'Sedang diunggah', validating: 'Menunggu validasi', ready: 'Video siap' };
+
+        function refreshWorkspace() {
+            var file = fileInput.files[0];
+            var locked = busy || !!uploadId || fileInput.disabled;
+            dropzone.setAttribute('aria-disabled', String(locked));
+            dropzone.classList.toggle('is-locked', locked);
+            dropzone.classList.toggle('has-error', lastError);
+            // Keep the native input available for replacement even while its visual empty state is hidden.
+            empty.classList.toggle('vp-empty-hidden', !!file);
+            selected.hidden = !file;
+            changeButton.disabled = locked;
+            clearButton.disabled = locked;
+            startButton.disabled = locked || !file || stage === 'ready';
+            if (file) {
+                root.querySelector('[data-video-file-name]').textContent = file.name;
+                root.querySelector('[data-video-file-meta]').textContent = (file.size / 1024 / 1024).toLocaleString('id-ID', { maximumFractionDigits: 2 }) + ' MiB · ' + (file.type || 'Format ditentukan dari ekstensi');
+                fileCheck.textContent = lastError ? 'Perlu diperiksa kembali' : stage === 'ready' ? 'Hasil lolos validasi server' : busy ? stageLabels[stage] : 'File dipilih · profil belum diperiksa';
+            }
+            root.dataset.workspaceState = lastError ? 'error' : cancelled ? 'cancelled' : busy ? stage : stage === 'ready' ? 'ready' : file ? 'selected' : 'browser';
+            liveStatus.textContent = lastError ? 'Terjadi kesalahan' : cancelled ? 'Persiapan dibatalkan' : busy ? stageLabels[stage] : stage === 'ready' ? 'Video siap' : file ? 'File siap diperiksa' : fileInput.disabled ? 'Browser belum siap' : 'Menunggu file video';
+            liveHint.textContent = status.textContent;
+            root.querySelectorAll('[data-stage]').forEach(function (item) {
+                var current = item.dataset.stage === stage;
+                item.classList.toggle('is-failed', current && lastError);
+                item.querySelector('[data-step-state]').textContent = current && lastError ? 'Gagal' : item.classList.contains('is-done') || (current && stage === 'ready') ? 'Selesai' : current ? (busy ? 'Berlangsung' : 'Saat ini') : 'Menunggu';
+                if (current) item.setAttribute('aria-current', 'step');
+                else item.removeAttribute('aria-current');
+            });
+        }
+
         function message(text, error) {
             status.textContent = text;
+            if (error) window.ncToast.error(text);
+            else if (stage === 'ready') window.ncToast.success(text);
             status.classList.toggle('is-error', !!error);
             status.classList.toggle('is-success', stage === 'ready' && !error);
+            lastError = !!error;
+            refreshWorkspace();
         }
 
         function setStage(next) {
             stage = next;
+            lastError = false;
+            progressWrap.hidden = true;
             var order = ['browser', 'processing', 'uploading', 'validating', 'ready'];
             root.querySelectorAll('[data-stage]').forEach(function (item) {
                 item.classList.toggle('is-current', item.dataset.stage === next);
                 item.classList.toggle('is-done', order.indexOf(item.dataset.stage) < order.indexOf(next));
             });
+            refreshWorkspace();
         }
 
         function setProgress(done, total, label) {
@@ -250,6 +297,7 @@
 
         function finish(error) {
             busy = false;
+            if (stage === 'ready' && !error) uploadId = null;
             releaseEngine();
             cancelButton.hidden = true;
             fileInput.disabled = stage === 'ready';
@@ -268,16 +316,59 @@
                 message(error && error.message || (stage === 'processing' ? fallback[processingStep] : 'Persiapan video gagal. Coba lagi dari file lokal.'), true);
             }
             if (cancelled) message('Persiapan dibatalkan. File sumber tetap di perangkat Anda.');
+            refreshWorkspace();
         }
 
         fileInput.addEventListener('change', function () {
             var file = fileInput.files[0];
             fileLabel.textContent = file ? file.name + ' · ' + Math.round(file.size / 1024 / 1024) + ' MiB' : 'Belum ada file dipilih.';
-            startButton.disabled = !file || busy;
+            startButton.disabled = !file || busy || !!uploadId;
+            if (!busy && !uploadId) {
+                cancelled = false;
+                lastError = false;
+                retryButton.hidden = true;
+                setStage('browser');
+                message(file ? 'File dipilih. Mulai persiapan untuk memeriksa profil video dan mengunggah hasilnya.' : 'Pilih satu file MP4 untuk memulai.');
+            }
+            refreshWorkspace();
+        });
+
+        changeButton.addEventListener('click', function () { if (!changeButton.disabled) fileInput.click(); });
+        clearButton.addEventListener('click', function () {
+            if (clearButton.disabled) return;
+            fileInput.value = '';
+            fileInput.dispatchEvent(new Event('change'));
+            fileInput.focus();
+        });
+        var dragDepth = 0;
+        dropzone.addEventListener('dragenter', function (event) {
+            event.preventDefault();
+            dragDepth++;
+            if (!busy && !uploadId && !fileInput.disabled) dropzone.classList.add('is-dragging');
+        });
+        dropzone.addEventListener('dragover', function (event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = busy || uploadId || fileInput.disabled ? 'none' : 'copy';
+        });
+        dropzone.addEventListener('dragleave', function () {
+            dragDepth = Math.max(0, dragDepth - 1);
+            if (!dragDepth) dropzone.classList.remove('is-dragging');
+        });
+        dropzone.addEventListener('drop', function (event) {
+            event.preventDefault();
+            dragDepth = 0;
+            dropzone.classList.remove('is-dragging');
+            if (busy || uploadId || fileInput.disabled) return;
+            var files = event.dataTransfer.files;
+            if (files.length !== 1) { message('Pilih satu file video untuk setiap persiapan.', true); return; }
+            try {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            } catch (error) { message('Browser belum mendukung pilihan melalui drag-and-drop. Gunakan tombol Pilih file atau Ganti file.', true); }
         });
 
         startButton.addEventListener('click', async function () {
-            if (busy || !supported()) return;
+            if (busy || uploadId || !supported()) return;
             var file = fileInput.files[0];
             if (!file) return;
             busy = true;
@@ -289,6 +380,8 @@
             retryButton.hidden = true;
             cancelButton.hidden = false;
             progressWrap.hidden = true;
+            setStage('browser');
+            message('Memeriksa format, ukuran, durasi, dan resolusi file sumber.');
             try {
                 if (!/\.mp4$/i.test(file.name) || (file.type && file.type !== 'video/mp4')) throw new Error('Pilih file MP4 yang valid.');
                 if (file.size > Number(root.dataset.sourceBytes)) throw new Error('File sumber melewati batas ' + Math.round(Number(root.dataset.sourceBytes) / 1024 / 1024) + ' MiB.');
@@ -344,7 +437,8 @@
 
         retryButton.addEventListener('click', function () { startButton.click(); });
         replaceButton.addEventListener('click', function () {
-            if (busy) return;
+            if (busy || uploadId) return;
+            cancelled = false;
             setStage('browser');
             fileInput.value = '';
             fileInput.disabled = false;
@@ -361,8 +455,8 @@
 
         setStage('browser');
         if (supported() && csrf) {
-            message('Browser mendukung persiapan. Pilih MP4 untuk memulai. Kelayakan HLS AES-128 tetap perlu diuji dengan video nyata.');
             fileInput.disabled = false;
+            message('Browser mendukung persiapan. Pilih MP4 untuk memulai.');
         } else {
             message('Browser atau koneksi ini belum mendukung WebAssembly, Worker, Web Crypto, atau HTTPS. Gunakan browser desktop terbaru melalui HTTPS.', true);
         }

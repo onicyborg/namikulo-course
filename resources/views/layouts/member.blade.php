@@ -23,6 +23,8 @@
         <link rel="stylesheet" href="{{ url('css/admin-workspace-data.css') }}?v=4">
         <link rel="stylesheet" href="{{ url('css/member-workspace.css') }}?v=2">
     @endif
+    <link rel="stylesheet" href="{{ url('css/searchable-select.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
 </head>
 <body class="nd-app nd-legacy nm-app{{ $usesWorkspaceTheme ? ' nm-workspace' : '' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>
@@ -44,8 +46,10 @@
     <script src="{{ url('js/pages/member-area.js') }}"></script>
     @if($usesServerTable)
         <script src="{{ url('js/pages/admin-data-table.js') }}?v=10"></script>
-        <script src="{{ url('js/remote-modal.js') }}?v=1"></script>
+        <script src="{{ url('js/remote-modal.js') }}?v=20"></script>
     @endif
+    <script src="{{ url('js/searchable-select.js') }}?v=1"></script>
     @stack('scripts')
+    @include('partials.global-toast')
 </body>
 </html>

@@ -1,0 +1,54 @@
+/* Shared close control for static and dynamically loaded Bootstrap modals. */
+body .modal .modal-dialog .modal-content .modal-header button.close {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    margin: 0 0 0 16px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: var(--nd-bad-bg, #fff1f2);
+    color: var(--nd-bad-text, #be123c);
+    opacity: 1;
+    text-shadow: none;
+    cursor: pointer;
+    transition: background-color .18s, border-color .18s, box-shadow .18s;
+}
+body .modal .modal-dialog .modal-content .modal-header button.close > * { display: none; }
+body .modal .modal-dialog .modal-content .modal-header button.close::before,
+body .modal .modal-dialog .modal-content .modal-header button.close::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transform: rotate(45deg);
+    pointer-events: none;
+}
+body .modal .modal-dialog .modal-content .modal-header button.close::after { transform: rotate(-45deg); }
+body .modal .modal-dialog .modal-content .modal-header button.close:hover {
+    border-color: currentColor;
+    color: var(--nd-bad-text, #be123c);
+    background: var(--nd-bad-bg, #fff1f2);
+    opacity: 1;
+}
+body .modal .modal-dialog .modal-content .modal-header button.close:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+}
+@media (pointer: coarse) {
+    body .modal .modal-dialog .modal-content .modal-header button.close {
+        flex-basis: 44px;
+        width: 44px;
+        height: 44px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    body .modal .modal-dialog .modal-content .modal-header button.close { transition: none; }
+}

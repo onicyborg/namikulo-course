@@ -21,6 +21,9 @@
     @if(request()->routeIs('admin.dashboard'))<link rel="stylesheet" href="{{ url('css/admin-action-tooltip.css') }}">@endif
     <link rel="stylesheet" href="{{ url('css/admin-workspace.css') }}?v=2">
     <link rel="stylesheet" href="{{ url('css/admin-workspace-data.css') }}?v=4">
+    @if(request()->routeIs('admin.lessons.video.prepare'))<link rel="stylesheet" href="{{ url('css/video-workspace.css') }}?v=1">@endif
+    <link rel="stylesheet" href="{{ url('css/searchable-select.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
 </head>
 <body class="nd-app na-admin{{ request()->routeIs('admin.dashboard') ? '' : ' nd-legacy' }}" data-timezone-url="{{ route('account.timezone.update') }}" data-saved-timezone="{{ auth()->user()->timezone }}">
     <a class="nd-skip" href="#main-content">Lewati ke konten utama</a>
@@ -44,8 +47,10 @@
     @if($usesServerTable)
         @if(request()->routeIs('admin.operations.index'))<script src="{{ url('js/pages/admin-audit-table.js') }}?v=1"></script>@endif
         <script src="{{ url('js/pages/admin-data-table.js') }}?v=11"></script>
-        <script src="{{ url('js/remote-modal.js') }}?v=1"></script>
+        <script src="{{ url('js/remote-modal.js') }}?v=20"></script>
     @endif
+    <script src="{{ url('js/searchable-select.js') }}?v=1"></script>
     @stack('scripts')
+    @include('partials.global-toast')
 </body>
 </html>

@@ -831,3 +831,29 @@ Tema menggunakan Manrope lokal, soft neutral/white pada light dan navy/elevated 
 Diskusi memakai avatar ringkas, aksen role admin, alur balasan dengan garis kiri, action berikon berlabel, serta kutipan dua baris yang tetap bisa diklik. Gambar diskusi maksimum 480px × 300px secara proporsional (230px tinggi di mobile), rich text lebar bergulir dalam kontennya. Modal memakai header tetap di luar satu area body scroll; composer tetap dalam alur agar tidak menutup percakapan. Toolbar editor membungkus dan seluruh fitur tetap tersedia.
 
 Tidak dilakukan pengujian, lint, build verification, atau inspeksi browser pada implementasi ini sesuai instruksi user. UAT manual: cek light/dark pada desktop/tablet/mobile, kontrol video/fullscreen, progres/unlock, navigasi bab, rich text/gambar/tabel, quote-highlight, modal percakapan panjang, kirim balasan, validasi, dan konfirmasi hapus. Tidak ada perintah instalasi/migration atau perubahan `.env`.
+
+### Siapkan Video — upload workspace
+
+Halaman `admin.lessons.video.prepare` memakai CSS terisolasi `video-workspace.css`, dimuat terakhir hanya untuk route ini. Dropzone mempertahankan native input berlabel sebagai target keyboard/file picker; drag-and-drop mengisi input yang sama. Setelah dipilih, nama/ukuran/MIME ditampilkan via `textContent`. Ganti/hapus pilihan hanya tersedia sebelum proses atau setelah proses gagal dan sesi impor sudah dilepas.
+
+Stepper mengikuti `setStage` existing, serta status error/cancel/ready nyata. Persentase hanya berasal dari byte unggahan dan hasil validasi segmen; proses lokal memakai deskripsi status tanpa estimasi persen. Panel status persiapan dipisahkan dari video aktif agar video lama yang masih tersedia tidak dianggap ikut gagal saat penggantian gagal. Persyaratan mengikuti limits/config existing. Desktop dua kolom, mobile stepper vertikal. Tidak menambahkan dependency atau mengubah format upload/HLS.
+
+UAT user: pilih/drop satu MP4, ganti/hapus pilihan, coba file tidak valid, jalankan persiapan sampai siap, pratinjau/penggantian, retry/cancel existing, kondisi sesi batal belum terkonfirmasi, serta keyboard dan kedua tema di desktop/mobile. Tidak ada testing, linting, build, browser automation, atau screenshot verification yang dijalankan agent sesuai instruksi. Tidak ada migration atau perubahan `.env`.
+
+### Searchable select — shared Select2 theme
+
+Audit penggunaan menemukan Select2 pada field User aktif di modal Tambah anggota. Select kategori, course, user, dan filter lainnya tetap native. `searchable-select.css` menyediakan tema `nc-premium` yang hanya menargetkan Select2 dalam shell aplikasi; warna mengikuti token `--nd-*` untuk kedua tema. Nama dan email pilihan ditampilkan terpisah, teks panjang membungkus, dan daftar memiliki batas tinggi serta scroll internal.
+
+`ncSearchableSelect.init(element, options)` di `searchable-select.js` menjaga satu instance per elemen, menentukan `dropdownParent` dari modal terdekat, memakai lebar penuh, dan memfokuskan pencarian saat dibuka. Modal ditutup juga menutup dropdown; `remote-modal.js` mengirim `nc:content-dispose` sebelum menghapus container agar instance dibersihkan. Konfigurasi AJAX serta informasi zona waktu member tetap berada di `admin-members.js`.
+
+UAT user: buka Tambah anggota dalam light/dark mode; cari nama/email, pilih hasil dengan mouse maupun keyboard, periksa hint zona waktu dan nilai form; tutup/buka modal kembali; coba hasil kosong dan nama panjang di layar kecil. Tidak ada testing, linting, build, atau browser automation yang dijalankan sesuai instruksi user. Tidak ada perintah instalasi, migration, atau perubahan `.env`.
+
+### Global Dynamic Island toast
+
+Seluruh layout web memakai `partials.global-toast`, `global-toast.css`, dan `global-toast.js`. Session success/error/warning/info/status ditampilkan sekali di halaman tujuan redirect. API frontend: `window.ncToast.success(message)`, `.error(message)`, `.warning(message)`, `.info(message)`, atau `.show(message, type, {key})`. Pesan dimasukkan dengan `textContent`; jangan mengirim exception, stack trace, atau respons server mentah ke toast.
+
+Satu toast top-center ditampilkan pada satu waktu; pesan identik yang sedang tampil/menunggu tidak digandakan. Durasi success/info 4 detik, warning/error 6 detik, dihentikan sementara saat hover, fokus, atau tab tidak aktif. Ada tombol tutup, live region polite/assertive, serta reduced-motion. Warna mengikuti tema aplikasi. Integrasi mencakup flash CRUD/auth/pembayaran/moderasi, urutan kurikulum, balasan diskusi, kegagalan memuat modal, salin rincian pembayaran, hasil/error persiapan video, dan penyelesaian materi. Tidak menampilkan toast untuk setiap heartbeat atau byte upload.
+
+Validation summary/field error, instruksi pembayaran yang belum tersedia, error akses/playback, retry tabel, dan status proses tetap tersedia secara persisten. Konfirmasi hapus tetap modal. Tidak mengganti daftar notifikasi in-app atau email dengan toast.
+
+UAT user: cek flash sesudah redirect pada admin/member/auth/publik; AJAX diskusi dan urutan; salin pembayaran; hasil persiapan video; antrean, deduplikasi, tutup, pause hover/fokus, light/dark, mobile, dan reduced-motion. Tanpa JavaScript flash tetap tersedia sebagai noscript. Tidak dilakukan pengujian, linting, build, atau browser automation sesuai instruksi. Tidak ada perintah instalasi, migration, atau perubahan environment.

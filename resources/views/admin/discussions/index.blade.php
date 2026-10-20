@@ -22,6 +22,6 @@
 @endsection
 @push('scripts')
 <script src="{{ url('js/admin-action-tooltip.js') }}"></script>
-<script src="{{ url('js/pages/discussion.js') }}?v=5"></script>
+<script src="{{ url('js/pages/discussion.js') }}?v=20"></script>
 
 @endpush

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url('css/premium-theme.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/premium-auth.css') }}?v=1">
     <link rel="stylesheet" href="{{ url('css/interaction-motion.css') }}?v=1">
+    <link rel="stylesheet" href="{{ url('css/modal-controls.css') }}?v=1">
 </head>
 <body class="nd-app nd-legacy nl-page nm-premium nm-auth">
     <a class="nd-skip" href="#main-content">Lewati ke formulir akun</a>
@@ -36,5 +37,6 @@
     <footer class="na-footer"><span>&copy; {{ date('Y') }} {{ config('app.name') }}</span><a href="{{ route('site.home') }}">Kembali ke beranda</a></footer>
     <script src="{{ url('js/app-custom.js') }}?v=5"></script>
     <script src="{{ url('js/interaction-motion.js') }}?v=1"></script>
+    @include('partials.global-toast')
 </body>
 </html>

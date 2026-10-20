@@ -33,11 +33,12 @@
 
     page.querySelectorAll('[data-copy-text]').forEach(function (button) {
         button.addEventListener('click', function () {
-            if (!navigator.clipboard) { button.textContent = 'Salin manual'; return; }
+            if (!navigator.clipboard) { window.ncToast.warning('Penyalinan otomatis tidak tersedia. Silakan salin rincian secara manual.'); button.textContent = 'Salin manual'; return; }
             navigator.clipboard.writeText(button.dataset.copyText).then(function () {
+                window.ncToast.success('Rincian pembayaran disalin.');
                 button.textContent = 'Tersalin';
                 window.setTimeout(function () { button.textContent = button.dataset.copyLabel || 'Salin'; }, 2000);
-            }).catch(function () { button.textContent = 'Salin manual'; });
+            }).catch(function () { window.ncToast.warning('Penyalinan otomatis tidak tersedia. Silakan salin rincian secara manual.'); button.textContent = 'Salin manual'; });
         });
     });
 

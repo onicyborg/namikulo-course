@@ -25,4 +25,4 @@
 @endpush
 @push('plugin-scripts')<script src="{{ asset('bundles/select2/dist/js/select2.full.min.js') }}"></script>@endpush
 @push('scripts')
-<script src="{{ url('js/admin-action-tooltip.js') }}"></script><script src="{{ url('js/pages/admin-content.js') }}?v=2"></script><script src="{{ url('js/pages/admin-members.js') }}?v=3"></script>@if($errors->any() && old('_modal'))<script>window.contentModalToOpen = @json(old('_modal'));</script>@endif @endpush
+<script src="{{ url('js/admin-action-tooltip.js') }}"></script><script src="{{ url('js/pages/admin-content.js') }}?v=2"></script><script src="{{ url('js/pages/admin-members.js') }}?v=4"></script>@if($errors->any() && old('_modal'))<script>window.contentModalToOpen = @json(old('_modal'));</script>@endif @endpush

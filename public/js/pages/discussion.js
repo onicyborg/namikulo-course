@@ -57,11 +57,7 @@
             modalBody.scrollTop = 0;
             modalBody.removeAttribute('aria-busy');
             if (successMessage) {
-                var message = document.createElement('p');
-                message.className = 'discussion-modal-success';
-                message.setAttribute('role', 'status');
-                message.textContent = successMessage;
-                modalBody.prepend(message);
+                window.ncToast.success(successMessage);
             }
             window.jQuery(modal).trigger('shown.bs.modal');
             var targetId = focusId || new URL(href, location.href).searchParams.get('focus');
@@ -116,13 +112,15 @@
             if ([401, 403, 419].includes(response.status)) {
                 feedback.textContent = 'Sesi atau akses Anda telah berakhir. Muat ulang halaman untuk melanjutkan.';
                 feedback.hidden = false;
+                window.ncToast.error(feedback.textContent);
                 button.disabled = false;
                 button.textContent = 'Kirim balasan';
                 return;
             }
             if (response.status === 429) {
-                feedback.textContent = 'Terlalu banyak kiriman. Tunggu sebentar sebelum mencoba lagi.';
-                feedback.hidden = false;
+                feedback.textContent = '';
+                feedback.hidden = true;
+                window.ncToast.warning('Terlalu banyak kiriman. Tunggu sebentar sebelum mencoba lagi.');
                 button.disabled = false;
                 button.textContent = 'Kirim balasan';
                 return;
@@ -130,16 +128,20 @@
             var data = await response.json();
             if (!response.ok) {
                 var errors = data.errors || {};
-                feedback.textContent = Object.values(errors).flat()[0] || data.message || 'Balasan belum dapat dikirim.';
+                feedback.textContent = response.status === 422
+                    ? Object.values(errors).flat()[0] || 'Periksa kembali isi balasan.'
+                    : 'Balasan belum dapat dikirim. Silakan coba lagi.';
                 feedback.hidden = false;
+                window.ncToast.error(feedback.textContent);
                 button.disabled = false;
                 button.textContent = 'Kirim balasan';
                 return;
             }
             await loadThread(data.url, data.post_id, 'Balasan berhasil dikirim.');
         } catch (error) {
-            feedback.textContent = 'Balasan belum dapat dikirim. Periksa koneksi lalu coba lagi.';
-            feedback.hidden = false;
+            feedback.textContent = '';
+            feedback.hidden = true;
+            window.ncToast.error('Balasan belum dapat dikirim. Periksa koneksi lalu coba lagi.');
             button.disabled = false;
             button.textContent = 'Kirim balasan';
         }

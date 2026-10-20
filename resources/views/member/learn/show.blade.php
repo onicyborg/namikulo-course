@@ -25,4 +25,4 @@
 @push('modals')@include('member.learn._discussion-modal')@endpush
 
 @push('player-scripts')<script src="{{ url('vendor/hls/hls.min.js') }}"></script>@endpush
-@push('scripts')<script src="{{ url('js/pages/player.js') }}?v=2"></script><script src="{{ url('js/pages/discussion.js') }}?v=6"></script>@endpush
+@push('scripts')<script src="{{ url('js/pages/player.js') }}?v=20"></script><script src="{{ url('js/pages/discussion.js') }}?v=20"></script>@endpush
